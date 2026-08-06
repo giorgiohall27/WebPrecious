@@ -1,18 +1,26 @@
 import { useTranslation } from 'react-i18next';
-import { Package, ClipboardList, AlertTriangle, FolderTree, TrendingUp, ArrowUpRight } from 'lucide-react';
-import { mockProducts, mockOrders, mockCategories } from '../../data/mockData';
+import { Package, ClipboardList, FolderTree, TrendingUp, ArrowUpRight, Building2, KeyRound } from 'lucide-react';
+import { useAuth } from '../../store/authStore';
+import { Link } from 'react-router-dom';
+import { useOrders } from '../../store/ordersStore';
+import { useProducts } from '../../store/productsStore';
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { companies } = useAuth();
+  const { orders } = useOrders();
+  const { products, categories } = useProducts();
 
-  const totalProducts = mockProducts.length;
-  const monthlyOrders = mockOrders.length;
-  const activeCategories = mockCategories.filter(c => c.active).length;
+  const totalProducts = products.length;
+  const monthlyOrders = orders.length;
+  const activeCategories = categories.filter(c => c.active).length;
+  const activeCompanies = companies.filter(company => company.active).length;
 
   const kpis = [
     { label: t('dashboard.totalProducts'), value: totalProducts, icon: Package, color: 'from-blue-500 to-blue-600', change: '+12%' },
     { label: t('dashboard.monthlyOrders'), value: monthlyOrders, icon: ClipboardList, color: 'from-emerald-500 to-emerald-600', change: '+8%' },
     { label: t('dashboard.activeCategories'), value: activeCategories, icon: FolderTree, color: 'from-violet-500 to-violet-600', change: '+2' },
+    { label: 'Empresas activas', value: activeCompanies, icon: Building2, color: 'from-slate-700 to-slate-900', change: `${companies.length} total` },
   ];
 
   return (
@@ -23,7 +31,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {kpis.map((kpi, i) => (
           <div key={i} className="card p-6 group hover:shadow-card-hover transition-all duration-300">
             <div className="flex items-start justify-between">
@@ -43,7 +51,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr,360px] gap-6">
         {/* Recent Orders */}
         <div className="card">
           <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100">
@@ -53,7 +61,7 @@ export default function Dashboard() {
             </button>
           </div>
           <div className="divide-y divide-surface-100">
-            {mockOrders.map(order => (
+            {orders.map(order => (
               <div key={order.id} className="px-6 py-4 flex items-center justify-between hover:bg-surface-50 transition-colors">
                 <div>
                   <p className="text-sm font-semibold text-surface-900">{order.companyName}</p>
@@ -70,6 +78,29 @@ export default function Dashboard() {
                     {t(`orders.${order.status}`)}
                   </span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100">
+            <h2 className="text-lg font-semibold text-surface-900">Empresas con PIN</h2>
+            <Link to="/admin/companies" className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+              Gestionar <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+          <div className="divide-y divide-surface-100">
+            {companies.slice(0, 5).map(company => (
+              <div key={company.id} className="px-6 py-4 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-surface-900 truncate">{company.name}</p>
+                  <p className="text-xs text-surface-400">{company.active ? 'Activa' : 'Pausada'}</p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-primary-700 bg-primary-50 border border-primary-100 rounded-full px-2 py-1">
+                  <KeyRound className="w-3 h-3" />
+                  {company.pin}
+                </span>
               </div>
             ))}
           </div>

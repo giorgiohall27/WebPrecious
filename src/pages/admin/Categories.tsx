@@ -1,15 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Plus, Edit3, Trash2, GripVertical, ChevronDown, ChevronRight, Wine, UtensilsCrossed, SprayCan, Package, HeartPulse } from 'lucide-react';
-import { mockCategories, mockSubcategories, mockProducts } from '../../data/mockData';
-import { Category, Subcategory } from '../../types';
+import { useProducts } from '../../store/productsStore';
 
 const iconMap: Record<string, any> = { wine: Wine, 'utensils-crossed': UtensilsCrossed, 'spray-can': SprayCan, package: Package, 'heart-pulse': HeartPulse };
 
 export default function Categories() {
   const { t } = useTranslation();
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>(mockSubcategories);
+  const {
+    categories,
+    subcategories,
+    products,
+    upsertCategory,
+    removeCategory,
+    upsertSubcategory,
+    removeSubcategory,
+  } = useProducts();
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addType, setAddType] = useState<'category' | 'subcategory'>('category');
@@ -17,15 +23,29 @@ export default function Categories() {
   const [selectedParent, setSelectedParent] = useState('');
 
   const getSubcats = (catId: string) => subcategories.filter(sc => sc.categoryId === catId);
-  const getProductCount = (catId: string) => mockProducts.filter(p => p.categoryId === catId).length;
+  const getProductCount = (catId: string) => products.filter(p => p.categoryId === catId).length;
 
   const addItem = () => {
     if (!newName.trim()) return;
     if (addType === 'category') {
-      setCategories(prev => [...prev, { id: `cat-new-${Date.now()}`, name: newName, key: newName.toLowerCase().replace(/\s+/g, '_'), icon: 'package', order: prev.length + 1, active: true }]);
+      upsertCategory({
+        id: `cat-new-${Date.now()}`,
+        name: newName.trim(),
+        key: newName.toLowerCase().replace(/\s+/g, '_'),
+        icon: 'package',
+        order: categories.length + 1,
+        active: true,
+      });
     } else {
       if (!selectedParent) return;
-      setSubcategories(prev => [...prev, { id: `sub-new-${Date.now()}`, categoryId: selectedParent, name: newName, key: newName.toLowerCase().replace(/\s+/g, '_'), order: prev.length + 1, active: true }]);
+      upsertSubcategory({
+        id: `sub-new-${Date.now()}`,
+        categoryId: selectedParent,
+        name: newName.trim(),
+        key: newName.toLowerCase().replace(/\s+/g, '_'),
+        order: subcategories.length + 1,
+        active: true,
+      });
     }
     setNewName('');
     setShowAddModal(false);
@@ -33,13 +53,18 @@ export default function Categories() {
 
   const deleteCategory = (id: string) => {
     if (confirm(t('categories.deleteConfirm'))) {
-      setCategories(prev => prev.filter(c => c.id !== id));
-      setSubcategories(prev => prev.filter(sc => sc.categoryId !== id));
+      removeCategory(id);
     }
   };
 
   const toggleActive = (id: string) => {
-    setCategories(prev => prev.map(c => c.id === id ? { ...c, active: !c.active } : c));
+    const category = categories.find(c => c.id === id);
+    if (category) upsertCategory({ ...category, active: !category.active });
+  };
+
+  const toggleSubcategoryActive = (id: string) => {
+    const subcategory = subcategories.find(sc => sc.id === id);
+    if (subcategory) upsertSubcategory({ ...subcategory, active: !subcategory.active });
   };
 
   return (
@@ -101,11 +126,14 @@ export default function Categories() {
                       <div key={sc.id} className="flex items-center gap-4 px-6 py-3 pl-20 hover:bg-surface-100/50 transition-colors">
                         <GripVertical className="w-3.5 h-3.5 text-surface-300" />
                         <span className="text-sm text-surface-700 flex-1">{sc.name}</span>
-                        <button className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${sc.active ? 'bg-green-50 text-green-700' : 'bg-surface-200 text-surface-500'}`}>
+                        <button
+                          onClick={() => toggleSubcategoryActive(sc.id)}
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${sc.active ? 'bg-green-50 text-green-700' : 'bg-surface-200 text-surface-500'}`}
+                        >
                           {sc.active ? t('common.active') : t('common.inactive')}
                         </button>
                         <button className="btn-icon"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button className="btn-icon text-red-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => removeSubcategory(sc.id)} className="btn-icon text-red-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     ))}
                   </div>

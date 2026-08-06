@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Search, Eye, ChevronDown, ChevronRight } from 'lucide-react';
-import { mockOrders } from '../../data/mockData';
 import { Order } from '../../types';
+import { useOrders } from '../../store/ordersStore';
 
 export default function Orders() {
   const { t } = useTranslation();
+  const { orders } = useOrders();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -18,7 +19,7 @@ export default function Orders() {
     cancelled:             'bg-red-50 text-red-700 border-red-200',
   };
 
-  const filtered = mockOrders.filter(o => {
+  const filtered = orders.filter(o => {
     const matchSearch = !search || o.companyName.toLowerCase().includes(search.toLowerCase()) || o.orderId.toLowerCase().includes(search.toLowerCase());
     const matchStatus = !statusFilter || o.status === statusFilter;
     return matchSearch && matchStatus;

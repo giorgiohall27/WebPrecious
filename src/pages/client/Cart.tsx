@@ -17,7 +17,7 @@ export default function Cart() {
   const [notes, setNotes] = useState('');
   const [sending, setSending] = useState(false);
 
-  const companyName   = userProfile?.companyName   ?? '';
+  const companyName   = userProfile?.name          ?? '';
   const companyCif    = userProfile?.cif            ?? '';
   const companyEmail  = userProfile?.email          ?? '';
   const companyPhone  = userProfile?.phone          ?? '';
@@ -51,7 +51,7 @@ export default function Cart() {
       addOrder({
         id: `ord-${Date.now()}`,
         orderId,
-        companyId: 'comp-demo',
+        companyId: userProfile?.id ?? 'comp-pin',
         companyName,
         companyCif,
         companyEmail,

@@ -52,6 +52,13 @@ export interface Company {
   deliveryAddress: string;
 }
 
+export interface ManagedCompany extends Company {
+  pin: string;
+  active: boolean;
+  createdAt: string;
+  notes?: string;
+}
+
 export interface Order {
   id: string;
   orderId: string;

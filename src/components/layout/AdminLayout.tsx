@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2 } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useState } from 'react';
+import { useAuth } from '../../store/authStore';
 
 const navItems = [
-  { key: 'dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-  { key: 'products', path: '/admin/products', icon: Package },
-  { key: 'categories', path: '/admin/categories', icon: FolderTree },
-  { key: 'orders', path: '/admin/orders', icon: ClipboardList },
+  { key: 'dashboard', label: 'Panel', path: '/admin/dashboard', icon: LayoutDashboard },
+  { key: 'companies', label: 'Empresas', path: '/admin/companies', icon: Building2 },
+  { key: 'products', label: 'Productos', path: '/admin/products', icon: Package },
+  { key: 'categories', label: 'Categorias', path: '/admin/categories', icon: FolderTree },
+  { key: 'orders', label: 'Pedidos', path: '/admin/orders', icon: ClipboardList },
 ];
 
 export default function AdminLayout() {
@@ -16,6 +18,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logoutSuperAdmin } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-surface-50">
@@ -49,7 +52,7 @@ export default function AdminLayout() {
                   id={`admin-nav-${item.key}`}
                 >
                   <item.icon className="w-5 h-5" />
-                  {t(`nav.${item.key}`)}
+                  {item.label}
                 </Link>
               );
             })}
@@ -58,7 +61,10 @@ export default function AdminLayout() {
           {/* Bottom */}
           <div className="px-4 py-4 border-t border-surface-100">
             <button
-              onClick={() => navigate('/admin')}
+              onClick={() => {
+                logoutSuperAdmin();
+                navigate('/admin');
+              }}
               className="sidebar-link w-full text-red-500 hover:text-red-600 hover:bg-red-50"
               id="admin-logout-btn"
             >

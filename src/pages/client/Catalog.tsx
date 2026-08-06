@@ -1,15 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   ShoppingCart, Plus, Minus, Check, SlidersHorizontal,
-  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Filter, AlertTriangle, Lock,
+  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Filter, AlertTriangle,
 } from 'lucide-react';
-import { mockCategories, mockSubcategories } from '../../data/mockData';
 import { Product, getStockLevel } from '../../types';
 import { useCart } from '../../store/cartStore';
 import { useProducts } from '../../store/productsStore';
-import { useAuth } from '../../store/authStore';
 
 const iconMap: Record<string, any> = {
   wine: Wine,
@@ -23,8 +21,7 @@ export default function Catalog() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem, items: cartItems } = useCart();
-  const { products, adjustStock } = useProducts();
-  const { isLoggedIn } = useAuth();
+  const { products, categories, subcategories, adjustStock } = useProducts();
 
   const selectedCategory    = searchParams.get('category') || '';
   const searchQuery         = searchParams.get('search')   || '';
@@ -46,7 +43,7 @@ export default function Catalog() {
   }, [selectedCategory, subFromUrl]);
 
   const subcatsForCategory = selectedCategory
-    ? mockSubcategories.filter(sc => sc.categoryId === selectedCategory)
+    ? subcategories.filter(sc => sc.categoryId === selectedCategory && sc.active)
     : [];
 
   const filtered = useMemo(() => {
@@ -124,8 +121,8 @@ export default function Catalog() {
           >
             {t('categoryNames.allCategories')}
           </button>
-          {mockCategories.filter(c => c.active).map(cat => {
-            const Icon   = iconMap[cat.icon] || Package;
+          {categories.filter(c => c.active).map(cat => {
+            const Icon   = iconMap[cat.icon?.toLowerCase?.() ?? cat.icon] || Package;
             const catKey = (cat as any).key as string;
             const count  = products.filter(p => p.categoryId === cat.id && p.active).length;
             const active = selectedCategory === cat.id;
@@ -357,59 +354,45 @@ export default function Catalog() {
 
                       {/* Bottom Layout: Qty Buttons (Left) and Price (Right) */}
                       <div className="mt-4 flex items-center justify-between gap-2">
-                        {isLoggedIn ? (
-                          <>
-                            {/* Quantity Controls - Left of Price */}
-                            <div className="flex flex-col items-center mr-2">
-                              {product.unitsPerBox && product.unitsPerBox > 1 && (
-                                <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
-                              )}
-                              <div className="flex items-center bg-surface-50 border border-surface-200 rounded-lg overflow-hidden shrink-0">
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) - 1); }} 
-                                  className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
-                                >
-                                  <Minus className="w-3.5 h-3.5" />
-                                </button>
-                                <span className="w-8 text-center text-xs font-bold text-surface-800">
-                                  {getQty(product.id)}
-                                </span>
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) + 1); }} 
-                                  className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
-                                >
-                                  <Plus className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </div>
-                            {/* Price - Bottom Right, Large */}
-                            <div className="text-right flex flex-col items-end">
-                              <div className="flex items-center gap-2">
-                                <span className="text-2xl font-black text-surface-900 leading-none">
-                                  €{product.price.toFixed(2)}
-                                </span>
-                                <button
-                                  onClick={() => handleAdd(product)}
-                                  className={`p-2 rounded-lg transition-all duration-150 ${
-                                    isAdded 
-                                      ? 'bg-emerald-500 text-white shadow-lg scale-95' 
-                                      : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
-                                  }`}
-                                >
-                                  {isAdded ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                                </button>
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <Link
-                            to="/"
-                            className="w-full py-2 rounded-lg text-xs font-medium border border-dashed border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center gap-1.5"
-                          >
-                            <Lock className="w-3.5 h-3.5" />
-                            Inicia sesión para ver precios
-                          </Link>
-                        )}
+                        <div className="flex flex-col items-center mr-2">
+                          {product.unitsPerBox && product.unitsPerBox > 1 && (
+                            <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                          )}
+                          <div className="flex items-center bg-surface-50 border border-surface-200 rounded-lg overflow-hidden shrink-0">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) - 1); }}
+                              className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
+                            >
+                              <Minus className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="w-8 text-center text-xs font-bold text-surface-800">
+                              {getQty(product.id)}
+                            </span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) + 1); }}
+                              className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-right flex flex-col items-end">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-black text-surface-900 leading-none">
+                              EUR {product.price.toFixed(2)}
+                            </span>
+                            <button
+                              onClick={() => handleAdd(product)}
+                              className={`p-2 rounded-lg transition-all duration-150 ${
+                                isAdded
+                                  ? 'bg-emerald-500 text-white shadow-lg scale-95'
+                                  : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
+                              }`}
+                            >
+                              {isAdded ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -490,58 +473,47 @@ export default function Catalog() {
 
               <div className="flex items-center justify-between gap-3 bg-surface-50 p-4 rounded-xl border border-surface-100">
                 <div className="flex flex-col">
-                  {isLoggedIn ? (
-                    <>
-                      <p className="text-2xl font-bold text-surface-900 leading-none">
-                        €{selectedProduct.price.toFixed(2)}
-                      </p>
-                      <p className="text-[10px] text-surface-400 mt-1 uppercase font-bold tracking-wider">{t('catalog.perUnit')}</p>
-                    </>
-                  ) : (
-                    <Link to="/" className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-primary-600 transition-colors">
-                      <Lock className="w-3 h-3" />
-                      <span className="font-medium">Identifícate</span>
-                    </Link>
-                  )}
+                  <p className="text-2xl font-bold text-surface-900 leading-none">
+                    EUR {selectedProduct.price.toFixed(2)}
+                  </p>
+                  <p className="text-[10px] text-surface-400 mt-1 uppercase font-bold tracking-wider">{t('catalog.perUnit')}</p>
                 </div>
 
-                {isLoggedIn && (
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-center">
-                      {selectedProduct.unitsPerBox && selectedProduct.unitsPerBox > 1 && (
-                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
-                      )}
-                      <div className="flex items-center bg-white border border-surface-200 rounded-lg overflow-hidden shadow-sm">
-                        <button 
-                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) - 1)} 
-                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
-                        >
-                          <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="w-10 text-center text-sm font-bold text-surface-800">
-                          {getQty(selectedProduct.id)}
-                        </span>
-                        <button 
-                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) + 1)} 
-                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center">
+                    {selectedProduct.unitsPerBox && selectedProduct.unitsPerBox > 1 && (
+                      <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                    )}
+                    <div className="flex items-center bg-white border border-surface-200 rounded-lg overflow-hidden shadow-sm">
+                      <button
+                        onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) - 1)}
+                        className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-10 text-center text-sm font-bold text-surface-800">
+                        {getQty(selectedProduct.id)}
+                      </span>
+                      <button
+                        onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) + 1)}
+                        className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        handleAdd(selectedProduct);
-                        setTimeout(() => setSelectedProduct(null), 600);
-                      }}
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md bg-primary-600 hover:bg-primary-700 text-white active:scale-95"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      {t('catalog.addToOrder')}
-                    </button>
                   </div>
-                )}
+
+                  <button
+                    onClick={() => {
+                      handleAdd(selectedProduct);
+                      setTimeout(() => setSelectedProduct(null), 600);
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md bg-primary-600 hover:bg-primary-700 text-white active:scale-95"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    {t('catalog.addToOrder')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

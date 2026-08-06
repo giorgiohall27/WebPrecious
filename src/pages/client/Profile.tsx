@@ -72,7 +72,7 @@ export default function Profile() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-surface-900">
-              {userProfile?.companyName ?? userEmail?.split('@')[0]}
+              {userProfile?.name ?? userEmail?.split('@')[0]}
             </h1>
             <p className="text-sm text-surface-400">{userEmail}</p>
           </div>
@@ -83,7 +83,7 @@ export default function Profile() {
             <p className="text-xs font-bold text-surface-400 uppercase tracking-widest mb-4">Datos de la empresa</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { Icon: Building2, label: 'Empresa',    value: userProfile.companyName },
+                { Icon: Building2, label: 'Empresa',    value: userProfile.name },
                 { Icon: Building2, label: 'CIF',        value: userProfile.cif },
                 { Icon: Mail,      label: 'Email',       value: userProfile.email },
                 { Icon: Phone,     label: 'Teléfono',    value: userProfile.phone },
