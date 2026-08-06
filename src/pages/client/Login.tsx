@@ -43,12 +43,12 @@ export default function ClientLogin() {
     setAdminError('');
   };
 
-  const handleCompanySubmit = (event: React.FormEvent) => {
+  const handleCompanySubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setCompanyError('');
     setCompanyLoading(true);
 
-    const result = loginWithPin(pin);
+    const result = await loginWithPin(pin);
     setCompanyLoading(false);
     if (result.success) {
       navigate('/catalog');
@@ -57,12 +57,12 @@ export default function ClientLogin() {
     }
   };
 
-  const handleAdminSubmit = (event: React.FormEvent) => {
+  const handleAdminSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setAdminError('');
     setAdminLoading(true);
 
-    const result = loginSuperAdminWithPin(adminPin);
+    const result = await loginSuperAdminWithPin(adminPin);
     setAdminLoading(false);
     if (result.success) {
       navigate('/admin/dashboard');

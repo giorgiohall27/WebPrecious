@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 import { Order } from '../types';
 import { mockOrders } from '../data/mockData';
 import { supabase, supabaseEnabled } from '../lib/supabase';
+import { useAuth } from './authStore';
 
 interface OrdersContextType {
   orders: Order[];
-  addOrder: (order: Order) => void;
+  addOrder: (order: Order) => Promise<Order | null>;
+  refreshOrders: () => Promise<void>;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
@@ -40,64 +42,67 @@ function toOrder(row: any): Order {
 }
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const { companySessionToken, superAdminSessionToken } = useAuth();
+  const [orders, setOrders] = useState<Order[]>(supabaseEnabled ? [] : mockOrders);
 
-  // Load orders from Supabase on mount
-  useEffect(() => {
+  const refreshOrders = useCallback(async () => {
     if (!supabaseEnabled) return;
-    supabase
-      .from('orders')
-      .select('*, order_items(*)')
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (!error && data) setOrders(data.map(toOrder));
-      });
-  }, []);
+    if (!superAdminSessionToken) {
+      setOrders([]);
+      return;
+    }
+
+    const { data, error } = await supabase.rpc('list_admin_orders', {
+      p_admin_token: superAdminSessionToken,
+    });
+    if (error) {
+      console.error('Error loading orders:', error);
+      return;
+    }
+
+    setOrders((data ?? []).map(toOrder));
+  }, [superAdminSessionToken]);
+
+  useEffect(() => {
+    refreshOrders();
+  }, [refreshOrders]);
 
   const addOrder = useCallback(async (order: Order) => {
-    // Optimistically update local state
-    setOrders(prev => [order, ...prev]);
-
-    if (!supabaseEnabled) return;
-
-    // Save to Supabase
-    const { error: orderErr } = await supabase.from('orders').insert({
-      id: order.id,
-      order_id: order.orderId,
-      company_id: order.companyId,
-      company_name: order.companyName,
-      company_cif: order.companyCif,
-      company_email: order.companyEmail,
-      company_phone: order.companyPhone,
-      contact_person: order.contactPerson,
-      delivery_address: order.deliveryAddress,
-      total_items: order.totalItems,
-      total_amount: order.totalAmount,
-      notes: order.notes ?? null,
-      status: order.status,
-      created_at: order.createdAt,
-      estimated_delivery: order.estimatedDelivery,
-    });
-    if (orderErr) { console.error('Error saving order:', orderErr); return; }
-
-    // Save order items
-    if (order.items.length > 0) {
-      await supabase.from('order_items').insert(
-        order.items.map(i => ({
-          order_id: order.id,
-          product_id: i.productId,
-          sku: i.sku,
-          name: i.name,
-          category_name: i.categoryName,
-          quantity: i.quantity,
-          unit_price: i.unitPrice,
-          subtotal: i.subtotal,
-        }))
-      );
+    if (!supabaseEnabled) {
+      setOrders(prev => [order, ...prev]);
+      return order;
     }
-  }, []);
 
-  return React.createElement(OrdersContext.Provider, { value: { orders, addOrder }, children });
+    if (!companySessionToken) {
+      console.error('Missing company session token');
+      return null;
+    }
+
+    const { data, error } = await supabase.rpc('create_order', {
+      p_company_token: companySessionToken,
+      p_order: {
+        id: order.id,
+        order_id: order.orderId,
+        notes: order.notes ?? null,
+        estimated_delivery: order.estimatedDelivery,
+      },
+      p_items: order.items.map(item => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+      })),
+    });
+
+    if (error || !data) {
+      console.error('Error saving order:', error);
+      return null;
+    }
+
+    const savedOrder = toOrder(data);
+    setOrders(prev => [savedOrder, ...prev]);
+    return savedOrder;
+  }, [companySessionToken]);
+
+  return React.createElement(OrdersContext.Provider, { value: { orders, addOrder, refreshOrders }, children });
 }
 
 export function useOrders() {

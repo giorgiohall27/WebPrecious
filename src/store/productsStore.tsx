@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 import { Category, Product, CartItem, Subcategory } from '../types';
 import { mockCategories, mockProducts, mockSubcategories } from '../data/mockData';
 import { supabase, supabaseEnabled } from '../lib/supabase';
+import { useAuth } from './authStore';
 
 interface ProductsContextType {
   products: Product[];
@@ -10,12 +11,13 @@ interface ProductsContextType {
   loading: boolean;
   decreaseStock: (items: CartItem[]) => void;
   adjustStock: (productId: string, delta: number) => void;
-  upsertProduct: (product: Product) => void;
-  removeProduct: (productId: string) => void;
-  upsertCategory: (category: Category) => void;
-  removeCategory: (categoryId: string) => void;
-  upsertSubcategory: (subcategory: Subcategory) => void;
-  removeSubcategory: (subcategoryId: string) => void;
+  upsertProduct: (product: Product) => Promise<void>;
+  removeProduct: (productId: string) => Promise<void>;
+  upsertCategory: (category: Category) => Promise<void>;
+  removeCategory: (categoryId: string) => Promise<void>;
+  upsertSubcategory: (subcategory: Subcategory) => Promise<void>;
+  removeSubcategory: (subcategoryId: string) => Promise<void>;
+  refreshCatalog: () => Promise<void>;
 }
 
 const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
@@ -110,32 +112,40 @@ function fromSubcategory(subcategory: Subcategory) {
 }
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
+  const { companySessionToken, superAdminSessionToken } = useAuth();
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [subcategories, setSubcategories] = useState<Subcategory[]>(mockSubcategories);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!supabaseEnabled) return;
-    setLoading(true);
+  const catalogToken = companySessionToken || superAdminSessionToken;
 
-    Promise.all([
-      supabase.from('categories').select('*').order('sort_order', { ascending: true }),
-      supabase.from('subcategories').select('*').order('sort_order', { ascending: true }),
-      supabase.from('products').select('*').order('name', { ascending: true }),
-    ]).then(([categoriesResult, subcategoriesResult, productsResult]) => {
-      if (!categoriesResult.error && categoriesResult.data?.length) {
-        setCategories(categoriesResult.data.map(toCategory));
-      }
-      if (!subcategoriesResult.error && subcategoriesResult.data) {
-        setSubcategories(subcategoriesResult.data.map(toSubcategory));
-      }
-      if (!productsResult.error && productsResult.data?.length) {
-        setProducts(productsResult.data.map(toProduct));
-      }
+  const refreshCatalog = useCallback(async () => {
+    if (!supabaseEnabled) return;
+    if (!catalogToken) {
+      setProducts([]);
+      setCategories([]);
+      setSubcategories([]);
+      return;
+    }
+
+    setLoading(true);
+    const { data, error } = await supabase.rpc('get_catalog', { p_session_token: catalogToken });
+    if (error) {
+      console.error('Error loading catalog:', error);
       setLoading(false);
-    });
-  }, []);
+      return;
+    }
+
+    setCategories((data?.categories ?? []).map(toCategory));
+    setSubcategories((data?.subcategories ?? []).map(toSubcategory));
+    setProducts((data?.products ?? []).map(toProduct));
+    setLoading(false);
+  }, [catalogToken]);
+
+  useEffect(() => {
+    refreshCatalog();
+  }, [refreshCatalog]);
 
   const decreaseStock = useCallback((items: CartItem[]) => {
     setProducts(prev =>
@@ -153,75 +163,108 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const upsertProduct = useCallback((product: Product) => {
+  const upsertProduct = useCallback(async (product: Product) => {
     setProducts(prev => {
       const exists = prev.some(item => item.id === product.id);
       return exists ? prev.map(item => item.id === product.id ? product : item) : [product, ...prev];
     });
 
-    if (supabaseEnabled) {
-      supabase.from('products').upsert(fromProduct(product), { onConflict: 'id' }).then(({ error }) => {
-        if (error) console.error('Error saving product:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { data, error } = await supabase.rpc('admin_upsert_product', {
+        p_admin_token: superAdminSessionToken,
+        p_product: fromProduct(product),
       });
+      if (error) {
+        console.error('Error saving product:', error);
+        return;
+      }
+      if (data) {
+        const saved = toProduct(data);
+        setProducts(prev => prev.map(item => item.id === saved.id ? saved : item));
+      }
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
-  const removeProduct = useCallback((productId: string) => {
+  const removeProduct = useCallback(async (productId: string) => {
     setProducts(prev => prev.filter(product => product.id !== productId));
 
-    if (supabaseEnabled) {
-      supabase.from('products').delete().eq('id', productId).then(({ error }) => {
-        if (error) console.error('Error deleting product:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { error } = await supabase.rpc('admin_delete_product', {
+        p_admin_token: superAdminSessionToken,
+        p_product_id: productId,
       });
+      if (error) console.error('Error deleting product:', error);
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
-  const upsertCategory = useCallback((category: Category) => {
+  const upsertCategory = useCallback(async (category: Category) => {
     setCategories(prev => {
       const exists = prev.some(item => item.id === category.id);
       return exists ? prev.map(item => item.id === category.id ? category : item) : [...prev, category];
     });
 
-    if (supabaseEnabled) {
-      supabase.from('categories').upsert(fromCategory(category), { onConflict: 'id' }).then(({ error }) => {
-        if (error) console.error('Error saving category:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { data, error } = await supabase.rpc('admin_upsert_category', {
+        p_admin_token: superAdminSessionToken,
+        p_category: fromCategory(category),
       });
+      if (error) {
+        console.error('Error saving category:', error);
+        return;
+      }
+      if (data) {
+        const saved = toCategory(data);
+        setCategories(prev => prev.map(item => item.id === saved.id ? saved : item));
+      }
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
-  const removeCategory = useCallback((categoryId: string) => {
+  const removeCategory = useCallback(async (categoryId: string) => {
     setCategories(prev => prev.filter(category => category.id !== categoryId));
     setSubcategories(prev => prev.filter(subcategory => subcategory.categoryId !== categoryId));
 
-    if (supabaseEnabled) {
-      supabase.from('categories').delete().eq('id', categoryId).then(({ error }) => {
-        if (error) console.error('Error deleting category:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { error } = await supabase.rpc('admin_delete_category', {
+        p_admin_token: superAdminSessionToken,
+        p_category_id: categoryId,
       });
+      if (error) console.error('Error deleting category:', error);
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
-  const upsertSubcategory = useCallback((subcategory: Subcategory) => {
+  const upsertSubcategory = useCallback(async (subcategory: Subcategory) => {
     setSubcategories(prev => {
       const exists = prev.some(item => item.id === subcategory.id);
       return exists ? prev.map(item => item.id === subcategory.id ? subcategory : item) : [...prev, subcategory];
     });
 
-    if (supabaseEnabled) {
-      supabase.from('subcategories').upsert(fromSubcategory(subcategory), { onConflict: 'id' }).then(({ error }) => {
-        if (error) console.error('Error saving subcategory:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { data, error } = await supabase.rpc('admin_upsert_subcategory', {
+        p_admin_token: superAdminSessionToken,
+        p_subcategory: fromSubcategory(subcategory),
       });
+      if (error) {
+        console.error('Error saving subcategory:', error);
+        return;
+      }
+      if (data) {
+        const saved = toSubcategory(data);
+        setSubcategories(prev => prev.map(item => item.id === saved.id ? saved : item));
+      }
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
-  const removeSubcategory = useCallback((subcategoryId: string) => {
+  const removeSubcategory = useCallback(async (subcategoryId: string) => {
     setSubcategories(prev => prev.filter(subcategory => subcategory.id !== subcategoryId));
 
-    if (supabaseEnabled) {
-      supabase.from('subcategories').delete().eq('id', subcategoryId).then(({ error }) => {
-        if (error) console.error('Error deleting subcategory:', error);
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { error } = await supabase.rpc('admin_delete_subcategory', {
+        p_admin_token: superAdminSessionToken,
+        p_subcategory_id: subcategoryId,
       });
+      if (error) console.error('Error deleting subcategory:', error);
     }
-  }, []);
+  }, [superAdminSessionToken]);
 
   return React.createElement(ProductsContext.Provider, {
     value: {
@@ -237,6 +280,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       removeCategory,
       upsertSubcategory,
       removeSubcategory,
+      refreshCatalog,
     },
     children,
   });

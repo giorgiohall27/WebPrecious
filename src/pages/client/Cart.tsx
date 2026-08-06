@@ -39,44 +39,56 @@ export default function Cart() {
     updateQuantity(productId, newQty);
   };
 
-  const handleSendOrder = () => {
+  const handleSendOrder = async () => {
     setSending(true);
     const itemsSnapshot = [...items];
     const totalSnapshot = getTotal();
-    setTimeout(() => {
-      const orderId = `PED-2026-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
-      const now = new Date();
-      const delivery = new Date(now);
-      delivery.setDate(delivery.getDate() + 3);
-      addOrder({
-        id: `ord-${Date.now()}`,
-        orderId,
-        companyId: userProfile?.id ?? 'comp-pin',
-        companyName,
-        companyCif,
-        companyEmail,
-        companyPhone,
-        contactPerson,
-        deliveryAddress: deliveryAddr,
-        items: itemsSnapshot.map(i => ({
-          productId: i.product.id,
-          sku: i.product.sku,
-          name: i.product.name,
-          categoryName: i.product.categoryName || '',
-          quantity: i.quantity,
-          unitPrice: i.product.price,
-          subtotal: i.product.price * i.quantity,
-        })),
-        totalItems: itemsSnapshot.length,
-        totalAmount: totalSnapshot,
-        notes: notes || undefined,
-        status: 'authorization_pending',
-        createdAt: now.toISOString(),
-        estimatedDelivery: delivery.toISOString().split('T')[0],
-      });
+
+    const orderId = `PED-2026-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
+    const now = new Date();
+    const delivery = new Date(now);
+    delivery.setDate(delivery.getDate() + 3);
+    const savedOrder = await addOrder({
+      id: `ord-${Date.now()}`,
+      orderId,
+      companyId: userProfile?.id ?? 'comp-pin',
+      companyName,
+      companyCif,
+      companyEmail,
+      companyPhone,
+      contactPerson,
+      deliveryAddress: deliveryAddr,
+      items: itemsSnapshot.map(i => ({
+        productId: i.product.id,
+        sku: i.product.sku,
+        name: i.product.name,
+        categoryName: i.product.categoryName || '',
+        quantity: i.quantity,
+        unitPrice: i.product.price,
+        subtotal: i.product.price * i.quantity,
+      })),
+      totalItems: itemsSnapshot.length,
+      totalAmount: totalSnapshot,
+      notes: notes || undefined,
+      status: 'authorization_pending',
+      createdAt: now.toISOString(),
+      estimatedDelivery: delivery.toISOString().split('T')[0],
+    });
+
+    if (savedOrder) {
       clearCart();
-      navigate('/order-confirmation', { state: { orderId, total: totalSnapshot, totalLines, notes } });
-    }, 1500);
+      navigate('/order-confirmation', {
+        state: {
+          orderId: savedOrder.orderId,
+          total: savedOrder.totalAmount,
+          totalLines: savedOrder.totalItems,
+          notes,
+        },
+      });
+    } else {
+      setSending(false);
+      alert('No se pudo enviar el pedido. Revisa la sesion o el stock e intentalo de nuevo.');
+    }
   };
 
   if (items.length === 0) {

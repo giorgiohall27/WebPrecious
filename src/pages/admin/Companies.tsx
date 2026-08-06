@@ -39,7 +39,7 @@ function toDraft(company: ManagedCompany): CompanyDraft {
     phone: company.phone,
     contactPerson: company.contactPerson,
     deliveryAddress: company.deliveryAddress,
-    pin: company.pin,
+    pin: '',
     active: company.active,
     notes: company.notes ?? '',
   };
@@ -58,6 +58,8 @@ export default function Companies() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const displayPin = (company: ManagedCompany) => company.pin || (company.pinHint ? `••••${company.pinHint}` : 'PIN oculto');
 
   const activeCompanies = companies.filter(company => company.active).length;
   const inactiveCompanies = companies.length - activeCompanies;
@@ -103,9 +105,9 @@ export default function Companies() {
     setMessage('');
   };
 
-  const handleCreate = (event: React.FormEvent) => {
+  const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();
-    const result = addCompany(draft);
+    const result = await addCompany(draft);
     if (!result.success) {
       showError(result.error || 'No se pudo crear la empresa');
       return;
@@ -126,9 +128,9 @@ export default function Companies() {
     setEditDraft(null);
   };
 
-  const saveEditing = (id: string) => {
+  const saveEditing = async (id: string) => {
     if (!editDraft) return;
-    const result = updateCompany(id, editDraft);
+    const result = await updateCompany(id, editDraft);
     if (!result.success) {
       showError(result.error || 'No se pudo guardar la empresa');
       return;
@@ -137,8 +139,8 @@ export default function Companies() {
     showMessage('Empresa actualizada');
   };
 
-  const toggleCompany = (company: ManagedCompany) => {
-    const result = updateCompany(company.id, { active: !company.active });
+  const toggleCompany = async (company: ManagedCompany) => {
+    const result = await updateCompany(company.id, { active: !company.active });
     if (!result.success) {
       showError(result.error || 'No se pudo cambiar el estado');
       return;
@@ -147,6 +149,11 @@ export default function Companies() {
   };
 
   const copyPin = async (company: ManagedCompany) => {
+    if (!company.pin) {
+      showError('Por seguridad el PIN completo no se muestra. Genera uno nuevo para copiarlo.');
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(company.pin);
       setCopiedId(company.id);
@@ -283,7 +290,7 @@ export default function Companies() {
                   <div className="flex flex-wrap items-center gap-2">
                     <button onClick={() => copyPin(company)} className="btn-secondary text-sm">
                       {copiedId === company.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {company.pin}
+                      {displayPin(company)}
                     </button>
                     <button onClick={() => toggleCompany(company)} className="btn-secondary text-sm">
                       <Power className="w-4 h-4" />

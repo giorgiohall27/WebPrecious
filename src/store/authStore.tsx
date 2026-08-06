@@ -5,10 +5,12 @@ import { supabase, supabaseEnabled } from '../lib/supabase';
 const SUPER_ADMIN_PASSWORD = 'Levi1234';
 
 const COMPANIES_STORAGE_KEY = 'webprecious.companies.v2';
-const COMPANY_SESSION_KEY = 'webprecious.companySession.v2';
-const SUPER_ADMIN_SESSION_KEY = 'webprecious.superAdminSession.v2';
+const COMPANY_SESSION_KEY = 'webprecious.companySession.v3';
+const COMPANY_PROFILE_KEY = 'webprecious.companyProfile.v3';
+const SUPER_ADMIN_SESSION_KEY = 'webprecious.superAdminSession.v3';
 
 type CompanyInput = Omit<ManagedCompany, 'id' | 'createdAt'>;
+type ActionResult<T = unknown> = Promise<{ success: boolean; error?: string } & T>;
 
 const defaultSuperAdmins: SuperAdmin[] = [
   {
@@ -32,6 +34,7 @@ const defaultCompanies: ManagedCompany[] = [
     contactPerson: 'Responsable de compras',
     deliveryAddress: 'Avenida del Mar 18, 29640 Fuengirola',
     pin: '123456',
+    pinHint: '56',
     active: true,
     createdAt: '2026-03-20T00:00:00.000Z',
     notes: 'Cliente demo hosteleria',
@@ -45,6 +48,7 @@ const defaultCompanies: ManagedCompany[] = [
     contactPerson: 'Laura Martinez',
     deliveryAddress: 'Calle Sol 24, 28004 Madrid',
     pin: '234567',
+    pinHint: '67',
     active: true,
     createdAt: '2026-03-20T00:00:00.000Z',
     notes: 'Cliente demo retail',
@@ -58,6 +62,7 @@ const defaultCompanies: ManagedCompany[] = [
     contactPerson: 'David Ruiz',
     deliveryAddress: 'Paseo Maritimo 7, 29016 Malaga',
     pin: '345678',
+    pinHint: '78',
     active: true,
     createdAt: '2026-03-20T00:00:00.000Z',
     notes: 'Cliente demo restauracion',
@@ -86,6 +91,11 @@ function writeText(key: string, value: string) {
   window.localStorage.setItem(key, value);
 }
 
+function writeJson(key: string, value: unknown) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
 function removeStored(key: string) {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem(key);
@@ -108,34 +118,25 @@ function createCompanyId(name: string) {
 }
 
 function toCompany(row: any): ManagedCompany {
+  const pin = row.pin ?? '';
+
   return {
     id: row.id,
     name: row.name,
     cif: row.cif ?? '',
     email: row.email ?? '',
     phone: row.phone ?? '',
-    contactPerson: row.contact_person ?? '',
-    deliveryAddress: row.delivery_address ?? '',
-    pin: row.pin,
+    contactPerson: row.contact_person ?? row.contactPerson ?? '',
+    deliveryAddress: row.delivery_address ?? row.deliveryAddress ?? '',
+    pin,
+    pinHint: row.pin_hint ?? row.pinHint ?? (pin ? pin.slice(-2) : ''),
     active: row.active,
-    createdAt: row.created_at ?? new Date().toISOString(),
+    createdAt: row.created_at ?? row.createdAt ?? new Date().toISOString(),
     notes: row.notes ?? '',
   };
 }
 
-function toSuperAdmin(row: any): SuperAdmin {
-  return {
-    id: row.id,
-    name: row.name,
-    email: row.email,
-    pin: row.pin,
-    active: row.active,
-    createdAt: row.created_at ?? new Date().toISOString(),
-    notes: row.notes ?? '',
-  };
-}
-
-function fromCompany(company: ManagedCompany) {
+function companyToPayload(company: Partial<CompanyInput> & { id?: string }) {
   return {
     id: company.id,
     name: company.name,
@@ -144,10 +145,8 @@ function fromCompany(company: ManagedCompany) {
     phone: company.phone,
     contact_person: company.contactPerson,
     delivery_address: company.deliveryAddress,
-    pin: company.pin,
     active: company.active,
     notes: company.notes ?? null,
-    created_at: company.createdAt,
   };
 }
 
@@ -159,69 +158,107 @@ interface AuthContextType {
   userProfile: ManagedCompany | null;
   currentCompany: ManagedCompany | null;
   companies: ManagedCompany[];
-  loginWithPin: (pin: string) => { success: boolean; error?: string };
-  login: (email: string, password: string) => { success: boolean; error?: string };
-  loginAsSuperAdmin: (email: string, password: string) => { success: boolean; error?: string };
-  loginSuperAdminWithPin: (pin: string) => { success: boolean; error?: string };
+  companySessionToken: string | null;
+  superAdminSessionToken: string | null;
+  loginWithPin: (pin: string) => ActionResult;
+  login: (email: string, password: string) => ActionResult;
+  loginAsSuperAdmin: (email: string, password: string) => ActionResult;
+  loginSuperAdminWithPin: (pin: string) => ActionResult;
   loginAsGuest: () => void;
   logout: () => void;
   logoutSuperAdmin: () => void;
-  addCompany: (company: CompanyInput) => { success: boolean; error?: string; company?: ManagedCompany };
-  updateCompany: (id: string, updates: Partial<CompanyInput>) => { success: boolean; error?: string };
-  removeCompany: (id: string) => void;
+  addCompany: (company: CompanyInput) => ActionResult<{ company?: ManagedCompany }>;
+  updateCompany: (id: string, updates: Partial<CompanyInput>) => ActionResult<{ company?: ManagedCompany }>;
+  removeCompany: (id: string) => Promise<void>;
   generatePin: () => string;
+  refreshCompanies: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [superAdmins, setSuperAdmins] = useState<SuperAdmin[]>(defaultSuperAdmins);
   const [companies, setCompanies] = useState<ManagedCompany[]>(() => {
+    if (supabaseEnabled) return [];
     const stored = readJson<ManagedCompany[]>(COMPANIES_STORAGE_KEY, defaultCompanies);
     return stored.length > 0 ? stored : defaultCompanies;
   });
-  const [currentCompanyId, setCurrentCompanyId] = useState<string | null>(() => readText(COMPANY_SESSION_KEY));
-  const [isSuperAdmin, setIsSuperAdmin] = useState(() => readText(SUPER_ADMIN_SESSION_KEY) === 'true');
-
-  const currentCompany = useMemo(
-    () => companies.find(company => company.id === currentCompanyId && company.active) ?? null,
-    [companies, currentCompanyId]
+  const [currentCompany, setCurrentCompany] = useState<ManagedCompany | null>(() =>
+    supabaseEnabled ? readJson<ManagedCompany | null>(COMPANY_PROFILE_KEY, null) : null
   );
+  const [companySessionToken, setCompanySessionToken] = useState<string | null>(() => readText(COMPANY_SESSION_KEY));
+  const [superAdminSessionToken, setSuperAdminSessionToken] = useState<string | null>(() => readText(SUPER_ADMIN_SESSION_KEY));
+  const [isSuperAdmin, setIsSuperAdmin] = useState(() => Boolean(readText(SUPER_ADMIN_SESSION_KEY)));
+
+  const userEmail = currentCompany?.email ?? null;
+
+  const refreshCompanies = async () => {
+    if (!supabaseEnabled) return;
+    if (!superAdminSessionToken) {
+      setCompanies([]);
+      return;
+    }
+
+    const { data, error } = await supabase.rpc('list_admin_companies', {
+      p_admin_token: superAdminSessionToken,
+    });
+
+    if (error) {
+      console.error('Error loading companies:', error);
+      return;
+    }
+
+    setCompanies((data ?? []).map(toCompany));
+  };
 
   useEffect(() => {
     if (!supabaseEnabled) return;
+    if (!companySessionToken) {
+      setCurrentCompany(null);
+      removeStored(COMPANY_PROFILE_KEY);
+      return;
+    }
 
-    Promise.all([
-      supabase.from('super_admins').select('*').order('name', { ascending: true }),
-      supabase.from('companies').select('*').order('name', { ascending: true }),
-    ]).then(([superAdminsResult, companiesResult]) => {
-      if (superAdminsResult.error) {
-        console.error('Error loading super admins:', superAdminsResult.error);
-      } else if (superAdminsResult.data?.length) {
-        setSuperAdmins(superAdminsResult.data.map(toSuperAdmin));
+    supabase.rpc('validate_company_session', { p_session_token: companySessionToken }).then(({ data, error }) => {
+      const company = data?.[0] ? toCompany(data[0]) : null;
+      if (error || !company) {
+        setCompanySessionToken(null);
+        setCurrentCompany(null);
+        removeStored(COMPANY_SESSION_KEY);
+        removeStored(COMPANY_PROFILE_KEY);
+        return;
       }
 
-      if (companiesResult.error) {
-        console.error('Error loading companies:', companiesResult.error);
-      } else if (companiesResult.data?.length) {
-        setCompanies(companiesResult.data.map(toCompany));
-      }
+      setCurrentCompany(company);
+      writeJson(COMPANY_PROFILE_KEY, company);
     });
-  }, []);
+  }, [companySessionToken]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!supabaseEnabled) return;
+    if (!superAdminSessionToken) {
+      setIsSuperAdmin(false);
+      setCompanies([]);
+      return;
+    }
+
+    supabase.rpc('validate_super_admin_session', { p_session_token: superAdminSessionToken }).then(({ data, error }) => {
+      if (error || !data?.length) {
+        setIsSuperAdmin(false);
+        setSuperAdminSessionToken(null);
+        removeStored(SUPER_ADMIN_SESSION_KEY);
+        setCompanies([]);
+        return;
+      }
+
+      setIsSuperAdmin(true);
+      refreshCompanies();
+    });
+  }, [superAdminSessionToken]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || supabaseEnabled) return;
     window.localStorage.setItem(COMPANIES_STORAGE_KEY, JSON.stringify(companies));
   }, [companies]);
-
-  useEffect(() => {
-    if (!currentCompanyId) return;
-    const companyExists = companies.some(company => company.id === currentCompanyId && company.active);
-    if (!companyExists) {
-      setCurrentCompanyId(null);
-      removeStored(COMPANY_SESSION_KEY);
-    }
-  }, [companies, currentCompanyId]);
 
   const generatePin = () => {
     let pin = '';
@@ -231,76 +268,101 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return pin;
   };
 
-  const loginWithPin = (pin: string): { success: boolean; error?: string } => {
+  const loginWithPin = async (pin: string): ActionResult => {
     const cleanPin = normalizePin(pin);
     if (cleanPin.length !== 6) {
       return { success: false, error: 'Introduce un PIN de 6 digitos' };
+    }
+
+    if (supabaseEnabled) {
+      const { data, error } = await supabase.rpc('verify_company_pin', { p_pin: cleanPin });
+      const row = data?.[0];
+      if (error || !row?.session_token) {
+        return { success: false, error: 'PIN no encontrado o bloqueado temporalmente' };
+      }
+
+      const company = toCompany(row);
+      setCompanySessionToken(row.session_token);
+      setCurrentCompany(company);
+      writeText(COMPANY_SESSION_KEY, row.session_token);
+      writeJson(COMPANY_PROFILE_KEY, company);
+      return { success: true };
     }
 
     const company = companies.find(item => item.pin === cleanPin);
-    if (!company) {
-      return { success: false, error: 'PIN no encontrado' };
-    }
-    if (!company.active) {
-      return { success: false, error: 'Esta empresa esta desactivada' };
-    }
+    if (!company) return { success: false, error: 'PIN no encontrado' };
+    if (!company.active) return { success: false, error: 'Esta empresa esta desactivada' };
 
-    setCurrentCompanyId(company.id);
-    writeText(COMPANY_SESSION_KEY, company.id);
+    setCurrentCompany(company);
+    writeJson(COMPANY_PROFILE_KEY, company);
     return { success: true };
   };
 
-  const loginAsSuperAdmin = (email: string, password: string): { success: boolean; error?: string } => {
-    const admin = superAdmins.find(item => item.email.toLowerCase() === email.trim().toLowerCase());
-    if (!admin) {
-      return { success: false, error: 'Email de Super Admin incorrecto' };
+  const loginAsSuperAdmin = async (email: string, password: string): ActionResult => {
+    if (supabaseEnabled) {
+      return { success: false, error: 'Usa el PIN de Super Admin' };
     }
-    if (password !== SUPER_ADMIN_PASSWORD) {
-      return { success: false, error: 'Clave de Super Admin incorrecta' };
-    }
-    if (!admin.active) {
-      return { success: false, error: 'Este Super Admin esta desactivado' };
-    }
+
+    const admin = defaultSuperAdmins.find(item => item.email.toLowerCase() === email.trim().toLowerCase());
+    if (!admin) return { success: false, error: 'Email de Super Admin incorrecto' };
+    if (password !== SUPER_ADMIN_PASSWORD) return { success: false, error: 'Clave de Super Admin incorrecta' };
+    if (!admin.active) return { success: false, error: 'Este Super Admin esta desactivado' };
 
     setIsSuperAdmin(true);
-    writeText(SUPER_ADMIN_SESSION_KEY, 'true');
+    writeText(SUPER_ADMIN_SESSION_KEY, 'local-super-admin');
     return { success: true };
   };
 
-  const loginSuperAdminWithPin = (pin: string): { success: boolean; error?: string } => {
+  const loginSuperAdminWithPin = async (pin: string): ActionResult => {
     const cleanPin = normalizePin(pin);
     if (cleanPin.length !== 6) {
       return { success: false, error: 'Introduce un PIN de 6 digitos' };
     }
-    const admin = superAdmins.find(item => item.pin === cleanPin);
-    if (!admin) {
-      return { success: false, error: 'PIN de Super Admin incorrecto' };
-    }
-    if (!admin.active) {
-      return { success: false, error: 'Este Super Admin esta desactivado' };
+
+    if (supabaseEnabled) {
+      const { data, error } = await supabase.rpc('verify_super_admin_pin', { p_pin: cleanPin });
+      const row = data?.[0];
+      if (error || !row?.session_token) {
+        return { success: false, error: 'PIN de Super Admin incorrecto o bloqueado temporalmente' };
+      }
+
+      setSuperAdminSessionToken(row.session_token);
+      setIsSuperAdmin(true);
+      writeText(SUPER_ADMIN_SESSION_KEY, row.session_token);
+      return { success: true };
     }
 
+    const admin = defaultSuperAdmins.find(item => item.pin === cleanPin);
+    if (!admin) return { success: false, error: 'PIN de Super Admin incorrecto' };
+    if (!admin.active) return { success: false, error: 'Este Super Admin esta desactivado' };
+
     setIsSuperAdmin(true);
-    writeText(SUPER_ADMIN_SESSION_KEY, 'true');
+    writeText(SUPER_ADMIN_SESSION_KEY, 'local-super-admin');
     return { success: true };
   };
 
   const loginAsGuest = () => {
-    setCurrentCompanyId(null);
+    setCurrentCompany(null);
+    setCompanySessionToken(null);
     removeStored(COMPANY_SESSION_KEY);
+    removeStored(COMPANY_PROFILE_KEY);
   };
 
   const logout = () => {
-    setCurrentCompanyId(null);
+    setCurrentCompany(null);
+    setCompanySessionToken(null);
     removeStored(COMPANY_SESSION_KEY);
+    removeStored(COMPANY_PROFILE_KEY);
   };
 
   const logoutSuperAdmin = () => {
     setIsSuperAdmin(false);
+    setSuperAdminSessionToken(null);
+    setCompanies(supabaseEnabled ? [] : companies);
     removeStored(SUPER_ADMIN_SESSION_KEY);
   };
 
-  const ensureCompanyCanUsePin = (pin: string, currentId?: string) => {
+  const ensureCompanyCanUsePinLocally = (pin: string, currentId?: string) => {
     const cleanPin = normalizePin(pin);
     if (cleanPin.length !== 6) {
       return { success: false, error: 'El PIN debe tener 6 digitos' };
@@ -311,101 +373,129 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true, pin: cleanPin };
   };
 
-  const addCompany = (company: CompanyInput) => {
-    const pinCheck = ensureCompanyCanUsePin(company.pin);
-    if (!pinCheck.success || !pinCheck.pin) return pinCheck;
-
+  const addCompany = async (company: CompanyInput): ActionResult<{ company?: ManagedCompany }> => {
     const name = company.name.trim();
-    if (!name) {
-      return { success: false, error: 'La empresa necesita un nombre' };
-    }
+    if (!name) return { success: false, error: 'La empresa necesita un nombre' };
+
+    const cleanPin = normalizePin(company.pin);
+    if (cleanPin.length !== 6) return { success: false, error: 'El PIN debe tener 6 digitos' };
 
     const nextCompany: ManagedCompany = {
       ...company,
       id: createCompanyId(name),
       name,
-      pin: pinCheck.pin,
+      pin: cleanPin,
+      pinHint: cleanPin.slice(-2),
       active: company.active,
       createdAt: new Date().toISOString(),
     };
 
-    setCompanies(prev => [nextCompany, ...prev]);
     if (supabaseEnabled) {
-      supabase.from('companies').upsert(fromCompany(nextCompany), { onConflict: 'id' }).then(({ error }) => {
-        if (error) console.error('Error saving company:', error);
+      if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
+      const { data, error } = await supabase.rpc('admin_create_company', {
+        p_admin_token: superAdminSessionToken,
+        p_company: companyToPayload(nextCompany),
+        p_pin: cleanPin,
       });
+      const created = data?.[0] ? toCompany(data[0]) : null;
+      if (error || !created) return { success: false, error: error?.message || 'No se pudo crear la empresa' };
+
+      setCompanies(prev => [created, ...prev.filter(item => item.id !== created.id)]);
+      return { success: true, company: created };
     }
+
+    const pinCheck = ensureCompanyCanUsePinLocally(cleanPin);
+    if (!pinCheck.success) return pinCheck;
+
+    setCompanies(prev => [nextCompany, ...prev]);
     return { success: true, company: nextCompany };
   };
 
-  const updateCompany = (id: string, updates: Partial<CompanyInput>) => {
+  const updateCompany = async (id: string, updates: Partial<CompanyInput>): ActionResult<{ company?: ManagedCompany }> => {
     const company = companies.find(item => item.id === id);
-    if (!company) {
-      return { success: false, error: 'Empresa no encontrada' };
-    }
+    if (!company) return { success: false, error: 'Empresa no encontrada' };
 
     const cleanUpdates = { ...updates };
-    if (cleanUpdates.pin !== undefined) {
-      const pinCheck = ensureCompanyCanUsePin(cleanUpdates.pin, id);
-      if (!pinCheck.success || !pinCheck.pin) return pinCheck;
-      cleanUpdates.pin = pinCheck.pin;
+    const cleanPin = cleanUpdates.pin ? normalizePin(cleanUpdates.pin) : '';
+    if (cleanUpdates.pin !== undefined && cleanPin.length > 0 && cleanPin.length !== 6) {
+      return { success: false, error: 'El PIN debe tener 6 digitos' };
     }
-
     if (cleanUpdates.name !== undefined && !cleanUpdates.name.trim()) {
       return { success: false, error: 'La empresa necesita un nombre' };
+    }
+
+    if (supabaseEnabled) {
+      if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
+      const { data, error } = await supabase.rpc('admin_update_company', {
+        p_admin_token: superAdminSessionToken,
+        p_company_id: id,
+        p_updates: companyToPayload(cleanUpdates),
+        p_pin: cleanPin || null,
+      });
+      const updated = data?.[0] ? toCompany(data[0]) : null;
+      if (error || !updated) return { success: false, error: error?.message || 'No se pudo guardar la empresa' };
+
+      setCompanies(prev => prev.map(item => item.id === id ? { ...updated, pin: updated.pin || cleanPin || '' } : item));
+      return { success: true, company: updated };
+    }
+
+    if (cleanPin) {
+      const pinCheck = ensureCompanyCanUsePinLocally(cleanPin, id);
+      if (!pinCheck.success) return pinCheck;
+      cleanUpdates.pin = cleanPin;
     }
 
     const updatedCompany: ManagedCompany = {
       ...company,
       ...cleanUpdates,
       name: cleanUpdates.name?.trim() ?? company.name,
+      pin: cleanPin || company.pin,
+      pinHint: cleanPin ? cleanPin.slice(-2) : company.pinHint,
     };
 
     setCompanies(prev => prev.map(item => item.id === id ? updatedCompany : item));
-    if (supabaseEnabled) {
-      supabase.from('companies').upsert(fromCompany(updatedCompany), { onConflict: 'id' }).then(({ error }) => {
-        if (error) console.error('Error updating company:', error);
-      });
-    }
-    return { success: true };
+    return { success: true, company: updatedCompany };
   };
 
-  const removeCompany = (id: string) => {
+  const removeCompany = async (id: string) => {
     setCompanies(prev => prev.filter(company => company.id !== id));
-    if (supabaseEnabled) {
-      supabase.from('companies').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Error deleting company:', error);
+
+    if (supabaseEnabled && superAdminSessionToken) {
+      const { error } = await supabase.rpc('admin_delete_company', {
+        p_admin_token: superAdminSessionToken,
+        p_company_id: id,
       });
+      if (error) console.error('Error deleting company:', error);
     }
-    if (currentCompanyId === id) logout();
+
+    if (currentCompany?.id === id) logout();
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        isLoggedIn: Boolean(currentCompany),
-        isGuest: !currentCompany,
-        isSuperAdmin,
-        userEmail: currentCompany?.email ?? null,
-        userProfile: currentCompany,
-        currentCompany,
-        companies,
-        loginWithPin,
-        login: loginAsSuperAdmin,
-        loginAsSuperAdmin,
-        loginSuperAdminWithPin,
-        loginAsGuest,
-        logout,
-        logoutSuperAdmin,
-        addCompany,
-        updateCompany,
-        removeCompany,
-        generatePin,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = useMemo<AuthContextType>(() => ({
+    isLoggedIn: Boolean(currentCompany),
+    isGuest: !currentCompany,
+    isSuperAdmin,
+    userEmail,
+    userProfile: currentCompany,
+    currentCompany,
+    companies,
+    companySessionToken,
+    superAdminSessionToken,
+    loginWithPin,
+    login: loginAsSuperAdmin,
+    loginAsSuperAdmin,
+    loginSuperAdminWithPin,
+    loginAsGuest,
+    logout,
+    logoutSuperAdmin,
+    addCompany,
+    updateCompany,
+    removeCompany,
+    generatePin,
+    refreshCompanies,
+  }), [currentCompany, isSuperAdmin, userEmail, companies, companySessionToken, superAdminSessionToken]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

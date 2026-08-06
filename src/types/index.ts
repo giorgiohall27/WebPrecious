@@ -54,6 +54,7 @@ export interface Company {
 
 export interface ManagedCompany extends Company {
   pin: string;
+  pinHint?: string;
   active: boolean;
   createdAt: string;
   notes?: string;
@@ -63,7 +64,8 @@ export interface SuperAdmin {
   id: string;
   name: string;
   email: string;
-  pin: string;
+  pin?: string;
+  pinHint?: string;
   active: boolean;
   createdAt: string;
   notes?: string;
