@@ -35,12 +35,12 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             {/* Client Auth */}
-            <Route path="/" element={<ClientLogin />} />
+            <Route path="/login" element={<ClientLogin />} />
             <Route path="/register" element={<Register />} />
 
             {/* Client Portal */}
             <Route element={<ClientLayout />}>
-              <Route path="/dashboard" element={<ClientDashboard />} />
+              <Route path="/" element={<ClientDashboard />} />
               <Route path="/catalog" element={<Catalog />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />

@@ -90,52 +90,23 @@ export default function Catalog() {
   };
 
   const getQty = (id: string) => quantities[id] || 1;
-  const setQty = (id: string, val: number, maxStock?: number) => {
+  const setQty = (id: string, val: number) => {
     const clamped = Math.max(1, val);
     setQuantities(prev => ({ ...prev, [id]: clamped }));
-    if (maxStock !== undefined && clamped > maxStock) {
-      setStockWarnings(prev => ({ ...prev, [id]: true }));
-    } else {
-      setStockWarnings(prev => ({ ...prev, [id]: false }));
-    }
   };
 
   const handleAdd = (product: Product) => {
-    const existingQty = cartItems.find(i => i.product.id === product.id)?.quantity ?? 0;
-    const requested = getQty(product.id);
-    const actualDelta = Math.min(requested, product.stock - existingQty);
-    if (actualDelta <= 0) {
-      setStockWarnings(prev => ({ ...prev, [product.id]: true }));
-      return;
-    }
-    if (requested > product.stock - existingQty) {
-      setStockWarnings(prev => ({ ...prev, [product.id]: true }));
-      setQuantities(prev => ({ ...prev, [product.id]: product.stock - existingQty }));
-    }
-    addItem(product, requested);
-    adjustStock(product.id, -actualDelta);
+    const requestedBoxes = getQty(product.id);
+    const multiplier = product.unitsPerBox || 1;
+    const totalUnits = requestedBoxes * multiplier;
+    
+    addItem(product, totalUnits);
+    adjustStock(product.id, -totalUnits);
     setAddedItems(prev => ({ ...prev, [product.id]: true }));
     setTimeout(() => setAddedItems(prev => ({ ...prev, [product.id]: false })), 1500);
   };
 
-  const stockBadge = (stock: number) => {
-    const level = getStockLevel(stock);
-    if (level === 'out') return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-50 text-red-700 border border-red-200">
-        {t('stock.noStock')}
-      </span>
-    );
-    if (level === 'low') return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-        {t('stock.lowStock')} · {stock}
-      </span>
-    );
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-        {t('stock.inStock')} · {stock}
-      </span>
-    );
-  };
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 animate-fade-in">
@@ -290,21 +261,7 @@ export default function Catalog() {
                 </div>
               </div>
 
-              {/* In stock */}
-              <div>
-                <label className="block text-[11px] font-bold text-surface-400 uppercase tracking-widest mb-1.5">
-                  {t('catalog.inStock')}
-                </label>
-                <select
-                  value={inStockOnly ? 'yes' : 'all'}
-                  onChange={e => setInStockOnly(e.target.value === 'yes')}
-                  className="w-full px-3 py-2.5 text-sm text-surface-800 bg-surface-50 border border-surface-200 rounded-xl focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
-                >
-                  <option value="all">Todos los productos</option>
-                  <option value="yes">Solo con stock disponible</option>
-                </select>
-              </div>
+
 
               {/* Results count */}
               <div className="pt-1 border-t border-surface-100">
@@ -340,115 +297,120 @@ export default function Catalog() {
                 const isOut   = product.stock === 0;
                 const isAdded = addedItems[product.id];
                 return (
-                  <div key={product.id} className={`card overflow-hidden group ${isOut ? 'opacity-70' : ''} hover:shadow-card-hover hover:border-surface-300 transition-all duration-150`}>
+                  <div key={product.id} className={`card overflow-hidden group ${isOut ? 'opacity-70' : ''} hover:shadow-card-hover hover:border-surface-300 transition-all duration-150 flex flex-col`}>
 
-                    {/* Image */}
+                    {/* Image Area */}
                     <div
-                      className="h-44 bg-white flex items-center justify-center relative overflow-hidden border-b border-surface-100 cursor-pointer"
+                      className="h-48 bg-gradient-to-br from-surface-50 to-white flex items-center justify-center relative overflow-hidden border-b border-surface-100 cursor-pointer"
                       onClick={() => setSelectedProduct(product)}
                     >
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                          onError={e => {
+                          className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500 ease-out"
+                          onError={(e) => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';
-                            const fallback = img.parentElement?.querySelector('.img-fallback') as HTMLElement;
-                            if (fallback) fallback.style.display = 'flex';
+                            const fb = img.parentElement?.querySelector('.product-fb') as HTMLElement;
+                            if (fb) fb.style.display = 'flex';
                           }}
                         />
                       ) : null}
-                      <div className="img-fallback absolute inset-0 items-center justify-center" style={{ display: product.imageUrl ? 'none' : 'flex' }}>
-                        <Package className="w-14 h-14 text-surface-200" />
+                      <div
+                        className="product-fb absolute inset-0 flex-col items-center justify-center gap-2"
+                        style={{ display: product.imageUrl ? 'none' : 'flex' }}
+                      >
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shadow-sm">
+                          <span className="text-2xl font-black text-primary-600">{(product.brand || product.name || 'P')[0]}</span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-surface-400 uppercase tracking-wider max-w-[80%] text-center line-clamp-1">{product.brand}</span>
                       </div>
-                      <div className="absolute top-2.5 right-2.5">{stockBadge(product.stock)}</div>
-                      {product.brand && (
-                        <span className="absolute top-2.5 left-2.5 bg-white/90 text-xs text-surface-600 px-2 py-0.5 rounded-full font-medium shadow-sm border border-surface-100">
-                          {product.brand}
+                      
+                      {/* Units - Top Right */}
+                      {product.unitMeasure && (
+                        <span className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm text-primary-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-primary-100 shadow-sm">
+                          {product.unitMeasure}
                         </span>
                       )}
                     </div>
 
-                    {/* Info */}
-                    <div className="p-4">
-                      <p className="text-[11px] text-primary-500 font-mono mb-0.5 uppercase tracking-wide">{product.sku}</p>
+                    {/* Info Section */}
+                    <div className="p-4 flex-1 flex flex-col">
+                      {/* Brand & Description Below Image */}
+                      {product.brand && (
+                        <p className="text-[10px] font-bold text-primary-600 uppercase tracking-wider mb-0.5">
+                          {product.brand}
+                        </p>
+                      )}
                       <h3
-                        className="font-semibold text-surface-900 text-sm leading-tight mt-0.5 cursor-pointer hover:text-primary-600 transition-colors"
+                        className="font-bold text-surface-900 text-sm leading-tight cursor-pointer hover:text-primary-600 transition-colors line-clamp-2"
                         onClick={() => setSelectedProduct(product)}
                       >
                         {product.name}
                       </h3>
-                      <p className="text-xs text-surface-400 mt-1 mb-3">
-                        {product.categoryName}{product.subcategoryName ? ` › ${product.subcategoryName}` : ''}
-                      </p>
-
-                      {isLoggedIn ? (
-                        <p className="text-xl font-bold text-surface-900 mb-3">
-                          €{product.price.toFixed(2)}
-                          <span className="text-xs font-normal text-surface-400 ml-1">{t('catalog.perUnit')}</span>
+                      {product.description && product.description !== product.name && (
+                        <p className="text-xs text-surface-500 mt-1 line-clamp-2 flex-1">
+                          {product.description}
                         </p>
-                      ) : (
-                        <Link
-                          to="/"
-                          className="flex items-center gap-1.5 mb-3 text-sm text-surface-400 hover:text-primary-600 transition-colors"
-                        >
-                          <Lock className="w-3.5 h-3.5" />
-                          <span className="font-medium">Inicia sesión para ver el precio</span>
-                        </Link>
                       )}
 
-                      {isLoggedIn && !isOut ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
-                              <button onClick={() => setQty(product.id, getQty(product.id) - 1, product.stock)} className="px-2.5 py-1.5 hover:bg-surface-50 transition-colors text-surface-600">
-                                <Minus className="w-3.5 h-3.5" />
-                              </button>
-                              <input
-                                type="number"
-                                value={getQty(product.id)}
-                                onChange={e => setQty(product.id, parseInt(e.target.value) || 1, product.stock)}
-                                className="w-10 text-center text-sm border-x border-surface-200 py-1.5 focus:outline-none bg-white"
-                                min="1"
-                              />
-                              <button onClick={() => setQty(product.id, getQty(product.id) + 1, product.stock)} className="px-2.5 py-1.5 hover:bg-surface-50 transition-colors text-surface-600">
-                                <Plus className="w-3.5 h-3.5" />
-                              </button>
+                      {/* Bottom Layout: Qty Buttons (Left) and Price (Right) */}
+                      <div className="mt-4 flex items-center justify-between gap-2">
+                        {isLoggedIn ? (
+                          <>
+                            {/* Quantity Controls - Left of Price */}
+                            <div className="flex flex-col items-center mr-2">
+                              {product.unitsPerBox && product.unitsPerBox > 1 && (
+                                <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                              )}
+                              <div className="flex items-center bg-surface-50 border border-surface-200 rounded-lg overflow-hidden shrink-0">
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) - 1); }} 
+                                  className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
+                                >
+                                  <Minus className="w-3.5 h-3.5" />
+                                </button>
+                                <span className="w-8 text-center text-xs font-bold text-surface-800">
+                                  {getQty(product.id)}
+                                </span>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) + 1); }} 
+                                  className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
-                            <button
-                              onClick={() => handleAdd(product)}
-                              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
-                                isAdded ? 'bg-emerald-500 text-white' : 'bg-primary-600 hover:bg-primary-700 text-white'
-                              }`}
-                            >
-                              {isAdded
-                                ? <><Check className="w-3.5 h-3.5" /> {t('catalog.added')}</>
-                                : <><ShoppingCart className="w-3.5 h-3.5" /> {t('catalog.addToOrder')}</>
-                              }
-                            </button>
-                          </div>
-                          {stockWarnings[product.id] && (
-                            <p className="text-xs text-amber-600 flex items-center gap-1">
-                              <AlertTriangle className="w-3 h-3 shrink-0" />
-                              {t('cart.stockWarning')} · {t('cart.maxStock')}: {product.stock}
-                            </p>
-                          )}
-                        </div>
-                      ) : isLoggedIn && isOut ? (
-                        <div className="py-2 bg-surface-50 rounded-lg text-center text-xs text-surface-400 font-medium border border-surface-200">
-                          {t('stock.noStock')}
-                        </div>
-                      ) : (
-                        <Link
-                          to="/"
-                          className="w-full py-2 rounded-lg text-sm font-medium border border-dashed border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center gap-1.5"
-                        >
-                          <Lock className="w-3.5 h-3.5" />
-                          Acceder para pedir
-                        </Link>
-                      )}
+                            {/* Price - Bottom Right, Large */}
+                            <div className="text-right flex flex-col items-end">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl font-black text-surface-900 leading-none">
+                                  €{product.price.toFixed(2)}
+                                </span>
+                                <button
+                                  onClick={() => handleAdd(product)}
+                                  className={`p-2 rounded-lg transition-all duration-150 ${
+                                    isAdded 
+                                      ? 'bg-emerald-500 text-white shadow-lg scale-95' 
+                                      : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
+                                  }`}
+                                >
+                                  {isAdded ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            to="/"
+                            className="w-full py-2 rounded-lg text-xs font-medium border border-dashed border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Lock className="w-3.5 h-3.5" />
+                            Inicia sesión para ver precios
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -469,12 +431,12 @@ export default function Catalog() {
             onClick={e => e.stopPropagation()}
           >
             {/* Image */}
-            <div className="h-56 bg-surface-50 relative overflow-hidden border-b border-surface-100">
+            <div className="h-64 bg-gradient-to-br from-surface-50 to-white relative overflow-hidden border-b border-surface-100">
               {selectedProduct.imageUrl ? (
                 <img
                   src={selectedProduct.imageUrl}
                   alt={selectedProduct.name}
-                  className="w-full h-full object-contain p-4"
+                  className="w-full h-full object-contain p-6"
                   onError={e => {
                     const img = e.target as HTMLImageElement;
                     img.style.display = 'none';
@@ -484,10 +446,13 @@ export default function Catalog() {
                 />
               ) : null}
               <div
-                className="modal-fb absolute inset-0 items-center justify-center"
+                className="modal-fb absolute inset-0 flex-col items-center justify-center gap-3"
                 style={{ display: selectedProduct.imageUrl ? 'none' : 'flex' }}
               >
-                <Package className="w-20 h-20 text-surface-200" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shadow-md">
+                  <span className="text-3xl font-black text-primary-600">{(selectedProduct.brand || selectedProduct.name || 'P')[0]}</span>
+                </div>
+                <span className="text-xs font-semibold text-surface-400 uppercase tracking-wider">{selectedProduct.brand}</span>
               </div>
               <button
                 onClick={() => setSelectedProduct(null)}
@@ -515,12 +480,6 @@ export default function Catalog() {
               )}
 
               <div className="flex flex-wrap items-center gap-2 mb-5">
-                {(() => {
-                  const level = getStockLevel(selectedProduct.stock);
-                  if (level === 'out') return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">{t('stock.noStock')}</span>;
-                  if (level === 'low') return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">{t('stock.lowStock')} · {selectedProduct.stock} ud</span>;
-                  return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">{t('stock.inStock')} · {selectedProduct.stock} ud</span>;
-                })()}
                 {selectedProduct.unitMeasure && (
                   <span className="px-2 py-0.5 rounded-full text-xs bg-surface-100 text-surface-600">{selectedProduct.unitMeasure}</span>
                 )}
@@ -529,44 +488,59 @@ export default function Catalog() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between gap-3">
-                {isLoggedIn ? (
-                  <p className="text-2xl font-bold text-surface-900">
-                    €{selectedProduct.price.toFixed(2)}
-                    <span className="text-xs font-normal text-surface-400 ml-1">{t('catalog.perUnit')}</span>
-                  </p>
-                ) : (
-                  <Link to="/" className="flex items-center gap-1.5 text-sm text-surface-400 hover:text-primary-600 transition-colors">
-                    <Lock className="w-4 h-4" />
-                    <span className="font-medium">Inicia sesión para ver el precio</span>
-                  </Link>
-                )}
-                {isLoggedIn ? (
-                  <button
-                    onClick={() => {
-                      if (selectedProduct.stock > 0) {
+              <div className="flex items-center justify-between gap-3 bg-surface-50 p-4 rounded-xl border border-surface-100">
+                <div className="flex flex-col">
+                  {isLoggedIn ? (
+                    <>
+                      <p className="text-2xl font-bold text-surface-900 leading-none">
+                        €{selectedProduct.price.toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-surface-400 mt-1 uppercase font-bold tracking-wider">{t('catalog.perUnit')}</p>
+                    </>
+                  ) : (
+                    <Link to="/" className="flex items-center gap-1.5 text-xs text-surface-400 hover:text-primary-600 transition-colors">
+                      <Lock className="w-3 h-3" />
+                      <span className="font-medium">Identifícate</span>
+                    </Link>
+                  )}
+                </div>
+
+                {isLoggedIn && (
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-center">
+                      {selectedProduct.unitsPerBox && selectedProduct.unitsPerBox > 1 && (
+                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                      )}
+                      <div className="flex items-center bg-white border border-surface-200 rounded-lg overflow-hidden shadow-sm">
+                        <button 
+                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) - 1)} 
+                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-10 text-center text-sm font-bold text-surface-800">
+                          {getQty(selectedProduct.id)}
+                        </span>
+                        <button 
+                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) + 1)} 
+                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
                         handleAdd(selectedProduct);
                         setTimeout(() => setSelectedProduct(null), 600);
-                      }
-                    }}
-                    disabled={selectedProduct.stock === 0}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm ${
-                      selectedProduct.stock === 0
-                        ? 'bg-surface-100 text-surface-400 cursor-not-allowed'
-                        : 'bg-primary-600 hover:bg-primary-700 text-white'
-                    }`}
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    {t('catalog.addToOrder')}
-                  </button>
-                ) : (
-                  <Link
-                    to="/"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-dashed border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
-                  >
-                    <Lock className="w-4 h-4" />
-                    Acceder
-                  </Link>
+                      }}
+                      className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md bg-primary-600 hover:bg-primary-700 text-white active:scale-95"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      {t('catalog.addToOrder')}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

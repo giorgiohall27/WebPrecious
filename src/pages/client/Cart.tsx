@@ -118,17 +118,30 @@ export default function Cart() {
               {/* Items */}
               {catItems.map(item => {
                 const overStock = item.quantity > item.product.stock;
+                const unitsPerBox = item.product.unitsPerBox || 1;
+                const boxCount = Math.round(item.quantity / unitsPerBox);
+                const boxPrice = item.product.price * unitsPerBox;
                 return (
                   <div key={item.product.id} className="px-6 py-4 flex items-center gap-4 border-t border-surface-100 first:border-t-0">
                     {/* Product Image */}
-                    <div className="w-14 h-14 rounded-lg bg-surface-100 flex items-center justify-center shrink-0">
-                      <ShoppingBag className="w-6 h-6 text-surface-300" />
+                    <div className="w-14 h-14 rounded-lg bg-surface-50 flex items-center justify-center shrink-0 overflow-hidden border border-surface-100">
+                      {item.product.imageUrl ? (
+                        <img
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
+                          className="w-full h-full object-contain p-1"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+                          <span className="text-lg font-black text-primary-400">{(item.product.brand || item.product.name || 'P')[0]}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-surface-900 text-sm truncate">{item.product.name}</p>
-                      <p className="text-xs text-surface-400">{item.product.sku} · {item.product.price.toFixed(2)} €{t('catalog.perUnit')}</p>
+                      <p className="text-xs text-surface-400">{item.product.sku} · {boxPrice.toFixed(2)} €/caja{unitsPerBox > 1 ? ` (${unitsPerBox} uds × €${item.product.price.toFixed(2)})` : ''}</p>
                       {overStock && (
                         <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
                           <AlertTriangle className="w-3 h-3" /> {t('cart.maxStock')}: {item.product.stock}
@@ -136,17 +149,25 @@ export default function Cart() {
                       )}
                     </div>
 
-                    {/* Quantity */}
-                    <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
-                      <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity - 1)} className="px-2 py-1.5 hover:bg-surface-50"><Minus className="w-3.5 h-3.5" /></button>
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={e => handleUpdateQty(item.product.id, item.quantity, parseInt(e.target.value) || 1)}
-                        className="w-14 text-center text-sm border-x border-surface-200 py-1.5 focus:outline-none"
-                        min="1"
-                      />
-                      <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity + 1)} className="px-2 py-1.5 hover:bg-surface-50"><Plus className="w-3.5 h-3.5" /></button>
+                    {/* Quantity (in boxes) */}
+                    <div className="flex flex-col items-center">
+                      {unitsPerBox > 1 && (
+                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                      )}
+                      <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
+                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity - unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Minus className="w-3.5 h-3.5" /></button>
+                        <input
+                          type="number"
+                          value={boxCount}
+                          onChange={e => {
+                            const newBoxes = parseInt(e.target.value) || 1;
+                            handleUpdateQty(item.product.id, item.quantity, newBoxes * unitsPerBox);
+                          }}
+                          className="w-14 text-center text-sm border-x border-surface-200 py-1.5 focus:outline-none"
+                          min="1"
+                        />
+                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity + unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Plus className="w-3.5 h-3.5" /></button>
+                      </div>
                     </div>
 
                     {/* Subtotal */}

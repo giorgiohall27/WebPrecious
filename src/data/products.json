@@ -1,0 +1,1395 @@
+[
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MAYNARD BASSETTS",
+    "DESCRIPCION": "LIQUORICE ALLSORTS",
+    "UNIDADES": "12 X 130G",
+    "PRECIO": 1.46
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MAYNARD BASSETTS",
+    "DESCRIPCION": "WINE GUMS",
+    "UNIDADES": "12 X 130G",
+    "PRECIO": 1.46
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MAYNARD BASSETTS",
+    "DESCRIPCION": "JELLY BABIES",
+    "UNIDADES": "12 X 130G",
+    "PRECIO": 1.46
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MAYNARD BASSETTS",
+    "DESCRIPCION": "SPORTS MIX",
+    "UNIDADES": "12 X 130G",
+    "PRECIO": 1.46
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MAYNARD BASSETTS",
+    "DESCRIPCION": "MIDGET GEMS",
+    "UNIDADES": "12 X 160G",
+    "PRECIO": 1.46
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "ROWNTREE",
+    "DESCRIPCION": "RANDOMS",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "ROWNTREE",
+    "DESCRIPCION": "FRUIT PASTILLES",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.79
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "ROWNTREE",
+    "DESCRIPCION": "PICK & MIX POUCH",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.79
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "ROWNTREE",
+    "DESCRIPCION": "FRUIT GUMS",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.79
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "STARBURST",
+    "DESCRIPCION": "ORIGINAL FRUIT CHEWS",
+    "UNIDADES": "12 X 141G",
+    "PRECIO": 1.79
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SWEETZONE",
+    "DESCRIPCION": "MALLOW MIX",
+    "UNIDADES": "10 X 140G",
+    "PRECIO": 1.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SWEETZONE",
+    "DESCRIPCION": "PARTY MIX",
+    "UNIDADES": "12 X 180G",
+    "PRECIO": 1.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SWEETZONE",
+    "DESCRIPCION": "TANGY MIX",
+    "UNIDADES": "12 X 180G",
+    "PRECIO": 1.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SWEETZONE",
+    "DESCRIPCION": "FIZZY MIX",
+    "UNIDADES": "12 X 180G",
+    "PRECIO": 1.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "ORIGINAL",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "FRUIT MIX",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "COLA",
+    "UNIDADES": "10 X 140G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "WATERMELON",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "STRAWBERRY",
+    "UNIDADES": "12 X 102G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "SOUR PATCH",
+    "DESCRIPCION": "BLUE RASPBERRY",
+    "UNIDADES": "12 X 102G",
+    "PRECIO": 1.97
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MILLIONS",
+    "DESCRIPCION": "TUBES / STRAWBERRY",
+    "UNIDADES": "12 X 58G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MILLIONS",
+    "DESCRIPCION": "TUBES / APPLE",
+    "UNIDADES": "12 X 58G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "MILLIONS",
+    "DESCRIPCION": "TUBES / RASPBERRY",
+    "UNIDADES": "12 X 58G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "GUMMY CLUSTER BERRIES",
+    "UNIDADES": "12 X 113G",
+    "PRECIO": 2.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "GRAPE & STRAWBERRY VIDEOBOX",
+    "UNIDADES": "12 X 141.7G",
+    "PRECIO": 1.96
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "RAINBOW VIDEOBOX",
+    "UNIDADES": "12 X 141.7G",
+    "PRECIO": 1.96
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "FRUIT VIDEOBOX",
+    "UNIDADES": "12 X 141.7G",
+    "PRECIO": 1.96
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "RAINBOW ROPE",
+    "UNIDADES": "24 X 26G",
+    "PRECIO": 1.38
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "VERY BERRY ROPE",
+    "UNIDADES": "24 X 26G",
+    "PRECIO": 1.38
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "NERDS",
+    "DESCRIPCION": "VERY BERRY GUMMY CLUSTERS",
+    "UNIDADES": "12 X 113G",
+    "PRECIO": 2.59
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "SALTED CARAMEL TOFFEE",
+    "UNIDADES": "12 X 150G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "ASSORTED TOFFEES",
+    "UNIDADES": "12 X 150G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "LIQUORICE TOFFEE",
+    "UNIDADES": "12 X 150G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "CREAMY TOFFEE",
+    "UNIDADES": "12 X 150G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "MINT TOFFEE",
+    "UNIDADES": "12 X 150G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WERTHERS",
+    "DESCRIPCION": "ECLAIRS",
+    "UNIDADES": "12 X 100G",
+    "PRECIO": 1.76
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WERTHERS",
+    "DESCRIPCION": "CREAMY FILLING",
+    "UNIDADES": "24 X 137.5G",
+    "PRECIO": 1.76
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WERTHERS",
+    "DESCRIPCION": "BUTTER CANDIES",
+    "UNIDADES": "24 X 137.5G",
+    "PRECIO": 1.76
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "WERTHERS",
+    "DESCRIPCION": "SOFT CARAMELS",
+    "UNIDADES": "24 X 137.5G",
+    "PRECIO": 1.76
+  },
+  {
+    "CATEGORIA": "SWEETS",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "ECLAIRS",
+    "UNIDADES": "12 X 130G",
+    "PRECIO": 1.7
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "OREO BITES",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "TWIRL MINI BITES",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "BITSA WISPA",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "CARAMEL NIBBLES POUCH",
+    "UNIDADES": "10 X 120G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "DAIRYMILK BUTTONS POUCH",
+    "UNIDADES": "10 X 110G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "DAIRY MILK ORANGE BUTTONS POUCH",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "WHITE CHOC BUTTONS",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "CARAMILK BUTTONS",
+    "UNIDADES": "10 X 90G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "CURLY WURLY SQUIRLIES",
+    "UNIDADES": "10 X 95G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "ROLOS POUCH",
+    "UNIDADES": "8 X 103G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "MUNCHIES POUCH",
+    "UNIDADES": "8 X 104G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "GALAXY",
+    "DESCRIPCION": "MINSTRELS POUCH",
+    "UNIDADES": "20 X 80G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "AERO MELTS POUCH",
+    "UNIDADES": "8 X 107G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "AERO PEPPERMINT POUCH",
+    "UNIDADES": "8 X 102G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "MILKYBAR BUTTONS",
+    "UNIDADES": "8 X 102G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "RIESEN",
+    "DESCRIPCION": "RIESEN BAG",
+    "UNIDADES": "12 X 110G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "REESE'S",
+    "DESCRIPCION": "PEANUT BUTTER CUPS 2PK",
+    "UNIDADES": "36 X 42G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "REESE'S",
+    "DESCRIPCION": "NUTRAGEOUS BARS",
+    "UNIDADES": "18 X 47G",
+    "PRECIO": 1.13
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "REESE'S",
+    "DESCRIPCION": "OVERLOAD",
+    "UNIDADES": "18 X 42G",
+    "PRECIO": 1.13
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "REESE'S",
+    "DESCRIPCION": "PEANUT BUTTER CUPS MINI POUCH",
+    "UNIDADES": "16 X 68G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "REESE'S",
+    "DESCRIPCION": "WHITE PEANUT BUTTER CUPS 2PK",
+    "UNIDADES": "24 X 39.5G",
+    "PRECIO": 1.15
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "MR.BEAST",
+    "DESCRIPCION": "MILK CHOCOLATE BAR",
+    "UNIDADES": "40 X 60G",
+    "PRECIO": 2.39
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "MR.BEAST",
+    "DESCRIPCION": "MILK CHOCOLATE CRUNCH BAR",
+    "UNIDADES": "40 X 60G",
+    "PRECIO": 2.39
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "MR.BEAST",
+    "DESCRIPCION": "MILK CHOCOLATE / PEANUT BUTTER BAR",
+    "UNIDADES": "40 X 60G",
+    "PRECIO": 2.39
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "MR.BEAST",
+    "DESCRIPCION": "MILK CHOCOLATE / ALMOND",
+    "UNIDADES": "40 X 60G",
+    "PRECIO": 2.39
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "TWIRL",
+    "UNIDADES": "5PK X 20",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "CRUNCHIE",
+    "UNIDADES": "4PK X 10",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "DAIRY MILK",
+    "UNIDADES": "4PK X 14",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "WISPA",
+    "UNIDADES": "4PK X 11",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "PICNIC",
+    "UNIDADES": "4PK X 10",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "DOUBLE DECKER",
+    "UNIDADES": "4PK X 8",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "BOOST BARS",
+    "UNIDADES": "4PK X 9",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "FLAKE",
+    "UNIDADES": "4PK X 20",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "FUDGE",
+    "UNIDADES": "5PK X 20",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "CHOCOLATES",
+    "MARCA": "CADBURY",
+    "DESCRIPCION": "DAIM BAR",
+    "UNIDADES": "3PK 24 X 84G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCVITIES",
+    "DESCRIPCION": "RICH TEA",
+    "UNIDADES": "20 X 300G",
+    "PRECIO": 2.49
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "HILL",
+    "DESCRIPCION": "CUSTARD CREAMS",
+    "UNIDADES": "36 X 150G",
+    "PRECIO": 0.85
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "HILL",
+    "DESCRIPCION": "CHOCOLATE CREAMS",
+    "UNIDADES": "36 X 150G",
+    "PRECIO": 0.85
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "HILL",
+    "DESCRIPCION": "COCONUT CREAMS",
+    "UNIDADES": "36 X 150G",
+    "PRECIO": 0.85
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "FOX'S",
+    "DESCRIPCION": "HALF COATED CHUNKIE COOKIE",
+    "UNIDADES": "8 X 175G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "FOX'S",
+    "DESCRIPCION": "TRIPLE CHOC CHUNKIE COOKIE",
+    "UNIDADES": "8 X 180G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "FOX'S",
+    "DESCRIPCION": "MILK CHOC CHUNKIE COOKIES",
+    "UNIDADES": "8 X 180G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "FOX'S",
+    "DESCRIPCION": "WHITE CHOC CHUNKIE COOKIES",
+    "UNIDADES": "8 X 180G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "BOUNTY",
+    "DESCRIPCION": "CHUNK COOKIES",
+    "UNIDADES": "8 X 180G",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCVITIES",
+    "DESCRIPCION": "GINGER NUTS",
+    "UNIDADES": "12 X 250G",
+    "PRECIO": 1.79
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCVITIES",
+    "DESCRIPCION": "DIGESTIVES",
+    "UNIDADES": "24 X 225G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCVITIES",
+    "DESCRIPCION": "MILK CHOCOLATE DIGESTIVES",
+    "UNIDADES": "15 X 266G",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCVITIES",
+    "DESCRIPCION": "DARK CHOC DIGESTIVES",
+    "UNIDADES": "15 X 266G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "KELLOGGS",
+    "DESCRIPCION": "CRUNCHY NUT CORNFLAKES",
+    "UNIDADES": "6 X 500G",
+    "PRECIO": 3.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DORSET",
+    "DESCRIPCION": "MUESLI",
+    "UNIDADES": "5 X 410G",
+    "PRECIO": 3.29
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DORSET",
+    "DESCRIPCION": "FRUITY MUESLI",
+    "UNIDADES": "5 X 410G",
+    "PRECIO": 3.29
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DORSET",
+    "DESCRIPCION": "NUTTY MUESLI",
+    "UNIDADES": "5 X 410G",
+    "PRECIO": 3.29
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "SHREDDED WHEAT 16'S",
+    "UNIDADES": "10 X 460G",
+    "PRECIO": 3.79
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "NESTLE",
+    "DESCRIPCION": "SHREDDIES",
+    "UNIDADES": "6 X 500G",
+    "PRECIO": 3.79
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "WEETABIX",
+    "DESCRIPCION": "WEETABIX STANDARD",
+    "UNIDADES": "10 X 500G",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCCOY'S",
+    "DESCRIPCION": "FLAME GRILLED STEAK CHIPS",
+    "UNIDADES": "32 X 45G",
+    "PRECIO": 1.39
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCCOY'S",
+    "DESCRIPCION": "HOT AND SPICY ",
+    "UNIDADES": "32 X 45G",
+    "PRECIO": 1.39
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCCOY'S",
+    "DESCRIPCION": "KING PRAWN",
+    "UNIDADES": "32 X 45G",
+    "PRECIO": 1.39
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCCOY'S",
+    "DESCRIPCION": "CHEDDAR ONION",
+    "UNIDADES": "32 X 45G",
+    "PRECIO": 1.39
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MCCOY'S",
+    "DESCRIPCION": "THAI SWEET CHICKEN",
+    "UNIDADES": "32 X 45G",
+    "PRECIO": 1.69
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "BAKED BEANS IN TOM SAUCE",
+    "UNIDADES": "24 X 220G",
+    "PRECIO": 0.85
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "SAGE & ONION STUFFING",
+    "UNIDADES": "12 X 85G",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "VEGETABLE GRAVY GRANULES",
+    "UNIDADES": "12 X 200G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "BEEF GRAVY",
+    "UNIDADES": "12 X 200G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "CHICKEN GRAVY",
+    "UNIDADES": "12 X 200G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "SALAD CREAM CLASSIC",
+    "UNIDADES": "12 X 420G",
+    "PRECIO": 2.59
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "SALAD CREAM LIGHT",
+    "UNIDADES": "12 X 420G",
+    "PRECIO": 2.59
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "EARL GREY 100 TEA BAGS",
+    "UNIDADES": "4 X 200G",
+    "PRECIO": 3.49
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "MORRISON",
+    "DESCRIPCION": "GOLD DECAF COFFEE",
+    "UNIDADES": "6 X 100G",
+    "PRECIO": 4.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DUERRS",
+    "DESCRIPCION": "ORANGE MARMALADE",
+    "UNIDADES": "6 X 454G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DUERRS",
+    "DESCRIPCION": "STRAWBERRY JAM",
+    "UNIDADES": "6 X 454G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "DUERRS",
+    "DESCRIPCION": "GINGER JAM",
+    "UNIDADES": "6 X 454G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "MRS B'S",
+    "DESCRIPCION": "PURE HONEY SQUEEZY",
+    "UNIDADES": "10 X 240G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "GO LOCAL",
+    "DESCRIPCION": "SMOOTH PEANUT BUTTER",
+    "UNIDADES": "6 X 340GR",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "GO LOCAL",
+    "DESCRIPCION": "CRUNCHY PEANUT BUTTER",
+    "UNIDADES": "6 X 340GR",
+    "PRECIO": 1.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "TATE & LYLE",
+    "DESCRIPCION": "CASTER SUGAR",
+    "UNIDADES": "10 X 500G",
+    "PRECIO": 1.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "TATE & LYLE",
+    "DESCRIPCION": "GRANULATED SUGAR",
+    "UNIDADES": "10 X 500G",
+    "PRECIO": 1.29
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "POT NOODLES",
+    "DESCRIPCION": "CHICKEN & MUSHROOM",
+    "UNIDADES": "12 X 90G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "POT NOODLES",
+    "DESCRIPCION": "BOMBAY BAD BOY",
+    "UNIDADES": "12 X 90G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "POT NOODLES",
+    "DESCRIPCION": "CURRY",
+    "UNIDADES": "12 X 90G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "POT NOODLES",
+    "DESCRIPCION": "BEEF & TOMATO",
+    "UNIDADES": "12 X 90G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BEN'S",
+    "DESCRIPCION": "ORIGINAL BASMATI RICE",
+    "UNIDADES": "6 X 220G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BEN'S",
+    "DESCRIPCION": "PILAU RICE",
+    "UNIDADES": "6 X 220G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BEN'S",
+    "DESCRIPCION": "LONG GRAIN RICE",
+    "UNIDADES": "6 X 250G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BEN'S",
+    "DESCRIPCION": "GOLDEN VEGETABLE RICE",
+    "UNIDADES": "6 X 220G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BEN'S",
+    "DESCRIPCION": "CHICKEN RICE",
+    "UNIDADES": "6 X 220G",
+    "PRECIO": 2.69
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BRANSTON",
+    "DESCRIPCION": "BAKED BEANS IN TOM SAUCE",
+    "UNIDADES": "24 X 410G",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BATCHELOR",
+    "DESCRIPCION": "MUSHY PEAS",
+    "UNIDADES": "24 X 300G",
+    "PRECIO": 1.09
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "HEINZ",
+    "DESCRIPCION": "BAKED BEANS",
+    "UNIDADES": "24 X 415G",
+    "PRECIO": 1.09
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "HEINZ",
+    "DESCRIPCION": "TOMATO SOUP",
+    "UNIDADES": "24 X 400G",
+    "PRECIO": 1.39
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "HEINZ",
+    "DESCRIPCION": "VEGETABLE SOUP",
+    "UNIDADES": "24 X 400G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "HEINZ",
+    "DESCRIPCION": "MUSHROOM SOUP",
+    "UNIDADES": "24 X 400G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "HEINZ",
+    "DESCRIPCION": "CHICKEN SOUP",
+    "UNIDADES": "24 X 400G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BRANSTON",
+    "DESCRIPCION": "ORIGINAL PICKLE",
+    "UNIDADES": "6 X 360G",
+    "PRECIO": 2.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "BRANSTON",
+    "DESCRIPCION": "SMALL CHUNK PICKLE",
+    "UNIDADES": "6 X 360G",
+    "PRECIO": 2.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "NICO'S",
+    "DESCRIPCION": "COCONUT MILK",
+    "UNIDADES": "12 X 400ML",
+    "PRECIO": 1.09
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "ENGLISH MUSTARD",
+    "UNIDADES": "6 X 100G",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "MINT SAUCE",
+    "UNIDADES": "8 X 155G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "APPLE SAUCE",
+    "UNIDADES": "8 X 155G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "HORSERADISH SAUCE",
+    "UNIDADES": "8 X 155G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "SEAFOOD SAUCE",
+    "UNIDADES": "8 X 155G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "ALIMENTACION",
+    "MARCA": "COLMANS",
+    "DESCRIPCION": "TARTARE SAUCE",
+    "UNIDADES": "8 X 155G",
+    "PRECIO": 1.95
+  },
+  {
+    "CATEGORIA": "SWEETS ",
+    "MARCA": "MILLIONS",
+    "DESCRIPCION": "TUBES/BLACKCURRANT",
+    "UNIDADES": "12 X 58G",
+    "PRECIO": 1.19
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "Monster munch Pickled Onion",
+    "UNIDADES": "35 X 40G",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "QUAVERS",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "HULA HOOPS ORIGINALS",
+    "UNIDADES": "32 X 34G",
+    "PRECIO": 0.79
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "BBQ BEEF",
+    "UNIDADES": "32 X 34G",
+    "PRECIO": 0.79
+  },
+  {
+    "CATEGORIA": "SNACKS",
+    "MARCA": "WALKERS",
+    "DESCRIPCION": "SALT AND VINEGAR ",
+    "UNIDADES": "32 X 34G",
+    "PRECIO": 0.79
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "FANTA",
+    "DESCRIPCION": "PINEAPPLE",
+    "UNIDADES": "6X500ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "FANTA",
+    "DESCRIPCION": "BERRY",
+    "UNIDADES": "12X355ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "FANTA",
+    "DESCRIPCION": "STRAWBERRY",
+    "UNIDADES": "12X355ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "FANTA",
+    "DESCRIPCION": "GRAPE",
+    "UNIDADES": "12X355ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "FANTA",
+    "DESCRIPCION": "PEACH",
+    "UNIDADES": "12X355ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "MARS",
+    "DESCRIPCION": "SNICKERS DRINK SPORTSCAP",
+    "UNIDADES": "8X350ML",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "MARS",
+    "DESCRIPCION": "TWIX DRINK SPORTSCAP",
+    "UNIDADES": "8X350ML",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "MARS",
+    "DESCRIPCION": "M&M DRINK SPORTSCAP",
+    "UNIDADES": "8X350ML",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "MARS",
+    "DESCRIPCION": "MARS DRINK SPORTSCAP",
+    "UNIDADES": "8X350ML",
+    "PRECIO": 2.29
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "AMAZONIA",
+    "DESCRIPCION": "JUGO DE COCO CON PULPA ",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "AMAZONIA",
+    "DESCRIPCION": "JUGO DE MARACUYÁ",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.89
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "AMAZONIA",
+    "DESCRIPCION": "JUGO DE MANGO",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.89
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "AMAZONIA",
+    "DESCRIPCION": "JUGO DE TAMARINDO",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.89
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "PG",
+    "DESCRIPCION": "40'S",
+    "UNIDADES": "X12",
+    "PRECIO": 1.69
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "PG",
+    "DESCRIPCION": "70'S DECAF",
+    "UNIDADES": "X6",
+    "PRECIO": 4.79
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "TETLEYS",
+    "DESCRIPCION": "ORIGINAL TEA",
+    "UNIDADES": "40'S X12",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "YORKSHIRE TEA",
+    "DESCRIPCION": "TEA BAGS 40'S",
+    "UNIDADES": "40'S X5",
+    "PRECIO": 1.89
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "YORKSHIRE TEA",
+    "DESCRIPCION": "TEA BAGS 210'S",
+    "UNIDADES": "210'S",
+    "PRECIO": 7.99
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "YORKSHIRE TEA",
+    "DESCRIPCION": "TEA BAGS 40'S DECAF ",
+    "UNIDADES": "5 X 125G",
+    "PRECIO": 2.79
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "GO LOCAL",
+    "DESCRIPCION": "GOLD COFFEE",
+    "UNIDADES": "6X325G",
+    "PRECIO": 3.29
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "LUCOZADE",
+    "DESCRIPCION": "ORIGINAL",
+    "UNIDADES": "24X380ML",
+    "PRECIO": 1.09
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "LUCOZADE",
+    "DESCRIPCION": "ORANGE",
+    "UNIDADES": "24X380ML",
+    "PRECIO": 1.09
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "LUCOZADE",
+    "DESCRIPCION": "BLUE BURST",
+    "UNIDADES": "12X500ML",
+    "PRECIO": 1.59
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "VIMTO",
+    "DESCRIPCION": "ORIGINAL LATA",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.69
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "COCA-COLA",
+    "DESCRIPCION": "ORIGINAL LATA",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.5
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "COCA-COLA",
+    "DESCRIPCION": "VANILLA LATA",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.595
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "ESSENCE",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "ESSENCE",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "ESSENCE",
+    "DESCRIPCION": "",
+    "UNIDADES": "",
+    "PRECIO": ""
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "COCA-COLA",
+    "DESCRIPCION": "CHERRY LATA",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.595
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "PEPSI",
+    "DESCRIPCION": "MAX CHERRY",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.69
+  },
+  {
+    "CATEGORIA": "REFRESCOS",
+    "MARCA": "TANGO",
+    "DESCRIPCION": "APPLE",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 0.79
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "STRONGBOW",
+    "DESCRIPCION": "STRAWBERRY/LIME",
+    "UNIDADES": "24X500ML",
+    "PRECIO": 0.89
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "KOPPARBERG",
+    "DESCRIPCION": "MIXED FRUITS",
+    "UNIDADES": "24X500ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "KOPPARBERG",
+    "DESCRIPCION": "PEAR",
+    "UNIDADES": "24X500ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "KOPPARBERG",
+    "DESCRIPCION": "WILD BERRIES",
+    "UNIDADES": "24X500ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "BACARDI BREEZER",
+    "DESCRIPCION": "LIME",
+    "UNIDADES": "24X275ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "BACARDI BREEZER",
+    "DESCRIPCION": "WATERMELON",
+    "UNIDADES": "24X275ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "BACARDI BREEZER",
+    "DESCRIPCION": "ORANGE",
+    "UNIDADES": "24X275ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "HARDY'S",
+    "DESCRIPCION": "PASSION FRUIT/MANGO",
+    "UNIDADES": "6X750ML",
+    "PRECIO": 3.89
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "JAM SHED",
+    "DESCRIPCION": "SHIRAZ WINE",
+    "UNIDADES": "6X750ML",
+    "PRECIO": 3.99
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "JAM SHED",
+    "DESCRIPCION": "ROSE WINE",
+    "UNIDADES": "6X750ML",
+    "PRECIO": 3.99
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "GREENE KING",
+    "DESCRIPCION": "IPA BEER",
+    "UNIDADES": "24X500ML",
+    "PRECIO": 1.35
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "MAGNERS",
+    "DESCRIPCION": "ORIGINAL BOTTLE",
+    "UNIDADES": "12X568ML",
+    "PRECIO": 1.49
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "LECOQ",
+    "DESCRIPCION": "SEX ON THE BEACH",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 1.05
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "LECOQ",
+    "DESCRIPCION": "MOJITO",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 1.05
+  },
+  {
+    "CATEGORIA": "BEBIDAS ALCOHOLICAS",
+    "MARCA": "LECOQ",
+    "DESCRIPCION": "PIÑA COLADA",
+    "UNIDADES": "24X330ML",
+    "PRECIO": 1.05
+  }
+]

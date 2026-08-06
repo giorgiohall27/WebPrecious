@@ -27,6 +27,7 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+~$*
 
 # Logs
 npm-debug.log*
@@ -40,5 +41,6 @@ lerna-debug.log*
 
 # Misc
 *.local
+SKILL.md
 
 .vercel

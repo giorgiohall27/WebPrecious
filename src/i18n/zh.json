@@ -1,4 +1,4 @@
-Necesito que me ordenes de forma profesional donde pone "comprar por categoría" en la página principal. {
+{
   "common": {
     "appName": "Precious Spain",
     "search": "搜索产品...",
@@ -63,7 +63,7 @@ Necesito que me ordenes de forma profesional donde pone "comprar por categoría"
     "step4Title": "收货",
     "step4Desc": "我们将订单直接准备并发货到您公司的仓库。随时查看订单历史。",
     "tryFreeLabel": "免费试用 — 查看无价格目录",
-    "tryFreeSubtext": "无需注册 · 无任何承诺",mbas
+    "tryFreeSubtext": "无需注册 · 无任何承诺",
     "statOnlineSub": "全天候门户",
     "step1TitleShort": "产品",
     "step3TitleShort": "响应时间",

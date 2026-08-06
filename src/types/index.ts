@@ -30,7 +30,8 @@ export interface Product {
   description?: string;
   brand?: string;
   unitMeasure?: string;
-  imageUrl?: string;
+  unitsPerBox?: number;
+  imageUrl?: string | null;
   weightKg?: number;
   iva?: number;
   active: boolean;
