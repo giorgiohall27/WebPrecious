@@ -1,16 +1,26 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import { ManagedCompany } from '../types';
+import { ManagedCompany, SuperAdmin } from '../types';
 import { supabase, supabaseEnabled } from '../lib/supabase';
 
-const SUPER_ADMIN_EMAIL = 'leviturjeman@gmail.com';
 const SUPER_ADMIN_PASSWORD = 'Levi1234';
-const SUPER_ADMIN_PIN = '909090';
 
 const COMPANIES_STORAGE_KEY = 'webprecious.companies.v2';
 const COMPANY_SESSION_KEY = 'webprecious.companySession.v2';
 const SUPER_ADMIN_SESSION_KEY = 'webprecious.superAdminSession.v2';
 
 type CompanyInput = Omit<ManagedCompany, 'id' | 'createdAt'>;
+
+const defaultSuperAdmins: SuperAdmin[] = [
+  {
+    id: 'super-admin-main',
+    name: 'Levi Super Admin',
+    email: 'leviturjeman@gmail.com',
+    pin: '909090',
+    active: true,
+    createdAt: '2026-03-20T00:00:00.000Z',
+    notes: 'Administrador principal de Precious Spain',
+  },
+];
 
 const defaultCompanies: ManagedCompany[] = [
   {
@@ -113,6 +123,18 @@ function toCompany(row: any): ManagedCompany {
   };
 }
 
+function toSuperAdmin(row: any): SuperAdmin {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    pin: row.pin,
+    active: row.active,
+    createdAt: row.created_at ?? new Date().toISOString(),
+    notes: row.notes ?? '',
+  };
+}
+
 function fromCompany(company: ManagedCompany) {
   return {
     id: company.id,
@@ -153,6 +175,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [superAdmins, setSuperAdmins] = useState<SuperAdmin[]>(defaultSuperAdmins);
   const [companies, setCompanies] = useState<ManagedCompany[]>(() => {
     const stored = readJson<ManagedCompany[]>(COMPANIES_STORAGE_KEY, defaultCompanies);
     return stored.length > 0 ? stored : defaultCompanies;
@@ -168,19 +191,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!supabaseEnabled) return;
 
-    supabase
-      .from('companies')
-      .select('*')
-      .order('name', { ascending: true })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error('Error loading companies:', error);
-          return;
-        }
-        if (data?.length) {
-          setCompanies(data.map(toCompany));
-        }
-      });
+    Promise.all([
+      supabase.from('super_admins').select('*').order('name', { ascending: true }),
+      supabase.from('companies').select('*').order('name', { ascending: true }),
+    ]).then(([superAdminsResult, companiesResult]) => {
+      if (superAdminsResult.error) {
+        console.error('Error loading super admins:', superAdminsResult.error);
+      } else if (superAdminsResult.data?.length) {
+        setSuperAdmins(superAdminsResult.data.map(toSuperAdmin));
+      }
+
+      if (companiesResult.error) {
+        console.error('Error loading companies:', companiesResult.error);
+      } else if (companiesResult.data?.length) {
+        setCompanies(companiesResult.data.map(toCompany));
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -225,11 +251,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginAsSuperAdmin = (email: string, password: string): { success: boolean; error?: string } => {
-    if (email.trim().toLowerCase() !== SUPER_ADMIN_EMAIL) {
+    const admin = superAdmins.find(item => item.email.toLowerCase() === email.trim().toLowerCase());
+    if (!admin) {
       return { success: false, error: 'Email de Super Admin incorrecto' };
     }
     if (password !== SUPER_ADMIN_PASSWORD) {
       return { success: false, error: 'Clave de Super Admin incorrecta' };
+    }
+    if (!admin.active) {
+      return { success: false, error: 'Este Super Admin esta desactivado' };
     }
 
     setIsSuperAdmin(true);
@@ -242,8 +272,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (cleanPin.length !== 6) {
       return { success: false, error: 'Introduce un PIN de 6 digitos' };
     }
-    if (cleanPin !== SUPER_ADMIN_PIN) {
+    const admin = superAdmins.find(item => item.pin === cleanPin);
+    if (!admin) {
       return { success: false, error: 'PIN de Super Admin incorrecto' };
+    }
+    if (!admin.active) {
+      return { success: false, error: 'Este Super Admin esta desactivado' };
     }
 
     setIsSuperAdmin(true);

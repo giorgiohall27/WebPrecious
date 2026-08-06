@@ -10,6 +10,17 @@ import { mockCategories, mockSubcategories, mockProducts } from '../src/data/moc
 const url = process.env.VITE_SUPABASE_URL || 'https://foiqyaaibhkegsvevyio.supabase.co';
 const key = process.env.SUPABASE_SERVICE_KEY || '';
 
+const superAdmins = [
+  {
+    id: 'super-admin-main',
+    name: 'Levi Super Admin',
+    email: 'leviturjeman@gmail.com',
+    pin: '909090',
+    active: true,
+    notes: 'Administrador principal de Precious Spain',
+  },
+];
+
 const demoCompanies = [
   {
     id: 'comp-hotel-costa-demo',
@@ -57,6 +68,10 @@ if (!key) {
 const sb = createClient(url, key);
 
 async function seed() {
+  console.log('Seeding super admins...');
+  const { error: superAdminError } = await sb.from('super_admins').upsert(superAdmins, { onConflict: 'id' });
+  if (superAdminError) throw superAdminError;
+
   console.log('Seeding companies...');
   const { error: companyError } = await sb.from('companies').upsert(demoCompanies, { onConflict: 'id' });
   if (companyError) throw companyError;

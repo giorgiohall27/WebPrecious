@@ -2,6 +2,17 @@
 
 create extension if not exists pgcrypto;
 
+create table if not exists public.super_admins (
+  id text primary key,
+  name text not null,
+  email text not null unique,
+  pin text not null unique check (pin ~ '^[0-9]{6}$'),
+  active boolean not null default true,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.companies (
   id text primary key,
   name text not null,
@@ -93,6 +104,7 @@ create table if not exists public.order_items (
   subtotal numeric(12, 2) not null default 0
 );
 
+create index if not exists idx_super_admins_pin on public.super_admins(pin);
 create index if not exists idx_companies_pin on public.companies(pin);
 create index if not exists idx_products_category on public.products(category_id);
 create index if not exists idx_products_active on public.products(active);
@@ -109,6 +121,11 @@ begin
   return new;
 end;
 $$;
+
+drop trigger if exists set_super_admins_updated_at on public.super_admins;
+create trigger set_super_admins_updated_at
+before update on public.super_admins
+for each row execute function public.set_updated_at();
 
 drop trigger if exists set_companies_updated_at on public.companies;
 create trigger set_companies_updated_at
@@ -131,6 +148,7 @@ before update on public.products
 for each row execute function public.set_updated_at();
 
 grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.super_admins to anon, authenticated;
 grant select, insert, update, delete on public.companies to anon, authenticated;
 grant select, insert, update, delete on public.categories to anon, authenticated;
 grant select, insert, update, delete on public.subcategories to anon, authenticated;

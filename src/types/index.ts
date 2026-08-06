@@ -59,6 +59,16 @@ export interface ManagedCompany extends Company {
   notes?: string;
 }
 
+export interface SuperAdmin {
+  id: string;
+  name: string;
+  email: string;
+  pin: string;
+  active: boolean;
+  createdAt: string;
+  notes?: string;
+}
+
 export interface Order {
   id: string;
   orderId: string;
