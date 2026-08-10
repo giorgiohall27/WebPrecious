@@ -6,6 +6,7 @@ import { useProducts } from '../../store/productsStore';
 import { useOrders } from '../../store/ordersStore';
 import { useAuth } from '../../store/authStore';
 import { useState } from 'react';
+import { notifyAdminNewOrder } from '../../lib/orderEmails';
 
 export default function Cart() {
   const { t } = useTranslation();
@@ -76,6 +77,7 @@ export default function Cart() {
     });
 
     if (savedOrder) {
+      notifyAdminNewOrder(savedOrder);
       clearCart();
       navigate('/order-confirmation', {
         state: {
