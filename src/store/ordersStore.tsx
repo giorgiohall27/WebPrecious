@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { Order } from '../types';
+import { Order, OrderItemAvailability } from '../types';
 import { mockOrders } from '../data/mockData';
 import { supabase, supabaseEnabled } from '../lib/supabase';
 import { useAuth } from './authStore';
@@ -8,6 +8,10 @@ interface OrdersContextType {
   orders: Order[];
   addOrder: (order: Order) => Promise<Order | null>;
   updateOrderStatus: (orderId: string, status: Order['status']) => Promise<Order | null>;
+  updateOrderWithItemDecisions: (
+    orderId: string,
+    decisions: Array<{ productId: string; availabilityStatus: OrderItemAvailability; adminNote?: string }>
+  ) => Promise<Order | null>;
   refreshOrders: () => Promise<void>;
 }
 
@@ -32,6 +36,8 @@ function toOrder(row: any): Order {
       quantity: i.quantity,
       unitPrice: Number(i.unit_price),
       subtotal: Number(i.subtotal),
+      availabilityStatus: i.availability_status ?? undefined,
+      adminNote: i.admin_note ?? undefined,
     })) ?? [],
     totalItems: row.total_items,
     totalAmount: Number(row.total_amount),
@@ -135,7 +141,56 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     return savedOrder;
   }, [superAdminSessionToken]);
 
-  return React.createElement(OrdersContext.Provider, { value: { orders, addOrder, updateOrderStatus, refreshOrders }, children });
+  const updateOrderWithItemDecisions = useCallback(async (
+    orderId: string,
+    decisions: Array<{ productId: string; availabilityStatus: OrderItemAvailability; adminNote?: string }>
+  ) => {
+    if (!supabaseEnabled) {
+      let updatedOrder: Order | null = null;
+      setOrders(prev => prev.map(order => {
+        if (order.id !== orderId) return order;
+        updatedOrder = {
+          ...order,
+          status: 'accepted_modified',
+          items: order.items.map(item => {
+            const decision = decisions.find(entry => entry.productId === item.productId);
+            return decision ? { ...item, ...decision } : item;
+          }),
+        };
+        return updatedOrder;
+      }));
+      return updatedOrder;
+    }
+
+    if (!superAdminSessionToken) {
+      console.error('Missing super admin session token');
+      return null;
+    }
+
+    const { data, error } = await supabase.rpc('admin_update_order_with_item_decisions', {
+      p_admin_token: superAdminSessionToken,
+      p_order_id: orderId,
+      p_items: decisions.map(item => ({
+        product_id: item.productId,
+        availability_status: item.availabilityStatus,
+        admin_note: item.adminNote ?? null,
+      })),
+    });
+
+    if (error || !data) {
+      console.error('Error updating order modifications:', error);
+      return null;
+    }
+
+    const savedOrder = toOrder(data);
+    setOrders(prev => prev.map(order => order.id === savedOrder.id ? savedOrder : order));
+    return savedOrder;
+  }, [superAdminSessionToken]);
+
+  return React.createElement(OrdersContext.Provider, {
+    value: { orders, addOrder, updateOrderStatus, updateOrderWithItemDecisions, refreshOrders },
+    children,
+  });
 }
 
 export function useOrders() {
