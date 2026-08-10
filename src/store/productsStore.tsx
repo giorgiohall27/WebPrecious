@@ -123,9 +123,9 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   const refreshCatalog = useCallback(async () => {
     if (!supabaseEnabled) return;
     if (!catalogToken) {
-      setProducts([]);
-      setCategories([]);
-      setSubcategories([]);
+      setProducts(mockProducts);
+      setCategories(mockCategories);
+      setSubcategories(mockSubcategories);
       return;
     }
 
