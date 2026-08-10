@@ -49,10 +49,14 @@ export default function App() {
             <Route path="/login" element={<ClientLogin />} />
             <Route path="/register" element={<Navigate to="/login" replace />} />
 
-            {/* Client Portal */}
-            <Route element={<RequireCompany><ClientLayout /></RequireCompany>}>
+            {/* Public Portal */}
+            <Route element={<ClientLayout />}>
               <Route path="/" element={<ClientDashboard />} />
               <Route path="/catalog" element={<Catalog />} />
+            </Route>
+
+            {/* Client Portal */}
+            <Route element={<RequireCompany><ClientLayout /></RequireCompany>}>
               <Route path="/cart" element={<Cart />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/profile" element={<Profile />} />
