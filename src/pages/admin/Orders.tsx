@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { Search, Eye, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckCircle, Search, XCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import { Order } from '../../types';
 import { useOrders } from '../../store/ordersStore';
 
 export default function Orders() {
   const { t } = useTranslation();
-  const { orders } = useOrders();
+  const { orders, updateOrderStatus } = useOrders();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -14,6 +14,8 @@ export default function Orders() {
   const statusColors: Record<string, string> = {
     pending:               'bg-amber-50 text-amber-700 border-amber-200',
     authorization_pending: 'bg-orange-50 text-orange-700 border-orange-200',
+    accepted:              'bg-emerald-50 text-emerald-700 border-emerald-200',
+    rejected:              'bg-red-50 text-red-700 border-red-200',
     processing:            'bg-blue-50 text-blue-700 border-blue-200',
     completed:             'bg-green-50 text-green-700 border-green-200',
     cancelled:             'bg-red-50 text-red-700 border-red-200',
@@ -47,6 +49,9 @@ export default function Orders() {
         <div className="relative">
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-field pr-8 appearance-none min-w-[160px]">
             <option value="">{t('common.all')} {t('orders.status')}</option>
+            <option value="authorization_pending">{t('orders.authorization_pending')}</option>
+            <option value="accepted">{t('orders.accepted')}</option>
+            <option value="rejected">{t('orders.rejected')}</option>
             <option value="pending">{t('orders.pending')}</option>
             <option value="processing">{t('orders.processing')}</option>
             <option value="completed">{t('orders.completed')}</option>
@@ -81,6 +86,30 @@ export default function Orders() {
                   </div>
                   <div className="text-right">
                     <p className="text-xl font-bold text-surface-900">{order.totalAmount.toFixed(2)} €</p>
+                    {order.status === 'authorization_pending' && (
+                      <div className="mt-2 flex items-center justify-end gap-2">
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            updateOrderStatus(order.id, 'accepted');
+                          }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Aceptar
+                        </button>
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            updateOrderStatus(order.id, 'rejected');
+                          }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 transition-colors"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
                   </div>
                   {isExpanded ? <ChevronDown className="w-5 h-5 text-surface-400" /> : <ChevronRight className="w-5 h-5 text-surface-400" />}
                 </div>

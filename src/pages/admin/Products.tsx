@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import Papa from 'papaparse';
-import { Product, getStockLevel } from '../../types';
+import { Product } from '../../types';
 import { useProducts } from '../../store/productsStore';
 
 type ProductDraft = {
@@ -21,7 +21,6 @@ type ProductDraft = {
   name: string;
   categoryId: string;
   price: string;
-  stock: string;
   brand: string;
   unitMeasure: string;
   description: string;
@@ -34,7 +33,6 @@ function emptyDraft(categoryId = 'cat-1'): ProductDraft {
     name: '',
     categoryId,
     price: '',
-    stock: '9999',
     brand: '',
     unitMeasure: '',
     description: '',
@@ -48,7 +46,6 @@ function draftFromProduct(product: Product): ProductDraft {
     name: product.name,
     categoryId: product.categoryId,
     price: String(product.price),
-    stock: String(product.stock),
     brand: product.brand ?? '',
     unitMeasure: product.unitMeasure ?? '',
     description: product.description ?? '',
@@ -109,7 +106,7 @@ export default function Products() {
       categoryId: category?.id ?? 'cat-1',
       categoryName: category?.name ?? 'Sin Categoria',
       price: Number.parseFloat(productDraft.price) || 0,
-      stock: Number.parseInt(productDraft.stock, 10) || 0,
+      stock: productBeingEdited?.stock ?? 9999,
       description: productDraft.description.trim() || productDraft.name.trim(),
       brand: productDraft.brand.trim(),
       unitMeasure: productDraft.unitMeasure.trim(),
@@ -127,7 +124,7 @@ export default function Products() {
     setProductDraft(emptyDraft(categories[0]?.id ?? 'cat-1'));
   };
 
-  const handleInlineEdit = (productId: string, field: 'price' | 'stock', value: number) => {
+  const handleInlineEdit = (productId: string, field: 'price', value: number) => {
     const product = products.find(item => item.id === productId);
     if (!product || Number.isNaN(value)) return;
     upsertProduct({ ...product, [field]: value });
@@ -176,7 +173,7 @@ export default function Products() {
         categoryName: row.categoria || category?.name || 'Sin Categoria',
         subcategoryName: row.subcategoria || '',
         price: Number.parseFloat(row.precio) || 0,
-        stock: Number.parseInt(row.stock, 10) || 0,
+        stock: existing?.stock ?? 9999,
         description: row.descripcion || row.nombre,
         brand: row.marca || '',
         unitMeasure: row.unidad_medida || 'unidad',
@@ -204,7 +201,6 @@ export default function Products() {
       categoria: product.categoryName,
       subcategoria: product.subcategoryName,
       precio: product.price,
-      stock: product.stock,
       descripcion: product.description,
       marca: product.brand,
       unidad_medida: product.unitMeasure,
@@ -214,13 +210,6 @@ export default function Products() {
     link.href = URL.createObjectURL(blob);
     link.download = 'productos_catalogo.csv';
     link.click();
-  };
-
-  const stockColor = (stock: number) => {
-    const level = getStockLevel(stock);
-    if (level === 'out') return 'text-red-600 bg-red-50';
-    if (level === 'low') return 'text-amber-600 bg-amber-50';
-    return 'text-green-600 bg-green-50';
   };
 
   const inputClass = 'input-field text-sm';
@@ -272,14 +261,13 @@ export default function Products() {
                 <th className="table-header">{t('products.name')}</th>
                 <th className="table-header">{t('products.category')}</th>
                 <th className="table-header">{t('products.price')}</th>
-                <th className="table-header">{t('products.stock')}</th>
                 <th className="table-header">{t('products.brand')}</th>
                 <th className="table-header text-right">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="text-center py-12 text-surface-400">{t('products.noProducts')}</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-surface-400">{t('products.noProducts')}</td></tr>
               ) : (
                 filtered.map(product => (
                   <tr key={product.id} className="hover:bg-surface-50 transition-colors">
@@ -305,14 +293,6 @@ export default function Products() {
                           EUR {product.price.toFixed(2)}
                         </button>
                       )}
-                    </td>
-                    <td className="table-cell">
-                      <button
-                        onClick={() => setEditingId(product.id)}
-                        className={`inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold ${stockColor(product.stock)}`}
-                      >
-                        {product.stock}
-                      </button>
                     </td>
                     <td className="table-cell text-sm text-surface-500">{product.brand || '-'}</td>
                     <td className="table-cell text-right">
@@ -351,7 +331,6 @@ export default function Products() {
               </select>
               <input className={inputClass} placeholder="Marca" value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
               <input className={inputClass} type="number" step="0.01" placeholder="Precio" value={productDraft.price} onChange={event => setDraftField('price', event.target.value)} required />
-              <input className={inputClass} type="number" placeholder="Stock" value={productDraft.stock} onChange={event => setDraftField('stock', event.target.value)} required />
               <input className={inputClass} placeholder="Unidad / caja" value={productDraft.unitMeasure} onChange={event => setDraftField('unitMeasure', event.target.value)} />
               <input className={inputClass} placeholder="URL imagen" value={productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
               <textarea className={`${inputClass} sm:col-span-2 min-h-[84px] resize-none`} placeholder="Descripcion" value={productDraft.description} onChange={event => setDraftField('description', event.target.value)} />
