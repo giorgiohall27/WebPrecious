@@ -3,7 +3,7 @@ const AdmZip = require('adm-zip');
 const fs = require('fs');
 const path = require('path');
 
-const XLSX_FILE = 'Copia de precious spain pedido con fotos.xlsx';
+const XLSX_FILE = process.argv[2] || 'Copia de precious spain pedido con fotos.xlsx';
 const OUTPUT_DIR = path.join(__dirname, 'public', 'products');
 
 // Create output directory
