@@ -76,7 +76,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 animate-fade-in space-y-12">
-      <div className="relative overflow-hidden rounded-2xl bg-[#0C1E35] text-white" style={{ minHeight: '480px' }}>
+      <div className="relative overflow-hidden rounded-2xl bg-[#0C1E35] text-white" style={{ minHeight: 'min(480px, 78vh)' }}>
         <div className="absolute inset-0">
           <ThreeDMarquee
             images={[
@@ -109,22 +109,23 @@ export default function ClientDashboard() {
           }}
         />
 
-        <div className="relative z-20 flex flex-col items-center justify-center text-center px-8 py-16 lg:py-24 h-full" style={{ minHeight: '480px' }}>
+        <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 py-14 lg:py-24 h-full" style={{ minHeight: 'min(480px, 78vh)' }}>
           <h1
-            className="font-black uppercase mb-5 leading-none select-none"
+            className="font-black uppercase mb-5 leading-[0.98] select-none max-w-full"
             style={{
-              fontSize: 'clamp(3.5rem, 10vw, 8rem)',
+              fontSize: 'clamp(2.35rem, 12vw, 8rem)',
               fontFamily: "'Tesla', 'Inter', sans-serif",
               fontWeight: 400,
-              letterSpacing: '0.25em',
+              letterSpacing: 'clamp(0.045em, 1.6vw, 0.25em)',
               textShadow: '0 2px 30px rgba(0,0,0,0.6)',
+              overflowWrap: 'normal',
             }}
           >
             PRECIOUS SPAIN
           </h1>
           <button
             onClick={() => navigate('/catalog')}
-            className="inline-flex items-center gap-2.5 bg-white text-[#0C1E35] font-bold px-10 py-4 mt-8 rounded-xl hover:bg-primary-50 transition-colors text-base shadow-2xl"
+            className="inline-flex items-center gap-2.5 bg-white text-[#0C1E35] font-bold px-6 sm:px-10 py-3.5 sm:py-4 mt-6 sm:mt-8 rounded-xl hover:bg-primary-50 transition-colors text-sm sm:text-base shadow-2xl"
           >
             {t('clientDashboard.browseAll')}
             <ArrowRight className="w-5 h-5" />

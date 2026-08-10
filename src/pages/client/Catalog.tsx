@@ -391,7 +391,7 @@ export default function Catalog() {
                     <h2 className="text-sm font-black uppercase tracking-wider text-surface-900">{brand}</h2>
                     <span className="text-xs font-semibold text-surface-400">{brandProducts.length} {t('catalog.productsFound')}</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {brandProducts.map(product => {
                 const isAdded = addedItems[product.id];
                 return (
@@ -399,14 +399,14 @@ export default function Catalog() {
 
                     {/* Image Area */}
                     <div
-                      className="h-48 bg-gradient-to-br from-surface-50 to-white flex items-center justify-center relative overflow-hidden border-b border-surface-100 cursor-pointer"
+                      className="h-32 sm:h-48 bg-gradient-to-br from-surface-50 to-white flex items-center justify-center relative overflow-hidden border-b border-surface-100 cursor-pointer"
                       onClick={() => setSelectedProduct(product)}
                     >
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500 ease-out"
+                          className="w-full h-full object-contain p-2.5 sm:p-4 group-hover:scale-110 transition-transform duration-500 ease-out"
                           onError={(e) => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';
@@ -419,22 +419,22 @@ export default function Catalog() {
                         className="product-fb absolute inset-0 flex-col items-center justify-center gap-2"
                         style={{ display: product.imageUrl ? 'none' : 'flex' }}
                       >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shadow-sm">
-                          <span className="text-2xl font-black text-primary-600">{(product.brand || product.name || 'P')[0]}</span>
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shadow-sm">
+                          <span className="text-xl sm:text-2xl font-black text-primary-600">{(product.brand || product.name || 'P')[0]}</span>
                         </div>
                         <span className="text-[10px] font-semibold text-surface-400 uppercase tracking-wider max-w-[80%] text-center line-clamp-1">{product.brand}</span>
                       </div>
                       
                       {/* Units - Top Right */}
                       {product.unitMeasure && (
-                        <span className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm text-primary-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-primary-100 shadow-sm">
+                          <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 bg-white/90 backdrop-blur-sm text-primary-700 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-primary-100 shadow-sm">
                           {product.unitMeasure}
                         </span>
                       )}
                     </div>
 
                     {/* Info Section */}
-                    <div className="p-4 flex-1 flex flex-col">
+                    <div className="p-3 sm:p-4 flex-1 flex flex-col">
                       {/* Brand & Description Below Image */}
                       {product.brand && (
                         <p className="text-[10px] font-bold text-primary-600 uppercase tracking-wider mb-0.5">
@@ -454,8 +454,8 @@ export default function Catalog() {
                       )}
 
                       {canViewSensitive ? (
-                        <div className="mt-4 flex items-center justify-between gap-2">
-                          <div className="flex flex-col items-center mr-2">
+                        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex flex-col items-start sm:items-center sm:mr-2">
                             {product.unitsPerBox && product.unitsPerBox > 1 && (
                               <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
                             )}
@@ -477,14 +477,14 @@ export default function Catalog() {
                               </button>
                             </div>
                           </div>
-                          <div className="text-right flex flex-col items-end">
-                            <div className="flex items-center gap-2">
-                              <span className="text-2xl font-black text-surface-900 leading-none">
+                          <div className="text-left sm:text-right flex flex-col items-stretch sm:items-end">
+                            <div className="flex items-center justify-between sm:justify-end gap-2">
+                              <span className="text-base sm:text-2xl font-black text-surface-900 leading-none">
                                 EUR {product.price.toFixed(2)}
                               </span>
                               <button
                                 onClick={() => handleAdd(product)}
-                                className={`p-2 rounded-lg transition-all duration-150 ${
+                                className={`p-2 rounded-lg transition-all duration-150 shrink-0 ${
                                   isAdded
                                     ? 'bg-emerald-500 text-white shadow-lg scale-95'
                                     : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
