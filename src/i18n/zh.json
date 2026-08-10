@@ -67,7 +67,14 @@
     "statOnlineSub": "全天候门户",
     "step1TitleShort": "产品",
     "step3TitleShort": "响应时间",
-    "featureChips": ["实时目录", "实时库存", "几分钟下单", "仓库配送", "订单历史", "多语言"]
+    "featureChips": [
+      "实时目录",
+      "实时库存",
+      "几分钟下单",
+      "仓库配送",
+      "订单历史",
+      "多语言"
+    ]
   },
   "nav": {
     "dashboard": "控制台",
@@ -293,7 +300,9 @@
     "statusReceived": "已接收",
     "statusPreparing": "准备中",
     "statusShipping": "运输中",
-    "statusDelivered": "已送达"
+    "statusDelivered": "已送达",
+    "accepted": "已接受",
+    "rejected": "已拒绝"
   },
   "language": {
     "es": "Español",

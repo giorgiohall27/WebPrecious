@@ -67,7 +67,14 @@
     "statOnlineSub": "पोर्टल 24/7",
     "step1TitleShort": "उत्पाद",
     "step3TitleShort": "प्रतिक्रिया समय",
-    "featureChips": ["रियल-टाइम कैटलॉग", "लाइव स्टॉक", "मिनटों में ऑर्डर", "गोदाम डिलीवरी", "ऑर्डर इतिहास", "बहुभाषी"]
+    "featureChips": [
+      "रियल-टाइम कैटलॉग",
+      "लाइव स्टॉक",
+      "मिनटों में ऑर्डर",
+      "गोदाम डिलीवरी",
+      "ऑर्डर इतिहास",
+      "बहुभाषी"
+    ]
   },
   "nav": {
     "dashboard": "डैशबोर्ड",
@@ -293,7 +300,9 @@
     "statusReceived": "प्राप्त",
     "statusPreparing": "तैयार हो रहा है",
     "statusShipping": "रास्ते में",
-    "statusDelivered": "वितरित"
+    "statusDelivered": "वितरित",
+    "accepted": "स्वीकृत",
+    "rejected": "अस्वीकृत"
   },
   "language": {
     "es": "Español",
