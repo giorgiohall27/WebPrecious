@@ -21,6 +21,7 @@ type ProductDraft = {
   name: string;
   categoryId: string;
   price: string;
+  iva: string;
   brand: string;
   unitMeasure: string;
   description: string;
@@ -33,6 +34,7 @@ function emptyDraft(categoryId = 'cat-1'): ProductDraft {
     name: '',
     categoryId,
     price: '',
+    iva: '21',
     brand: '',
     unitMeasure: '',
     description: '',
@@ -46,6 +48,7 @@ function draftFromProduct(product: Product): ProductDraft {
     name: product.name,
     categoryId: product.categoryId,
     price: String(product.price),
+    iva: String(product.iva ?? 21),
     brand: product.brand ?? '',
     unitMeasure: product.unitMeasure ?? '',
     description: product.description ?? '',
@@ -111,7 +114,7 @@ export default function Products() {
       brand: productDraft.brand.trim(),
       unitMeasure: productDraft.unitMeasure.trim(),
       imageUrl: productDraft.imageUrl.trim() || null,
-      iva: productBeingEdited?.iva ?? 21,
+      iva: Number.parseFloat(productDraft.iva) === 10 ? 10 : 21,
       active: true,
     };
   };
@@ -332,6 +335,25 @@ export default function Products() {
               <input className={inputClass} placeholder="Marca" value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
               <input className={inputClass} type="number" step="0.01" placeholder="Precio" value={productDraft.price} onChange={event => setDraftField('price', event.target.value)} required />
               <input className={inputClass} placeholder="Unidad / caja" value={productDraft.unitMeasure} onChange={event => setDraftField('unitMeasure', event.target.value)} />
+              <div className="sm:col-span-2">
+                <label className="input-label">IVA del producto</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDraftField('iva', '21')}
+                    className={`rounded-xl border px-4 py-3 text-sm font-bold transition-colors ${productDraft.iva === '21' ? 'border-primary-500 bg-primary-600 text-white shadow-sm' : 'border-surface-200 bg-white text-surface-700 hover:bg-surface-50'}`}
+                  >
+                    IVA 21%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDraftField('iva', '10')}
+                    className={`rounded-xl border px-4 py-3 text-sm font-bold transition-colors ${productDraft.iva === '10' ? 'border-primary-500 bg-primary-600 text-white shadow-sm' : 'border-surface-200 bg-white text-surface-700 hover:bg-surface-50'}`}
+                  >
+                    IVA 10%
+                  </button>
+                </div>
+              </div>
               <input className={inputClass} placeholder="URL imagen" value={productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
               <textarea className={`${inputClass} sm:col-span-2 min-h-[84px] resize-none`} placeholder="Descripcion" value={productDraft.description} onChange={event => setDraftField('description', event.target.value)} />
             </div>
