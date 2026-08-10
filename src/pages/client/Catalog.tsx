@@ -27,10 +27,10 @@ export default function Catalog() {
   const selectedCategory    = searchParams.get('category') || '';
   const searchQuery         = searchParams.get('search')   || '';
   const subFromUrl          = searchParams.get('sub')      || '';
+  const selectedBrand       = searchParams.get('brand')    || '';
 
   const [selectedSubcategory, setSelectedSubcategory] = useState(subFromUrl);
   const [sortBy, setSortBy]           = useState('name');
-  const [inStockOnly, setInStockOnly] = useState(false);
   const [priceMin, setPriceMin]       = useState('');
   const [priceMax, setPriceMax]       = useState('');
   const [quantities, setQuantities]   = useState<Record<string, number>>({});
@@ -55,23 +55,39 @@ export default function Catalog() {
       result = result.filter(p =>
         p.name.toLowerCase().includes(q) ||
         p.sku.toLowerCase().includes(q) ||
+        (p.brand?.toLowerCase().includes(q)) ||
         (p.description?.toLowerCase().includes(q))
       );
     }
     if (selectedCategory)    result = result.filter(p => p.categoryId === selectedCategory);
     if (selectedSubcategory) result = result.filter(p => p.subcategoryId === selectedSubcategory);
-    if (inStockOnly)         result = result.filter(p => p.stock > 0);
+    if (selectedBrand)       result = result.filter(p => (p.brand || 'Sin marca') === selectedBrand);
     if (canViewSensitive && priceMin) result = result.filter(p => p.price >= parseFloat(priceMin));
     if (canViewSensitive && priceMax) result = result.filter(p => p.price <= parseFloat(priceMax));
     result.sort((a, b) => {
-      if (sortBy === 'name')      return a.name.localeCompare(b.name);
+      if (sortBy === 'name')      return (a.brand || '').localeCompare(b.brand || '') || a.name.localeCompare(b.name);
       if (canViewSensitive && sortBy === 'priceAsc')  return a.price - b.price;
       if (canViewSensitive && sortBy === 'priceDesc') return b.price - a.price;
-      if (sortBy === 'stock')     return b.stock - a.stock;
       return 0;
     });
     return result;
-  }, [searchQuery, selectedCategory, selectedSubcategory, sortBy, inStockOnly, priceMin, priceMax, products, canViewSensitive]);
+  }, [searchQuery, selectedCategory, selectedSubcategory, selectedBrand, sortBy, priceMin, priceMax, products, canViewSensitive]);
+
+  const brandOptions = useMemo(() => {
+    let scope = products.filter(p => p.active);
+    if (selectedCategory) scope = scope.filter(p => p.categoryId === selectedCategory);
+    if (selectedSubcategory) scope = scope.filter(p => p.subcategoryId === selectedSubcategory);
+    return Array.from(new Set(scope.map(p => p.brand || 'Sin marca'))).sort((a, b) => a.localeCompare(b));
+  }, [products, selectedCategory, selectedSubcategory]);
+
+  const brandGroups = useMemo(() => {
+    const groups = new Map<string, Product[]>();
+    filtered.forEach(product => {
+      const brand = product.brand || 'Sin marca';
+      groups.set(brand, [...(groups.get(brand) ?? []), product]);
+    });
+    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [filtered]);
 
   useEffect(() => {
     if (!canViewSensitive && (priceMin || priceMax || sortBy.startsWith('price'))) {
@@ -93,6 +109,15 @@ export default function Catalog() {
     if (selectedCategory) params.category = selectedCategory;
     if (subId) params.sub = subId;
     if (searchQuery) params.search = searchQuery;
+    setSearchParams(params);
+  };
+
+  const handleBrand = (brand: string) => {
+    const params: Record<string, string> = {};
+    if (selectedCategory) params.category = selectedCategory;
+    if (selectedSubcategory) params.sub = selectedSubcategory;
+    if (searchQuery) params.search = searchQuery;
+    if (brand) params.brand = brand;
     setSearchParams(params);
   };
 
@@ -214,6 +239,46 @@ export default function Catalog() {
         </div>
       )}
 
+      {brandOptions.length > 1 && (
+        <div className="mt-3 mb-5">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <button
+              onClick={() => handleBrand('')}
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors border ${
+                !selectedBrand
+                  ? 'bg-surface-900 text-white border-surface-900 shadow-sm'
+                  : 'bg-white text-surface-600 border-surface-200 hover:border-surface-400 hover:text-surface-900'
+              }`}
+            >
+              Todas las marcas
+            </button>
+            {brandOptions.map(brand => {
+              const isActive = selectedBrand === brand;
+              const count = products.filter(p =>
+                p.active &&
+                (!selectedCategory || p.categoryId === selectedCategory) &&
+                (!selectedSubcategory || p.subcategoryId === selectedSubcategory) &&
+                (p.brand || 'Sin marca') === brand
+              ).length;
+              return (
+                <button
+                  key={brand}
+                  onClick={() => handleBrand(brand)}
+                  className={`flex-shrink-0 flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors border ${
+                    isActive
+                      ? 'bg-surface-900 text-white border-surface-900 shadow-sm'
+                      : 'bg-white text-surface-600 border-surface-200 hover:border-surface-400 hover:text-surface-900'
+                  }`}
+                >
+                  {brand}
+                  <span className={`${isActive ? 'text-white/70' : 'text-surface-400'}`}>({count})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-6 mt-4">
 
         {/* Filters Sidebar */}
@@ -226,9 +291,9 @@ export default function Catalog() {
                 <SlidersHorizontal className="w-4 h-4 text-white" />
               </div>
               <span className="font-bold text-white text-sm tracking-tight flex-1">{t('catalog.filters')}</span>
-              {(inStockOnly || (canViewSensitive && (priceMin || priceMax)) || sortBy !== 'name') && (
+              {((canViewSensitive && (priceMin || priceMax)) || sortBy !== 'name') && (
                 <button
-                  onClick={() => { setInStockOnly(false); setPriceMin(''); setPriceMax(''); setSortBy('name'); }}
+                  onClick={() => { setPriceMin(''); setPriceMax(''); setSortBy('name'); }}
                   className="flex items-center gap-1 text-[11px] text-white/80 hover:text-white font-semibold bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-full transition-colors border border-white/20"
                 >
                   <X className="w-2.5 h-2.5" />
@@ -253,7 +318,6 @@ export default function Catalog() {
                   <option value="name">{t('catalog.sortName')}</option>
                   {canViewSensitive && <option value="priceAsc">{t('catalog.sortPriceAsc')}</option>}
                   {canViewSensitive && <option value="priceDesc">{t('catalog.sortPriceDesc')}</option>}
-                  <option value="stock">{t('catalog.sortStock')}</option>
                 </select>
               </div>
 
@@ -320,12 +384,18 @@ export default function Catalog() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filtered.map(product => {
-                const isOut   = product.stock === 0;
+            <div className="space-y-8">
+              {brandGroups.map(([brand, brandProducts]) => (
+                <section key={brand} className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-surface-100 pb-2">
+                    <h2 className="text-sm font-black uppercase tracking-wider text-surface-900">{brand}</h2>
+                    <span className="text-xs font-semibold text-surface-400">{brandProducts.length} {t('catalog.productsFound')}</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {brandProducts.map(product => {
                 const isAdded = addedItems[product.id];
                 return (
-                  <div key={product.id} className={`card overflow-hidden group ${isOut ? 'opacity-70' : ''} hover:shadow-card-hover hover:border-surface-300 transition-all duration-150 flex flex-col`}>
+                  <div key={product.id} className="card overflow-hidden group hover:shadow-card-hover hover:border-surface-300 transition-all duration-150 flex flex-col">
 
                     {/* Image Area */}
                     <div
@@ -437,6 +507,9 @@ export default function Catalog() {
                   </div>
                 );
               })}
+                  </div>
+                </section>
+              ))}
             </div>
           )}
         </div>

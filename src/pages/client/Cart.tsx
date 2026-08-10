@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShoppingBag, Trash2, Plus, Minus, Send, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, Trash2, Plus, Minus, Send, ArrowLeft } from 'lucide-react';
 import { useCart } from '../../store/cartStore';
 import { useProducts } from '../../store/productsStore';
 import { useOrders } from '../../store/ordersStore';
@@ -87,7 +87,7 @@ export default function Cart() {
       });
     } else {
       setSending(false);
-      alert('No se pudo enviar el pedido. Revisa la sesion o el stock e intentalo de nuevo.');
+      alert('No se pudo enviar el pedido. Revisa la sesión e inténtalo de nuevo.');
     }
   };
 
@@ -129,7 +129,6 @@ export default function Cart() {
 
               {/* Items */}
               {catItems.map(item => {
-                const overStock = item.quantity > item.product.stock;
                 const unitsPerBox = item.product.unitsPerBox || 1;
                 const boxCount = Math.round(item.quantity / unitsPerBox);
                 const boxPrice = item.product.price * unitsPerBox;
@@ -154,11 +153,6 @@ export default function Cart() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-surface-900 text-sm truncate">{item.product.name}</p>
                       <p className="text-xs text-surface-400">{item.product.sku} · {boxPrice.toFixed(2)} €/caja{unitsPerBox > 1 ? ` (${unitsPerBox} uds × €${item.product.price.toFixed(2)})` : ''}</p>
-                      {overStock && (
-                        <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                          <AlertTriangle className="w-3 h-3" /> {t('cart.maxStock')}: {item.product.stock}
-                        </p>
-                      )}
                     </div>
 
                     {/* Quantity (in boxes) */}
