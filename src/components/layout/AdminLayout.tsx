@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2 } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2 } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useState } from 'react';
 import { useAuth } from '../../store/authStore';
@@ -84,9 +84,20 @@ export default function AdminLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-surface-200 px-4 lg:px-8 py-3 flex items-center justify-between">
-          <button className="lg:hidden btn-icon" onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="lg:hidden btn-icon" onClick={() => setSidebarOpen(true)}>
+              <Menu className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="btn-icon"
+              aria-label="Volver atras"
+              title="Volver atras"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          </div>
           <div className="flex-1" />
           <LanguageSwitcher />
         </header>
