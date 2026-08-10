@@ -7,7 +7,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { mockCategories, mockSubcategories, mockProducts } from '../src/data/mockData';
 
-const url = process.env.VITE_SUPABASE_URL || 'https://foiqyaaibhkegsvevyio.supabase.co';
+const url = process.env.VITE_SUPABASE_URL || 'https://xzxkaophgiogtqjoxteg.supabase.co';
 const key = process.env.SUPABASE_SERVICE_KEY || '';
 
 const superAdmins = [
