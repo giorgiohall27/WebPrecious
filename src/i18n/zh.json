@@ -302,6 +302,7 @@
     "statusShipping": "运输中",
     "statusDelivered": "已送达",
     "accepted": "已接受",
+    "accepted_modified": "已接受并修改",
     "rejected": "已拒绝"
   },
   "language": {

@@ -302,6 +302,7 @@
     "statusShipping": "En camino",
     "statusDelivered": "Entregado",
     "accepted": "Aceptado",
+    "accepted_modified": "Aceptado con modificaciones",
     "rejected": "Rechazado"
   },
   "language": {

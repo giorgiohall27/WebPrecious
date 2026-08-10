@@ -302,6 +302,7 @@
     "statusShipping": "रास्ते में",
     "statusDelivered": "वितरित",
     "accepted": "स्वीकृत",
+    "accepted_modified": "परिवर्तनों के साथ स्वीकृत",
     "rejected": "अस्वीकृत"
   },
   "language": {

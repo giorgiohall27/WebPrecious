@@ -302,6 +302,7 @@
     "statusShipping": "Shipping",
     "statusDelivered": "Delivered",
     "accepted": "Accepted",
+    "accepted_modified": "Accepted with changes",
     "rejected": "Rejected"
   },
   "language": {
