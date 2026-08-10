@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  ArrowLeft,
   ArrowRight,
   Building2,
   KeyRound,
@@ -74,12 +75,23 @@ export default function ClientLogin() {
   return (
     <div className="min-h-screen bg-[#f4f6fa] flex flex-col">
       <div className="flex items-center justify-between px-6 py-4">
-        <Link to="/login" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#0C1E35] flex items-center justify-center">
-            <ShoppingBag className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-base font-bold text-surface-900 tracking-tight">Precious Spain</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="w-9 h-9 rounded-lg border border-surface-200 bg-white text-surface-600 hover:text-surface-900 hover:border-primary-300 hover:bg-primary-50 transition-colors flex items-center justify-center"
+            aria-label="Volver atras"
+            title="Volver atras"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#0C1E35] flex items-center justify-center">
+              <ShoppingBag className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-base font-bold text-surface-900 tracking-tight">Precious Spain</span>
+          </Link>
+        </div>
         <LanguageSwitcher />
       </div>
 
