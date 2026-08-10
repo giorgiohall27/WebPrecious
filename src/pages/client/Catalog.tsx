@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  ShoppingCart, Plus, Minus, Check, SlidersHorizontal,
-  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Filter, Lock,
+  ShoppingCart, Plus, Minus, Check,
+  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Lock,
 } from 'lucide-react';
 import { Product } from '../../types';
 import { useCart } from '../../store/cartStore';
@@ -18,6 +18,22 @@ const iconMap: Record<string, any> = {
   'heart-pulse': HeartPulse,
 };
 
+const brandPriority = (brand: string, selectedCategoryName?: string) => {
+  if (selectedCategoryName?.toLowerCase() !== 'snacks') return 0;
+  const normalized = brand.toLowerCase();
+  if (normalized === 'walkers') return -2;
+  if (normalized === "mccoy's" || normalized === 'mccoys') return -1;
+  return 0;
+};
+
+const isCadburyMultipack = (product: Product) =>
+  product.brand?.toLowerCase() === 'cadbury' && product.name.toLowerCase().includes('multipack');
+
+const needsLargerProductImage = (product: Product) => {
+  const name = product.name.toLowerCase();
+  return product.brand?.toLowerCase().includes('reese') && (name.includes('nutrageous') || name.includes('overload'));
+};
+
 export default function Catalog() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,12 +46,8 @@ export default function Catalog() {
   const selectedBrand       = searchParams.get('brand')    || '';
 
   const [selectedSubcategory, setSelectedSubcategory] = useState(subFromUrl);
-  const [sortBy, setSortBy]           = useState('name');
-  const [priceMin, setPriceMin]       = useState('');
-  const [priceMax, setPriceMax]       = useState('');
   const [quantities, setQuantities]   = useState<Record<string, number>>({});
   const [addedItems, setAddedItems]   = useState<Record<string, boolean>>({});
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { isLoggedIn, isSuperAdmin } = useAuth();
   const canViewSensitive = isLoggedIn || isSuperAdmin;
@@ -62,16 +74,9 @@ export default function Catalog() {
     if (selectedCategory)    result = result.filter(p => p.categoryId === selectedCategory);
     if (selectedSubcategory) result = result.filter(p => p.subcategoryId === selectedSubcategory);
     if (selectedBrand)       result = result.filter(p => (p.brand || 'Sin marca') === selectedBrand);
-    if (canViewSensitive && priceMin) result = result.filter(p => p.price >= parseFloat(priceMin));
-    if (canViewSensitive && priceMax) result = result.filter(p => p.price <= parseFloat(priceMax));
-    result.sort((a, b) => {
-      if (sortBy === 'name')      return (a.brand || '').localeCompare(b.brand || '') || a.name.localeCompare(b.name);
-      if (canViewSensitive && sortBy === 'priceAsc')  return a.price - b.price;
-      if (canViewSensitive && sortBy === 'priceDesc') return b.price - a.price;
-      return 0;
-    });
+    result.sort((a, b) => (a.brand || '').localeCompare(b.brand || '') || a.name.localeCompare(b.name));
     return result;
-  }, [searchQuery, selectedCategory, selectedSubcategory, selectedBrand, sortBy, priceMin, priceMax, products, canViewSensitive]);
+  }, [searchQuery, selectedCategory, selectedSubcategory, selectedBrand, products]);
 
   const brandOptions = useMemo(() => {
     let scope = products.filter(p => p.active);
@@ -86,16 +91,23 @@ export default function Catalog() {
       const brand = product.brand || 'Sin marca';
       groups.set(brand, [...(groups.get(brand) ?? []), product]);
     });
-    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [filtered]);
+    const categoryName = categories.find(category => category.id === selectedCategory)?.name;
+    return Array.from(groups.entries())
+      .map(([brand, brandProducts]) => [
+        brand,
+        [...brandProducts].sort((a, b) => {
+          if (a.brand?.toLowerCase() === 'cadbury' && b.brand?.toLowerCase() === 'cadbury') {
+            return Number(isCadburyMultipack(b)) - Number(isCadburyMultipack(a)) || a.name.localeCompare(b.name);
+          }
+          return a.name.localeCompare(b.name);
+        }),
+      ] as [string, Product[]])
+      .sort(([a], [b]) => brandPriority(a, categoryName) - brandPriority(b, categoryName) || a.localeCompare(b));
+  }, [filtered, categories, selectedCategory]);
 
   useEffect(() => {
-    if (!canViewSensitive && (priceMin || priceMax || sortBy.startsWith('price'))) {
-      setPriceMin('');
-      setPriceMax('');
-      setSortBy('name');
-    }
-  }, [canViewSensitive, priceMin, priceMax, sortBy]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCategory, selectedSubcategory, selectedBrand]);
 
   const setCategory = (catId: string) => {
     const params: Record<string, string> = {};
@@ -121,18 +133,19 @@ export default function Catalog() {
     setSearchParams(params);
   };
 
-  const getQty = (id: string) => quantities[id] || 1;
+  const getQty = (id: string) => quantities[id] || 0;
   const setQty = (id: string, val: number) => {
-    const clamped = Math.max(1, val);
+    const clamped = Math.max(0, val);
     setQuantities(prev => ({ ...prev, [id]: clamped }));
   };
 
   const handleAdd = (product: Product) => {
     const requestedBoxes = getQty(product.id);
+    if (requestedBoxes <= 0) return;
     const multiplier = product.unitsPerBox || 1;
     const totalUnits = requestedBoxes * multiplier;
     
-    addItem(product, totalUnits);
+    addItem(product, requestedBoxes);
     adjustStock(product.id, -totalUnits);
     setAddedItems(prev => ({ ...prev, [product.id]: true }));
     setTimeout(() => setAddedItems(prev => ({ ...prev, [product.id]: false })), 1500);
@@ -250,7 +263,7 @@ export default function Catalog() {
                   : 'bg-white text-surface-600 border-surface-200 hover:border-surface-400 hover:text-surface-900'
               }`}
             >
-              Todas las marcas
+              {t('catalog.allBrands')}
             </button>
             {brandOptions.map(brand => {
               const isActive = selectedBrand === brand;
@@ -279,100 +292,11 @@ export default function Catalog() {
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-4">
-
-        {/* Filters Sidebar */}
-        <aside className={`lg:w-60 shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-          <div className="sticky top-20 rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
-
-            {/* Header */}
-            <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-[#0C1E35] to-[#1a3a5c]">
-              <div className="w-8 h-8 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
-                <SlidersHorizontal className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-white text-sm tracking-tight flex-1">{t('catalog.filters')}</span>
-              {((canViewSensitive && (priceMin || priceMax)) || sortBy !== 'name') && (
-                <button
-                  onClick={() => { setPriceMin(''); setPriceMax(''); setSortBy('name'); }}
-                  className="flex items-center gap-1 text-[11px] text-white/80 hover:text-white font-semibold bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-full transition-colors border border-white/20"
-                >
-                  <X className="w-2.5 h-2.5" />
-                  Reset
-                </button>
-              )}
-            </div>
-
-            <div className="p-5 space-y-5">
-
-              {/* Sort */}
-              <div>
-                <label className="block text-[11px] font-bold text-surface-400 uppercase tracking-widest mb-1.5">
-                  {t('catalog.sortBy')}
-                </label>
-                <select
-                  value={sortBy}
-                  onChange={e => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm text-surface-800 bg-surface-50 border border-surface-200 rounded-xl focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
-                >
-                  <option value="name">{t('catalog.sortName')}</option>
-                  {canViewSensitive && <option value="priceAsc">{t('catalog.sortPriceAsc')}</option>}
-                  {canViewSensitive && <option value="priceDesc">{t('catalog.sortPriceDesc')}</option>}
-                </select>
-              </div>
-
-              {/* Price range */}
-              {canViewSensitive && (
-                <div>
-                  <label className="block text-[11px] font-bold text-surface-400 uppercase tracking-widest mb-1.5">
-                    {t('catalog.priceRange')}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-surface-400 font-semibold pointer-events-none">€</span>
-                      <input
-                        type="number"
-                        value={priceMin}
-                        onChange={e => setPriceMin(e.target.value)}
-                        placeholder={t('catalog.min')}
-                        className="w-full pl-6 pr-2 py-2.5 text-sm border border-surface-200 rounded-xl bg-surface-50 focus:bg-white focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all"
-                      />
-                    </div>
-                    <span className="text-surface-300 text-sm">—</span>
-                    <div className="flex-1 relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-surface-400 font-semibold pointer-events-none">€</span>
-                      <input
-                        type="number"
-                        value={priceMax}
-                        onChange={e => setPriceMax(e.target.value)}
-                        placeholder={t('catalog.max')}
-                        className="w-full pl-6 pr-2 py-2.5 text-sm border border-surface-200 rounded-xl bg-surface-50 focus:bg-white focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-
-
-              {/* Results count */}
-              <div className="pt-1 border-t border-surface-100">
-                <p className="text-[11px] text-surface-400 font-medium text-center">
-                  <span className="font-bold text-surface-700">{filtered.length}</span> {t('catalog.productsFound')}
-                </p>
-              </div>
-
-            </div>
-          </div>
-        </aside>
-
+      <div className="mt-4">
         {/* Product Grid */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs text-surface-500 font-medium">{filtered.length} {t('catalog.productsFound')}</p>
-            <button onClick={() => setShowFilters(!showFilters)} className="btn-ghost lg:hidden text-sm">
-              <Filter className="w-4 h-4" /> {t('catalog.filters')}
-            </button>
           </div>
 
           {filtered.length === 0 ? (
@@ -406,7 +330,7 @@ export default function Catalog() {
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-contain p-2.5 sm:p-4 group-hover:scale-110 transition-transform duration-500 ease-out"
+                          className={`w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 ease-out ${needsLargerProductImage(product) ? 'p-0.5 sm:p-1 scale-110' : 'p-2.5 sm:p-4'}`}
                           onError={(e) => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';
@@ -457,7 +381,7 @@ export default function Catalog() {
                         <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                           <div className="flex flex-col items-start sm:items-center sm:mr-2">
                             {product.unitsPerBox && product.unitsPerBox > 1 && (
-                              <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                              <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
                             )}
                             <div className="flex items-center bg-surface-50 border border-surface-200 rounded-lg overflow-hidden shrink-0">
                               <button
@@ -484,9 +408,12 @@ export default function Catalog() {
                               </span>
                               <button
                                 onClick={() => handleAdd(product)}
+                                disabled={getQty(product.id) <= 0}
                                 className={`p-2 rounded-lg transition-all duration-150 shrink-0 ${
                                   isAdded
                                     ? 'bg-emerald-500 text-white shadow-lg scale-95'
+                                    : getQty(product.id) <= 0
+                                      ? 'bg-surface-300 text-white cursor-not-allowed'
                                     : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
                                 }`}
                               >
@@ -531,7 +458,7 @@ export default function Catalog() {
                 <img
                   src={selectedProduct.imageUrl}
                   alt={selectedProduct.name}
-                  className="w-full h-full object-contain p-6"
+                  className={`w-full h-full object-contain ${needsLargerProductImage(selectedProduct) ? 'p-2 scale-110' : 'p-6'}`}
                   onError={e => {
                     const img = e.target as HTMLImageElement;
                     img.style.display = 'none';
@@ -602,7 +529,7 @@ export default function Catalog() {
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-center">
                       {selectedProduct.unitsPerBox && selectedProduct.unitsPerBox > 1 && (
-                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
                       )}
                       <div className="flex items-center bg-white border border-surface-200 rounded-lg overflow-hidden shadow-sm">
                         <button
@@ -628,6 +555,7 @@ export default function Catalog() {
                         handleAdd(selectedProduct);
                         setTimeout(() => setSelectedProduct(null), 600);
                       }}
+                      disabled={getQty(selectedProduct.id) <= 0}
                       className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md bg-primary-600 hover:bg-primary-700 text-white active:scale-95"
                     >
                       <ShoppingCart className="w-4 h-4" />

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './store/cartStore';
 import { ProductsProvider } from './store/productsStore';
 import { OrdersProvider } from './store/ordersStore';
+import { PromotionsProvider } from './store/promotionsStore';
 import { AuthProvider } from './store/authStore';
 import { useAuth } from './store/authStore';
 import { ViewModeProvider } from './store/viewModeStore';
@@ -16,6 +17,7 @@ import Products from './pages/admin/Products';
 import Categories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
 import Companies from './pages/admin/Companies';
+import Promotions from './pages/admin/Promotions';
 
 // Client Pages
 import ClientLogin from './pages/client/Login';
@@ -41,6 +43,7 @@ export default function App() {
     <ViewModeProvider>
     <AuthProvider>
     <ProductsProvider>
+    <PromotionsProvider>
       <OrdersProvider>
       <CartProvider>
         <BrowserRouter>
@@ -71,6 +74,7 @@ export default function App() {
               <Route path="/admin/companies" element={<Companies />} />
               <Route path="/admin/products" element={<Products />} />
               <Route path="/admin/categories" element={<Categories />} />
+              <Route path="/admin/promotions" element={<Promotions />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
             </Route>
 
@@ -80,6 +84,7 @@ export default function App() {
         </BrowserRouter>
       </CartProvider>
       </OrdersProvider>
+    </PromotionsProvider>
     </ProductsProvider>
     </AuthProvider>
     </ViewModeProvider>
