@@ -119,7 +119,7 @@ create table if not exists public.orders (
   total_amount numeric(12, 2) not null default 0,
   notes text,
   status text not null default 'authorization_pending'
-    check (status in ('pending', 'authorization_pending', 'processing', 'completed', 'cancelled')),
+    check (status in ('pending', 'authorization_pending', 'accepted', 'rejected', 'processing', 'completed', 'cancelled')),
   created_at timestamptz not null default now(),
   estimated_delivery date
 );
@@ -1004,7 +1004,7 @@ as $$
 begin
   perform public.require_admin_session(p_admin_token);
 
-  if p_status not in ('pending', 'authorization_pending', 'processing', 'completed', 'cancelled') then
+  if p_status not in ('pending', 'authorization_pending', 'accepted', 'rejected', 'processing', 'completed', 'cancelled') then
     raise exception 'Invalid order status';
   end if;
 
