@@ -235,7 +235,10 @@
     "perUnit": "/件",
     "productsFound": "个产品",
     "viewDetails": "查看详情",
-    "categories": "分类"
+    "categories": "分类",
+    "publicNoticeTitle": "目录可见但隐藏价格",
+    "publicNoticeText": "以客户或超级管理员身份登录后即可查看价格并创建订单。",
+    "priceHidden": "登录后可见价格"
   },
   "cart": {
     "title": "订单购物车",

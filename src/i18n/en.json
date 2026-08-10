@@ -235,7 +235,10 @@
     "perUnit": "/unit",
     "productsFound": "products found",
     "viewDetails": "View Details",
-    "categories": "Categories"
+    "categories": "Categories",
+    "publicNoticeTitle": "Catalog visible without prices",
+    "publicNoticeText": "Log in as a client or Super Admin to view prices and create orders.",
+    "priceHidden": "Price visible after login"
   },
   "cart": {
     "title": "Order Cart",

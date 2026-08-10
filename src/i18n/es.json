@@ -235,7 +235,10 @@
     "perUnit": "/ud",
     "productsFound": "productos encontrados",
     "viewDetails": "Ver Detalles",
-    "categories": "Categorías"
+    "categories": "Categorías",
+    "publicNoticeTitle": "Catálogo visible sin precios",
+    "publicNoticeText": "Inicia sesión como cliente o Super Admin para ver precios y crear pedidos.",
+    "priceHidden": "Precio visible con login"
   },
   "cart": {
     "title": "Carrito de Pedido",
