@@ -85,10 +85,12 @@ export interface Order {
   totalItems: number;
   totalAmount: number;
   notes?: string;
-  status: 'pending' | 'authorization_pending' | 'accepted' | 'rejected' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'authorization_pending' | 'accepted' | 'accepted_modified' | 'rejected' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
   estimatedDelivery: string;
 }
+
+export type OrderItemAvailability = 'available' | 'unavailable';
 
 export interface OrderItem {
   productId: string;
@@ -98,6 +100,8 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  availabilityStatus?: OrderItemAvailability;
+  adminNote?: string;
 }
 
 export type StockLevel = 'high' | 'low' | 'out';
