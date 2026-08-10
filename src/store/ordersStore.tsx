@@ -7,6 +7,7 @@ import { useAuth } from './authStore';
 interface OrdersContextType {
   orders: Order[];
   addOrder: (order: Order) => Promise<Order | null>;
+  updateOrderStatus: (orderId: string, status: Order['status']) => Promise<Order | null>;
   refreshOrders: () => Promise<void>;
 }
 
@@ -102,7 +103,39 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     return savedOrder;
   }, [companySessionToken]);
 
-  return React.createElement(OrdersContext.Provider, { value: { orders, addOrder, refreshOrders }, children });
+  const updateOrderStatus = useCallback(async (orderId: string, status: Order['status']) => {
+    if (!supabaseEnabled) {
+      let updatedOrder: Order | null = null;
+      setOrders(prev => prev.map(order => {
+        if (order.id !== orderId) return order;
+        updatedOrder = { ...order, status };
+        return updatedOrder;
+      }));
+      return updatedOrder;
+    }
+
+    if (!superAdminSessionToken) {
+      console.error('Missing super admin session token');
+      return null;
+    }
+
+    const { data, error } = await supabase.rpc('admin_update_order_status', {
+      p_admin_token: superAdminSessionToken,
+      p_order_id: orderId,
+      p_status: status,
+    });
+
+    if (error || !data) {
+      console.error('Error updating order status:', error);
+      return null;
+    }
+
+    const savedOrder = toOrder(data);
+    setOrders(prev => prev.map(order => order.id === savedOrder.id ? savedOrder : order));
+    return savedOrder;
+  }, [superAdminSessionToken]);
+
+  return React.createElement(OrdersContext.Provider, { value: { orders, addOrder, updateOrderStatus, refreshOrders }, children });
 }
 
 export function useOrders() {
