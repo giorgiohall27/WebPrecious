@@ -1,26 +1,26 @@
 // Auto-generated from Excel data with real product images
-// Generated on: 2026-03-31T20:47:00.988Z
-// Source: Copia de precious spain pedido con fotos.xlsx
+// Generated on: 2026-08-10T18:47:30.917Z
+// Source: /Users/giorgiorobinsonhall/Downloads/PRECIOUS SPAIN WEBPAGE FILE.xlsx
 import { Category, Product, Subcategory, Order } from '../types';
 
 export const categories: Category[] = [
   {
     "id": "cat-1",
-    "name": "SWEETS",
-    "key": "sweets",
+    "name": "CHUCHES",
+    "key": "chuches",
     "icon": "Package",
     "order": 1,
     "active": true,
-    "productCount": 41
+    "productCount": 39
   },
   {
     "id": "cat-2",
-    "name": "CHOCOLATES",
-    "key": "chocolates",
+    "name": "CHOCOLATE",
+    "key": "chocolate",
     "icon": "Package",
     "order": 2,
     "active": true,
-    "productCount": 34
+    "productCount": 35
   },
   {
     "id": "cat-3",
@@ -29,16 +29,16 @@ export const categories: Category[] = [
     "icon": "Package",
     "order": 3,
     "active": true,
-    "productCount": 32
+    "productCount": 24
   },
   {
     "id": "cat-4",
-    "name": "ALIMENTACION",
-    "key": "alimentacion",
+    "name": "ALIMENTACIÓN",
+    "key": "alimentación",
     "icon": "Package",
     "order": 4,
     "active": true,
-    "productCount": 40
+    "productCount": 56
   },
   {
     "id": "cat-5",
@@ -47,7 +47,7 @@ export const categories: Category[] = [
     "icon": "Package",
     "order": 5,
     "active": true,
-    "productCount": 29
+    "productCount": 37
   },
   {
     "id": "cat-6",
@@ -56,7 +56,7 @@ export const categories: Category[] = [
     "icon": "Package",
     "order": 6,
     "active": true,
-    "productCount": 15
+    "productCount": 29
   }
 ];
 export const products: Product[] = [
@@ -65,13 +65,13 @@ export const products: Product[] = [
     "sku": "SKU-1000",
     "name": "LIQUORICE ALLSORTS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.46,
     "stock": 9999,
     "description": "LIQUORICE ALLSORTS",
     "brand": "MAYNARD BASSETTS",
-    "unitMeasure": "12 X 130G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10 X 130G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -82,13 +82,13 @@ export const products: Product[] = [
     "sku": "SKU-1001",
     "name": "WINE GUMS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.46,
     "stock": 9999,
     "description": "WINE GUMS",
     "brand": "MAYNARD BASSETTS",
-    "unitMeasure": "12 X 130G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10 X 130G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -99,13 +99,13 @@ export const products: Product[] = [
     "sku": "SKU-1002",
     "name": "JELLY BABIES",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.46,
     "stock": 9999,
     "description": "JELLY BABIES",
     "brand": "MAYNARD BASSETTS",
-    "unitMeasure": "12 X 130G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10 X 130G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -116,13 +116,13 @@ export const products: Product[] = [
     "sku": "SKU-1003",
     "name": "SPORTS MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.46,
     "stock": 9999,
     "description": "SPORTS MIX",
     "brand": "MAYNARD BASSETTS",
-    "unitMeasure": "12 X 130G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10 X 130G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -133,13 +133,13 @@ export const products: Product[] = [
     "sku": "SKU-1004",
     "name": "MIDGET GEMS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.46,
     "stock": 9999,
     "description": "MIDGET GEMS",
     "brand": "MAYNARD BASSETTS",
-    "unitMeasure": "12 X 160G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10 X 160G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -150,7 +150,7 @@ export const products: Product[] = [
     "sku": "SKU-1005",
     "name": "RANDOMS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "RANDOMS",
@@ -167,7 +167,7 @@ export const products: Product[] = [
     "sku": "SKU-1006",
     "name": "FRUIT PASTILLES",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.79,
     "stock": 9999,
     "description": "FRUIT PASTILLES",
@@ -184,7 +184,7 @@ export const products: Product[] = [
     "sku": "SKU-1007",
     "name": "PICK & MIX POUCH",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.79,
     "stock": 9999,
     "description": "PICK & MIX POUCH",
@@ -201,7 +201,7 @@ export const products: Product[] = [
     "sku": "SKU-1008",
     "name": "FRUIT GUMS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.79,
     "stock": 9999,
     "description": "FRUIT GUMS",
@@ -218,7 +218,7 @@ export const products: Product[] = [
     "sku": "SKU-1009",
     "name": "ORIGINAL FRUIT CHEWS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.79,
     "stock": 9999,
     "description": "ORIGINAL FRUIT CHEWS",
@@ -235,7 +235,7 @@ export const products: Product[] = [
     "sku": "SKU-1010",
     "name": "MALLOW MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.59,
     "stock": 9999,
     "description": "MALLOW MIX",
@@ -252,7 +252,7 @@ export const products: Product[] = [
     "sku": "SKU-1011",
     "name": "PARTY MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.59,
     "stock": 9999,
     "description": "PARTY MIX",
@@ -269,7 +269,7 @@ export const products: Product[] = [
     "sku": "SKU-1012",
     "name": "TANGY MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.59,
     "stock": 9999,
     "description": "TANGY MIX",
@@ -286,7 +286,7 @@ export const products: Product[] = [
     "sku": "SKU-1013",
     "name": "FIZZY MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.59,
     "stock": 9999,
     "description": "FIZZY MIX",
@@ -303,7 +303,7 @@ export const products: Product[] = [
     "sku": "SKU-1014",
     "name": "ORIGINAL",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "ORIGINAL",
@@ -320,7 +320,7 @@ export const products: Product[] = [
     "sku": "SKU-1015",
     "name": "FRUIT MIX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "FRUIT MIX",
@@ -337,7 +337,7 @@ export const products: Product[] = [
     "sku": "SKU-1016",
     "name": "COLA",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "COLA",
@@ -354,7 +354,7 @@ export const products: Product[] = [
     "sku": "SKU-1017",
     "name": "WATERMELON",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "WATERMELON",
@@ -371,30 +371,30 @@ export const products: Product[] = [
     "sku": "SKU-1018",
     "name": "STRAWBERRY",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "STRAWBERRY",
     "brand": "SOUR PATCH",
-    "unitMeasure": "12 X 102G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10X 102G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image19.png"
   },
   {
     "id": "prod-20",
     "sku": "SKU-1019",
     "name": "BLUE RASPBERRY",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.97,
     "stock": 9999,
     "description": "BLUE RASPBERRY",
     "brand": "SOUR PATCH",
-    "unitMeasure": "12 X 102G",
-    "unitsPerBox": 12,
+    "unitMeasure": "10X 102G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -403,14 +403,14 @@ export const products: Product[] = [
   {
     "id": "prod-21",
     "sku": "SKU-1020",
-    "name": "TUBES / STRAWBERRY",
+    "name": "TUBES/STRAWBERRY",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.19,
     "stock": 9999,
-    "description": "TUBES / STRAWBERRY",
+    "description": "TUBES/STRAWBERRY",
     "brand": "MILLIONS",
-    "unitMeasure": "12 X 58G",
+    "unitMeasure": "12X58G",
     "unitsPerBox": 12,
     "weightKg": 0,
     "iva": 21,
@@ -422,7 +422,7 @@ export const products: Product[] = [
     "sku": "SKU-1021",
     "name": "TUBES / APPLE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.19,
     "stock": 9999,
     "description": "TUBES / APPLE",
@@ -439,7 +439,7 @@ export const products: Product[] = [
     "sku": "SKU-1022",
     "name": "TUBES / RASPBERRY",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.19,
     "stock": 9999,
     "description": "TUBES / RASPBERRY",
@@ -454,15 +454,15 @@ export const products: Product[] = [
   {
     "id": "prod-24",
     "sku": "SKU-1023",
-    "name": "TUBES/BLACKCURRANT",
+    "name": "GUMMY CLUSTER BERRIES",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 1.19,
+    "categoryName": "CHUCHES",
+    "price": 2.59,
     "stock": 9999,
-    "description": "TUBES/BLACKCURRANT",
-    "brand": "MILLIONS",
-    "unitMeasure": "12X58G",
-    "unitsPerBox": 12,
+    "description": "GUMMY CLUSTER BERRIES",
+    "brand": "NERDS",
+    "unitMeasure": "10 X 113G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -471,26 +471,9 @@ export const products: Product[] = [
   {
     "id": "prod-25",
     "sku": "SKU-1024",
-    "name": "GUMMY CLUSTER FRUITS",
-    "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 2.59,
-    "stock": 9999,
-    "description": "GUMMY CLUSTER FRUITS",
-    "brand": "NERDS",
-    "unitMeasure": "12 X 113G",
-    "unitsPerBox": 12,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": "/products/image26.png"
-  },
-  {
-    "id": "prod-26",
-    "sku": "SKU-1025",
     "name": "GRAPE & STRAWBERRY VIDEOBOX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.96,
     "stock": 9999,
     "description": "GRAPE & STRAWBERRY VIDEOBOX",
@@ -500,14 +483,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image30.png"
+    "imageUrl": "/products/image29.png"
   },
   {
-    "id": "prod-27",
-    "sku": "SKU-1026",
+    "id": "prod-26",
+    "sku": "SKU-1025",
     "name": "RAINBOW VIDEOBOX",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.96,
     "stock": 9999,
     "description": "RAINBOW VIDEOBOX",
@@ -517,17 +500,34 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image29.png"
+    "imageUrl": "/products/image26.png"
+  },
+  {
+    "id": "prod-27",
+    "sku": "SKU-1026",
+    "name": "RAINBOW ROPE",
+    "categoryId": "cat-1",
+    "categoryName": "CHUCHES",
+    "price": 1.38,
+    "stock": 9999,
+    "description": "RAINBOW ROPE",
+    "brand": "NERDS",
+    "unitMeasure": "24 X 26G",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image27.png"
   },
   {
     "id": "prod-28",
     "sku": "SKU-1027",
-    "name": "RAINBOW ROPE",
+    "name": "VERY BERRY ROPE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.38,
     "stock": 9999,
-    "description": "RAINBOW ROPE",
+    "description": "VERY BERRY ROPE",
     "brand": "NERDS",
     "unitMeasure": "24 X 26G",
     "unitsPerBox": 24,
@@ -539,15 +539,15 @@ export const products: Product[] = [
   {
     "id": "prod-29",
     "sku": "SKU-1028",
-    "name": "VERY BERRY ROPE",
+    "name": "VERY BERRY GUMMY CLUSTERS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 1.38,
+    "categoryName": "CHUCHES",
+    "price": 2.59,
     "stock": 9999,
-    "description": "VERY BERRY ROPE",
+    "description": "VERY BERRY GUMMY CLUSTERS",
     "brand": "NERDS",
-    "unitMeasure": "24 X 26G",
-    "unitsPerBox": 24,
+    "unitMeasure": "10X 113G",
+    "unitsPerBox": 10,
     "weightKg": 0,
     "iva": 21,
     "active": true,
@@ -556,26 +556,9 @@ export const products: Product[] = [
   {
     "id": "prod-30",
     "sku": "SKU-1029",
-    "name": "VERY BERRY GUMMY CLUSTERS",
-    "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 2.59,
-    "stock": 9999,
-    "description": "VERY BERRY GUMMY CLUSTERS",
-    "brand": "NERDS",
-    "unitMeasure": "12 X 113G",
-    "unitsPerBox": 12,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": null
-  },
-  {
-    "id": "prod-31",
-    "sku": "SKU-1030",
     "name": "SALTED CARAMEL TOFFEE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.89,
     "stock": 9999,
     "description": "SALTED CARAMEL TOFFEE",
@@ -585,14 +568,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image33.png"
+    "imageUrl": "/products/image30.png"
   },
   {
-    "id": "prod-32",
-    "sku": "SKU-1031",
+    "id": "prod-31",
+    "sku": "SKU-1030",
     "name": "ASSORTED TOFFEES",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.89,
     "stock": 9999,
     "description": "ASSORTED TOFFEES",
@@ -605,11 +588,11 @@ export const products: Product[] = [
     "imageUrl": "/products/image31.png"
   },
   {
-    "id": "prod-33",
-    "sku": "SKU-1032",
+    "id": "prod-32",
+    "sku": "SKU-1031",
     "name": "LIQUORICE TOFFEE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.89,
     "stock": 9999,
     "description": "LIQUORICE TOFFEE",
@@ -622,11 +605,11 @@ export const products: Product[] = [
     "imageUrl": "/products/image32.png"
   },
   {
-    "id": "prod-34",
-    "sku": "SKU-1033",
+    "id": "prod-33",
+    "sku": "SKU-1032",
     "name": "CREAMY TOFFEE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.89,
     "stock": 9999,
     "description": "CREAMY TOFFEE",
@@ -636,14 +619,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image33.png"
   },
   {
-    "id": "prod-35",
-    "sku": "SKU-1034",
+    "id": "prod-34",
+    "sku": "SKU-1033",
     "name": "MINT TOFFEE",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.89,
     "stock": 9999,
     "description": "MINT TOFFEE",
@@ -653,14 +636,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image34.png"
+    "imageUrl": "/products/image34.jpeg"
   },
   {
-    "id": "prod-36",
-    "sku": "SKU-1035",
+    "id": "prod-35",
+    "sku": "SKU-1034",
     "name": "ECLAIRS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.76,
     "stock": 9999,
     "description": "ECLAIRS",
@@ -670,14 +653,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image35.png"
+    "imageUrl": "/products/image35.jpeg"
   },
   {
-    "id": "prod-37",
-    "sku": "SKU-1036",
+    "id": "prod-36",
+    "sku": "SKU-1035",
     "name": "CREAMY FILLING",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.76,
     "stock": 9999,
     "description": "CREAMY FILLING",
@@ -690,11 +673,11 @@ export const products: Product[] = [
     "imageUrl": "/products/image36.png"
   },
   {
-    "id": "prod-38",
-    "sku": "SKU-1037",
+    "id": "prod-37",
+    "sku": "SKU-1036",
     "name": "BUTTER CANDIES",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.76,
     "stock": 9999,
     "description": "BUTTER CANDIES",
@@ -704,14 +687,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image37.png"
+    "imageUrl": "/products/image37.jpeg"
   },
   {
-    "id": "prod-39",
-    "sku": "SKU-1038",
+    "id": "prod-38",
+    "sku": "SKU-1037",
     "name": "SOFT CARAMELS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
+    "categoryName": "CHUCHES",
     "price": 1.76,
     "stock": 9999,
     "description": "SOFT CARAMELS",
@@ -721,15 +704,15 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image38.png"
+    "imageUrl": "/products/image38.jpeg"
   },
   {
-    "id": "prod-40",
-    "sku": "SKU-1039",
+    "id": "prod-39",
+    "sku": "SKU-1038",
     "name": "ECLAIRS",
     "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 1.7,
+    "categoryName": "CHUCHES",
+    "price": 1.89,
     "stock": 9999,
     "description": "ECLAIRS",
     "brand": "CADBURY",
@@ -738,14 +721,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image39.jpeg"
   },
   {
-    "id": "prod-41",
-    "sku": "SKU-1040",
+    "id": "prod-40",
+    "sku": "SKU-1039",
     "name": "OREO BITES",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
     "description": "OREO BITES",
@@ -755,14 +738,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image39.png"
+    "imageUrl": "/products/image40.jpeg"
   },
   {
-    "id": "prod-42",
-    "sku": "SKU-1041",
+    "id": "prod-41",
+    "sku": "SKU-1040",
     "name": "TWIRL MINI BITES",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
     "description": "TWIRL MINI BITES",
@@ -772,14 +755,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image41.jpeg"
   },
   {
-    "id": "prod-43",
-    "sku": "SKU-1042",
+    "id": "prod-42",
+    "sku": "SKU-1041",
     "name": "BITSA WISPA",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
     "description": "BITSA WISPA",
@@ -789,14 +772,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image41.png"
+    "imageUrl": "/products/image42.jpeg"
   },
   {
-    "id": "prod-44",
-    "sku": "SKU-1043",
+    "id": "prod-43",
+    "sku": "SKU-1042",
     "name": "CARAMEL NIBBLES POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
     "description": "CARAMEL NIBBLES POUCH",
@@ -806,14 +789,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image42.png"
+    "imageUrl": "/products/image43.jpeg"
   },
   {
-    "id": "prod-45",
-    "sku": "SKU-1044",
+    "id": "prod-44",
+    "sku": "SKU-1043",
     "name": "DAIRYMILK BUTTONS POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
     "description": "DAIRYMILK BUTTONS POUCH",
@@ -823,51 +806,17 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image44.jpeg"
   },
   {
-    "id": "prod-46",
-    "sku": "SKU-1045",
-    "name": "DAIRY MILK ORANGE BUTTONS POUCH",
+    "id": "prod-45",
+    "sku": "SKU-1044",
+    "name": "DAIRY MILK ORANGE BUTTONS",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "DAIRY MILK ORANGE BUTTONS POUCH",
-    "brand": "CADBURY",
-    "unitMeasure": "10 X 95G",
-    "unitsPerBox": 10,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": "/products/image43.png"
-  },
-  {
-    "id": "prod-47",
-    "sku": "SKU-1046",
-    "name": "WHITE CHOC BUTTONS",
-    "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
-    "price": 1.99,
-    "stock": 9999,
-    "description": "WHITE CHOC BUTTONS",
-    "brand": "CADBURY",
-    "unitMeasure": "10 X 95G",
-    "unitsPerBox": 10,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": null
-  },
-  {
-    "id": "prod-48",
-    "sku": "SKU-1047",
-    "name": "CURLY WURLY SQUIRLIES",
-    "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
-    "price": 1.99,
-    "stock": 9999,
-    "description": "CURLY WURLY SQUIRLIES",
+    "description": "DAIRY MILK ORANGE BUTTONS",
     "brand": "CADBURY",
     "unitMeasure": "10 X 95G",
     "unitsPerBox": 10,
@@ -877,11 +826,62 @@ export const products: Product[] = [
     "imageUrl": "/products/image45.png"
   },
   {
+    "id": "prod-46",
+    "sku": "SKU-1045",
+    "name": "WHITE CHOCOLATE  BUTTONS",
+    "categoryId": "cat-2",
+    "categoryName": "CHOCOLATE",
+    "price": 1.99,
+    "stock": 9999,
+    "description": "WHITE CHOCOLATE  BUTTONS",
+    "brand": "CADBURY",
+    "unitMeasure": "10 X 95G",
+    "unitsPerBox": 10,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image46.jpeg"
+  },
+  {
+    "id": "prod-47",
+    "sku": "SKU-1046",
+    "name": "CARAMILK BUTTONS",
+    "categoryId": "cat-2",
+    "categoryName": "CHOCOLATE",
+    "price": 1.99,
+    "stock": 9999,
+    "description": "CARAMILK BUTTONS",
+    "brand": "CADBURY",
+    "unitMeasure": "10 X 90G",
+    "unitsPerBox": 10,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image47.png"
+  },
+  {
+    "id": "prod-48",
+    "sku": "SKU-1047",
+    "name": "CURLY WURLY SQUIRLIES",
+    "categoryId": "cat-2",
+    "categoryName": "CHOCOLATE",
+    "price": 1.99,
+    "stock": 9999,
+    "description": "CURLY WURLY SQUIRLIES",
+    "brand": "CADBURY",
+    "unitMeasure": "10 X 95G",
+    "unitsPerBox": 10,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image48.png"
+  },
+  {
     "id": "prod-49",
     "sku": "SKU-1048",
     "name": "ROLOS POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "ROLOS POUCH",
@@ -891,14 +891,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image46.png"
+    "imageUrl": "/products/image49.png"
   },
   {
     "id": "prod-50",
     "sku": "SKU-1049",
     "name": "MUNCHIES POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "MUNCHIES POUCH",
@@ -908,14 +908,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image47.png"
+    "imageUrl": "/products/image50.jpeg"
   },
   {
     "id": "prod-51",
     "sku": "SKU-1050",
     "name": "MINSTRELS POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "MINSTRELS POUCH",
@@ -925,14 +925,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image51.png"
+    "imageUrl": "/products/image51.jpeg"
   },
   {
     "id": "prod-52",
     "sku": "SKU-1051",
     "name": "AERO MELTS POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.95,
     "stock": 9999,
     "description": "AERO MELTS POUCH",
@@ -942,14 +942,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image50.png"
+    "imageUrl": "/products/image53.png"
   },
   {
     "id": "prod-53",
     "sku": "SKU-1052",
     "name": "AERO PEPPERMINT POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.95,
     "stock": 9999,
     "description": "AERO PEPPERMINT POUCH",
@@ -959,14 +959,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image49.png"
+    "imageUrl": "/products/image52.png"
   },
   {
     "id": "prod-54",
     "sku": "SKU-1053",
     "name": "MILKYBAR BUTTONS",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "MILKYBAR BUTTONS",
@@ -976,14 +976,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image48.png"
+    "imageUrl": "/products/image54.jpeg"
   },
   {
     "id": "prod-55",
     "sku": "SKU-1054",
     "name": "RIESEN BAG",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "RIESEN BAG",
@@ -993,14 +993,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image55.png"
   },
   {
     "id": "prod-56",
     "sku": "SKU-1055",
     "name": "PEANUT BUTTER CUPS 2PK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.19,
     "stock": 9999,
     "description": "PEANUT BUTTER CUPS 2PK",
@@ -1010,14 +1010,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image54.png"
+    "imageUrl": "/products/image56.png"
   },
   {
     "id": "prod-57",
     "sku": "SKU-1056",
     "name": "NUTRAGEOUS BARS",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.13,
     "stock": 9999,
     "description": "NUTRAGEOUS BARS",
@@ -1027,14 +1027,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image52.png"
+    "imageUrl": "/products/image59.png"
   },
   {
     "id": "prod-58",
     "sku": "SKU-1057",
     "name": "OVERLOAD",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.13,
     "stock": 9999,
     "description": "OVERLOAD",
@@ -1044,14 +1044,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image53.png"
+    "imageUrl": "/products/image58.png"
   },
   {
     "id": "prod-59",
     "sku": "SKU-1058",
     "name": "PEANUT BUTTER CUPS MINI POUCH",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.89,
     "stock": 9999,
     "description": "PEANUT BUTTER CUPS MINI POUCH",
@@ -1061,14 +1061,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image56.png"
+    "imageUrl": "/products/image60.jpeg"
   },
   {
     "id": "prod-60",
     "sku": "SKU-1059",
     "name": "WHITE PEANUT BUTTER CUPS 2PK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.15,
     "stock": 9999,
     "description": "WHITE PEANUT BUTTER CUPS 2PK",
@@ -1078,14 +1078,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image55.png"
+    "imageUrl": "/products/image57.png"
   },
   {
     "id": "prod-61",
     "sku": "SKU-1060",
     "name": "MILK CHOCOLATE BAR",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 2.39,
     "stock": 9999,
     "description": "MILK CHOCOLATE BAR",
@@ -1095,14 +1095,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image61.png"
   },
   {
     "id": "prod-62",
     "sku": "SKU-1061",
     "name": "MILK CHOCOLATE CRUNCH BAR",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 2.39,
     "stock": 9999,
     "description": "MILK CHOCOLATE CRUNCH BAR",
@@ -1119,7 +1119,7 @@ export const products: Product[] = [
     "sku": "SKU-1062",
     "name": "MILK CHOCOLATE / PEANUT BUTTER BAR",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 2.39,
     "stock": 9999,
     "description": "MILK CHOCOLATE / PEANUT BUTTER BAR",
@@ -1136,7 +1136,7 @@ export const products: Product[] = [
     "sku": "SKU-1063",
     "name": "MILK CHOCOLATE / ALMOND",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 2.39,
     "stock": 9999,
     "description": "MILK CHOCOLATE / ALMOND",
@@ -1146,177 +1146,177 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image64.png"
   },
   {
     "id": "prod-65",
     "sku": "SKU-1064",
-    "name": "TWIRL",
+    "name": "TWIRL MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "TWIRL",
+    "description": "TWIRL MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "5PK X 20",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image65.jpeg"
   },
   {
     "id": "prod-66",
     "sku": "SKU-1065",
-    "name": "CRUNCHIE",
+    "name": "CRUNCHIE MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "CRUNCHIE",
+    "description": "CRUNCHIE MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 10",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image57.png"
+    "imageUrl": "/products/image66.jpeg"
   },
   {
     "id": "prod-67",
     "sku": "SKU-1066",
-    "name": "DAIRY MILK",
+    "name": "DAIRY MILK MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "DAIRY MILK",
+    "description": "DAIRY MILK MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 14",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image67.jpeg"
   },
   {
     "id": "prod-68",
     "sku": "SKU-1067",
-    "name": "WISPA",
+    "name": "WISPA MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "WISPA",
+    "description": "WISPA MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 11",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image68.png"
   },
   {
     "id": "prod-69",
     "sku": "SKU-1068",
-    "name": "PICNIC",
+    "name": "PICNIC MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "PICNIC",
+    "description": "PICNIC MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 10",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image58.png"
+    "imageUrl": "/products/image69.jpeg"
   },
   {
     "id": "prod-70",
     "sku": "SKU-1069",
-    "name": "DOUBLE DECKER",
+    "name": "DOUBLE DECKER MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "DOUBLE DECKER",
+    "description": "DOUBLE DECKER MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 8",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image70.jpeg"
   },
   {
     "id": "prod-71",
     "sku": "SKU-1070",
-    "name": "BOOST BARS",
+    "name": "BOOST BARS MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "BOOST BARS",
+    "description": "BOOST BARS MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 9",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image71.jpeg"
   },
   {
     "id": "prod-72",
     "sku": "SKU-1071",
-    "name": "FLAKE",
+    "name": "FLAKE MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "FLAKE",
+    "description": "FLAKE MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "4PK X 20",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image65.png"
+    "imageUrl": "/products/image72.jpeg"
   },
   {
     "id": "prod-73",
     "sku": "SKU-1072",
-    "name": "FUDGE",
+    "name": "FUDGE MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "FUDGE",
+    "description": "FUDGE MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "5PK X 20",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image59.png"
+    "imageUrl": "/products/image73.jpeg"
   },
   {
     "id": "prod-74",
     "sku": "SKU-1073",
-    "name": "DAIM BAR",
+    "name": "DAIM BAR MULTIPACK",
     "categoryId": "cat-2",
-    "categoryName": "CHOCOLATES",
+    "categoryName": "CHOCOLATE",
     "price": 1.99,
     "stock": 9999,
-    "description": "DAIM BAR",
+    "description": "DAIM BAR MULTIPACK",
     "brand": "CADBURY",
     "unitMeasure": "3PK 24 X 84G",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image60.png"
+    "imageUrl": "/products/image74.jpeg"
   },
   {
     "id": "prod-75",
@@ -1333,7 +1333,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image66.png"
+    "imageUrl": "/products/image75.png"
   },
   {
     "id": "prod-76",
@@ -1350,7 +1350,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image76.png"
   },
   {
     "id": "prod-77",
@@ -1367,7 +1367,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image71.png"
+    "imageUrl": "/products/image77.jpeg"
   },
   {
     "id": "prod-78",
@@ -1384,7 +1384,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image78.png"
   },
   {
     "id": "prod-79",
@@ -1401,7 +1401,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image79.png"
   },
   {
     "id": "prod-80",
@@ -1418,7 +1418,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image80.png"
   },
   {
     "id": "prod-81",
@@ -1435,7 +1435,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image81.png"
   },
   {
     "id": "prod-82",
@@ -1452,7 +1452,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image82.jpeg"
   },
   {
     "id": "prod-83",
@@ -1469,7 +1469,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image74.png"
+    "imageUrl": "/products/image83.png"
   },
   {
     "id": "prod-84",
@@ -1486,7 +1486,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image84.jpeg"
   },
   {
     "id": "prod-85",
@@ -1503,7 +1503,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image67.png"
+    "imageUrl": "/products/image85.png"
   },
   {
     "id": "prod-86",
@@ -1520,7 +1520,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image69.png"
+    "imageUrl": "/products/image86.jpeg"
   },
   {
     "id": "prod-87",
@@ -1537,14 +1537,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image87.jpeg"
   },
   {
     "id": "prod-88",
     "sku": "SKU-1087",
     "name": "CRUNCHY NUT CORNFLAKES",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.99,
     "stock": 9999,
     "description": "CRUNCHY NUT CORNFLAKES",
@@ -1554,14 +1554,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image88.png"
   },
   {
     "id": "prod-89",
     "sku": "SKU-1088",
     "name": "MUESLI",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.29,
     "stock": 9999,
     "description": "MUESLI",
@@ -1571,14 +1571,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image86.png"
+    "imageUrl": "/products/image89.jpeg"
   },
   {
     "id": "prod-90",
     "sku": "SKU-1089",
     "name": "FRUITY MUESLI",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.29,
     "stock": 9999,
     "description": "FRUITY MUESLI",
@@ -1588,14 +1588,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image84.png"
+    "imageUrl": "/products/image90.jpeg"
   },
   {
     "id": "prod-91",
     "sku": "SKU-1090",
     "name": "NUTTY MUESLI",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.29,
     "stock": 9999,
     "description": "NUTTY MUESLI",
@@ -1605,14 +1605,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image85.png"
+    "imageUrl": "/products/image91.png"
   },
   {
     "id": "prod-92",
     "sku": "SKU-1091",
     "name": "SHREDDED WHEAT 16'S",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.79,
     "stock": 9999,
     "description": "SHREDDED WHEAT 16'S",
@@ -1622,14 +1622,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image83.png"
+    "imageUrl": "/products/image92.png"
   },
   {
     "id": "prod-93",
     "sku": "SKU-1092",
     "name": "SHREDDIES",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.79,
     "stock": 9999,
     "description": "SHREDDIES",
@@ -1639,14 +1639,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image93.png"
   },
   {
     "id": "prod-94",
     "sku": "SKU-1093",
     "name": "WEETABIX STANDARD",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.99,
     "stock": 9999,
     "description": "WEETABIX STANDARD",
@@ -1656,7 +1656,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image89.png"
+    "imageUrl": "/products/image94.png"
   },
   {
     "id": "prod-95",
@@ -1673,7 +1673,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image87.png"
+    "imageUrl": "/products/image95.png"
   },
   {
     "id": "prod-96",
@@ -1690,7 +1690,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image88.png"
+    "imageUrl": "/products/image96.jpeg"
   },
   {
     "id": "prod-97",
@@ -1707,7 +1707,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image82.png"
+    "imageUrl": "/products/image97.jpeg"
   },
   {
     "id": "prod-98",
@@ -1724,7 +1724,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image75.png"
+    "imageUrl": "/products/image98.jpeg"
   },
   {
     "id": "prod-99",
@@ -1741,14 +1741,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image76.png"
+    "imageUrl": "/products/image99.png"
   },
   {
     "id": "prod-100",
     "sku": "SKU-1099",
     "name": "BAKED BEANS IN TOM SAUCE",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 0.85,
     "stock": 9999,
     "description": "BAKED BEANS IN TOM SAUCE",
@@ -1758,14 +1758,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image100.jpeg"
   },
   {
     "id": "prod-101",
     "sku": "SKU-1100",
     "name": "SAGE & ONION STUFFING",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 0.99,
     "stock": 9999,
     "description": "SAGE & ONION STUFFING",
@@ -1775,14 +1775,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image101.png"
   },
   {
     "id": "prod-102",
     "sku": "SKU-1101",
     "name": "VEGETABLE GRAVY GRANULES",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "VEGETABLE GRAVY GRANULES",
@@ -1792,14 +1792,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image102.jpeg"
   },
   {
     "id": "prod-103",
     "sku": "SKU-1102",
     "name": "BEEF GRAVY",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "BEEF GRAVY",
@@ -1809,14 +1809,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image103.jpeg"
   },
   {
     "id": "prod-104",
     "sku": "SKU-1103",
     "name": "CHICKEN GRAVY",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "CHICKEN GRAVY",
@@ -1826,14 +1826,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image104.jpeg"
   },
   {
     "id": "prod-105",
     "sku": "SKU-1104",
     "name": "SALAD CREAM CLASSIC",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.59,
     "stock": 9999,
     "description": "SALAD CREAM CLASSIC",
@@ -1843,14 +1843,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image105.jpeg"
   },
   {
     "id": "prod-106",
     "sku": "SKU-1105",
     "name": "SALAD CREAM LIGHT",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.59,
     "stock": 9999,
     "description": "SALAD CREAM LIGHT",
@@ -1860,14 +1860,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image106.jpeg"
   },
   {
     "id": "prod-107",
     "sku": "SKU-1106",
     "name": "EARL GREY 100 TEA BAGS",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.49,
     "stock": 9999,
     "description": "EARL GREY 100 TEA BAGS",
@@ -1877,14 +1877,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image107.jpeg"
   },
   {
     "id": "prod-108",
     "sku": "SKU-1107",
     "name": "GOLD DECAF COFFEE",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 4.99,
     "stock": 9999,
     "description": "GOLD DECAF COFFEE",
@@ -1894,14 +1894,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image108.jpeg"
   },
   {
     "id": "prod-109",
     "sku": "SKU-1108",
     "name": "ORANGE MARMALADE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "ORANGE MARMALADE",
@@ -1911,14 +1911,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image109.jpeg"
   },
   {
     "id": "prod-110",
     "sku": "SKU-1109",
     "name": "STRAWBERRY JAM",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "STRAWBERRY JAM",
@@ -1928,14 +1928,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image110.png"
   },
   {
     "id": "prod-111",
     "sku": "SKU-1110",
     "name": "GINGER JAM",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "GINGER JAM",
@@ -1945,14 +1945,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image111.png"
   },
   {
     "id": "prod-112",
     "sku": "SKU-1111",
     "name": "PURE HONEY SQUEEZY",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "PURE HONEY SQUEEZY",
@@ -1962,14 +1962,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image112.jpeg"
   },
   {
     "id": "prod-113",
     "sku": "SKU-1112",
     "name": "SMOOTH PEANUT BUTTER",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.99,
     "stock": 9999,
     "description": "SMOOTH PEANUT BUTTER",
@@ -1979,14 +1979,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image113.jpeg"
   },
   {
     "id": "prod-114",
     "sku": "SKU-1113",
     "name": "CRUNCHY PEANUT BUTTER",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.99,
     "stock": 9999,
     "description": "CRUNCHY PEANUT BUTTER",
@@ -1996,14 +1996,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image114.jpeg"
   },
   {
     "id": "prod-115",
     "sku": "SKU-1114",
     "name": "CASTER SUGAR",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.69,
     "stock": 9999,
     "description": "CASTER SUGAR",
@@ -2013,14 +2013,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image115.png"
   },
   {
     "id": "prod-116",
     "sku": "SKU-1115",
     "name": "GRANULATED SUGAR",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.29,
     "stock": 9999,
     "description": "GRANULATED SUGAR",
@@ -2030,14 +2030,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image116.png"
   },
   {
     "id": "prod-117",
     "sku": "SKU-1116",
     "name": "CHICKEN & MUSHROOM",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "CHICKEN & MUSHROOM",
@@ -2047,14 +2047,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image117.png"
   },
   {
     "id": "prod-118",
     "sku": "SKU-1117",
     "name": "BOMBAY BAD BOY",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "BOMBAY BAD BOY",
@@ -2064,14 +2064,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image118.png"
   },
   {
     "id": "prod-119",
     "sku": "SKU-1118",
     "name": "CURRY",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "CURRY",
@@ -2081,14 +2081,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image119.png"
   },
   {
     "id": "prod-120",
     "sku": "SKU-1119",
     "name": "BEEF & TOMATO",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "BEEF & TOMATO",
@@ -2098,14 +2098,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image120.png"
   },
   {
     "id": "prod-121",
     "sku": "SKU-1120",
     "name": "ORIGINAL BASMATI RICE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "ORIGINAL BASMATI RICE",
@@ -2115,14 +2115,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image121.png"
   },
   {
     "id": "prod-122",
     "sku": "SKU-1121",
     "name": "PILAU RICE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "PILAU RICE",
@@ -2132,14 +2132,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image122.png"
   },
   {
     "id": "prod-123",
     "sku": "SKU-1122",
     "name": "LONG GRAIN RICE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "LONG GRAIN RICE",
@@ -2149,14 +2149,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image72.png"
+    "imageUrl": "/products/image123.jpeg"
   },
   {
     "id": "prod-124",
     "sku": "SKU-1123",
     "name": "GOLDEN VEGETABLE RICE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "GOLDEN VEGETABLE RICE",
@@ -2166,14 +2166,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image124.png"
   },
   {
     "id": "prod-125",
     "sku": "SKU-1124",
     "name": "CHICKEN RICE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.69,
     "stock": 9999,
     "description": "CHICKEN RICE",
@@ -2183,14 +2183,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image125.png"
   },
   {
     "id": "prod-126",
     "sku": "SKU-1125",
     "name": "BAKED BEANS IN TOM SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 0.99,
     "stock": 9999,
     "description": "BAKED BEANS IN TOM SAUCE",
@@ -2200,31 +2200,31 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image126.png"
   },
   {
     "id": "prod-127",
     "sku": "SKU-1126",
     "name": "MUSHY PEAS",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.09,
     "stock": 9999,
     "description": "MUSHY PEAS",
-    "brand": "BATCHELOR",
+    "brand": "BATCHELORS",
     "unitMeasure": "24 X 300G",
     "unitsPerBox": 24,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image127.png"
   },
   {
     "id": "prod-128",
     "sku": "SKU-1127",
     "name": "BAKED BEANS",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.09,
     "stock": 9999,
     "description": "BAKED BEANS",
@@ -2234,14 +2234,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image128.png"
   },
   {
     "id": "prod-129",
     "sku": "SKU-1128",
     "name": "TOMATO SOUP",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.39,
     "stock": 9999,
     "description": "TOMATO SOUP",
@@ -2251,14 +2251,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image129.png"
   },
   {
     "id": "prod-130",
     "sku": "SKU-1129",
     "name": "VEGETABLE SOUP",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.19,
     "stock": 9999,
     "description": "VEGETABLE SOUP",
@@ -2268,14 +2268,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image130.jpeg"
   },
   {
     "id": "prod-131",
     "sku": "SKU-1130",
     "name": "MUSHROOM SOUP",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.19,
     "stock": 9999,
     "description": "MUSHROOM SOUP",
@@ -2285,14 +2285,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image131.png"
   },
   {
     "id": "prod-132",
     "sku": "SKU-1131",
     "name": "CHICKEN SOUP",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.19,
     "stock": 9999,
     "description": "CHICKEN SOUP",
@@ -2302,14 +2302,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image132.png"
   },
   {
     "id": "prod-133",
     "sku": "SKU-1132",
     "name": "ORIGINAL PICKLE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.89,
     "stock": 9999,
     "description": "ORIGINAL PICKLE",
@@ -2319,14 +2319,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image133.png"
   },
   {
     "id": "prod-134",
     "sku": "SKU-1133",
     "name": "SMALL CHUNK PICKLE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.89,
     "stock": 9999,
     "description": "SMALL CHUNK PICKLE",
@@ -2336,14 +2336,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image134.png"
   },
   {
     "id": "prod-135",
     "sku": "SKU-1134",
     "name": "COCONUT MILK",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.09,
     "stock": 9999,
     "description": "COCONUT MILK",
@@ -2353,14 +2353,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image135.png"
   },
   {
     "id": "prod-136",
     "sku": "SKU-1135",
     "name": "ENGLISH MUSTARD",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "ENGLISH MUSTARD",
@@ -2370,14 +2370,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image136.png"
   },
   {
     "id": "prod-137",
     "sku": "SKU-1136",
     "name": "MINT SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.95,
     "stock": 9999,
     "description": "MINT SAUCE",
@@ -2387,14 +2387,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image137.png"
   },
   {
     "id": "prod-138",
     "sku": "SKU-1137",
     "name": "APPLE SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.95,
     "stock": 9999,
     "description": "APPLE SAUCE",
@@ -2404,14 +2404,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image138.png"
   },
   {
     "id": "prod-139",
     "sku": "SKU-1138",
     "name": "HORSERADISH SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.95,
     "stock": 9999,
     "description": "HORSERADISH SAUCE",
@@ -2421,14 +2421,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image139.png"
   },
   {
     "id": "prod-140",
     "sku": "SKU-1139",
     "name": "SEAFOOD SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.95,
     "stock": 9999,
     "description": "SEAFOOD SAUCE",
@@ -2438,14 +2438,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image140.png"
   },
   {
     "id": "prod-141",
     "sku": "SKU-1140",
     "name": "TARTARE SAUCE",
     "categoryId": "cat-4",
-    "categoryName": "ALIMENTACION",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.95,
     "stock": 9999,
     "description": "TARTARE SAUCE",
@@ -2455,62 +2455,45 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image141.png"
   },
   {
     "id": "prod-142",
     "sku": "SKU-1141",
-    "name": "TUBES/BLACKCURRANT",
-    "categoryId": "cat-1",
-    "categoryName": "SWEETS",
-    "price": 1.19,
-    "stock": 9999,
-    "description": "TUBES/BLACKCURRANT",
-    "brand": "MILLIONS",
-    "unitMeasure": "12 X 58G",
-    "unitsPerBox": 12,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": null
-  },
-  {
-    "id": "prod-143",
-    "sku": "SKU-1142",
-    "name": "Monster munch Pickled Onion",
+    "name": "MONSTER MUNCH PICKLED  ONION",
     "categoryId": "cat-3",
     "categoryName": "SNACKS",
     "price": 0.99,
     "stock": 9999,
-    "description": "Monster munch Pickled Onion",
+    "description": "MONSTER MUNCH PICKLED  ONION",
     "brand": "WALKERS",
     "unitMeasure": "35 X 40G",
     "unitsPerBox": 35,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image77.png"
+    "imageUrl": "/products/image142.png"
+  },
+  {
+    "id": "prod-143",
+    "sku": "SKU-1142",
+    "name": "QUAVERS",
+    "categoryId": "cat-3",
+    "categoryName": "SNACKS",
+    "price": 0.99,
+    "stock": 9999,
+    "description": "QUAVERS",
+    "brand": "WALKERS",
+    "unitMeasure": "30X34G",
+    "unitsPerBox": 30,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image143.png"
   },
   {
     "id": "prod-144",
     "sku": "SKU-1143",
-    "name": "QUAVERS",
-    "categoryId": "cat-3",
-    "categoryName": "SNACKS",
-    "price": 0,
-    "stock": 9999,
-    "description": "QUAVERS",
-    "brand": "WALKERS",
-    "unitMeasure": "",
-    "unitsPerBox": 1,
-    "weightKg": 0,
-    "iva": 21,
-    "active": true,
-    "imageUrl": null
-  },
-  {
-    "id": "prod-145",
-    "sku": "SKU-1144",
     "name": "HULA HOOPS ORIGINALS",
     "categoryId": "cat-3",
     "categoryName": "SNACKS",
@@ -2523,41 +2506,58 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image81.png"
+    "imageUrl": "/products/image144.png"
+  },
+  {
+    "id": "prod-145",
+    "sku": "SKU-1144",
+    "name": "HULA  HOOPS BBQ BEEF",
+    "categoryId": "cat-3",
+    "categoryName": "SNACKS",
+    "price": 0.79,
+    "stock": 9999,
+    "description": "HULA  HOOPS BBQ BEEF",
+    "brand": "WALKERS",
+    "unitMeasure": "32 X 34G",
+    "unitsPerBox": 32,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image145.png"
   },
   {
     "id": "prod-146",
     "sku": "SKU-1145",
-    "name": "BBQ BEEF",
+    "name": "HULA HOOPS CHEESE ONION",
     "categoryId": "cat-3",
     "categoryName": "SNACKS",
     "price": 0.79,
     "stock": 9999,
-    "description": "BBQ BEEF",
+    "description": "HULA HOOPS CHEESE ONION",
     "brand": "WALKERS",
     "unitMeasure": "32 X 34G",
     "unitsPerBox": 32,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image80.png"
+    "imageUrl": "/products/image147.png"
   },
   {
     "id": "prod-147",
     "sku": "SKU-1146",
-    "name": "SALT AND VINEGAR",
+    "name": "HULA HOOPS SALT AND VINEGAR",
     "categoryId": "cat-3",
     "categoryName": "SNACKS",
     "price": 0.79,
     "stock": 9999,
-    "description": "SALT AND VINEGAR",
+    "description": "HULA HOOPS SALT AND VINEGAR",
     "brand": "WALKERS",
     "unitMeasure": "32 X 34G",
     "unitsPerBox": 32,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": "/products/image79.png"
+    "imageUrl": "/products/image146.png"
   },
   {
     "id": "prod-148",
@@ -2565,16 +2565,16 @@ export const products: Product[] = [
     "name": "PINEAPPLE",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
-    "price": 0.99,
+    "price": 1.09,
     "stock": 9999,
     "description": "PINEAPPLE",
     "brand": "FANTA",
-    "unitMeasure": "6X500ML",
-    "unitsPerBox": 6,
+    "unitMeasure": "12X355ML",
+    "unitsPerBox": 12,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image149.jpeg"
   },
   {
     "id": "prod-149",
@@ -2582,7 +2582,7 @@ export const products: Product[] = [
     "name": "BERRY",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
-    "price": 0.99,
+    "price": 1.09,
     "stock": 9999,
     "description": "BERRY",
     "brand": "FANTA",
@@ -2591,7 +2591,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image148.jpeg"
   },
   {
     "id": "prod-150",
@@ -2599,7 +2599,7 @@ export const products: Product[] = [
     "name": "STRAWBERRY",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
-    "price": 0.99,
+    "price": 1.09,
     "stock": 9999,
     "description": "STRAWBERRY",
     "brand": "FANTA",
@@ -2608,7 +2608,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image150.png"
   },
   {
     "id": "prod-151",
@@ -2616,7 +2616,7 @@ export const products: Product[] = [
     "name": "GRAPE",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
-    "price": 0.99,
+    "price": 1.09,
     "stock": 9999,
     "description": "GRAPE",
     "brand": "FANTA",
@@ -2625,7 +2625,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image151.png"
   },
   {
     "id": "prod-152",
@@ -2633,7 +2633,7 @@ export const products: Product[] = [
     "name": "PEACH",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
-    "price": 0.99,
+    "price": 1.09,
     "stock": 9999,
     "description": "PEACH",
     "brand": "FANTA",
@@ -2642,7 +2642,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image152.png"
   },
   {
     "id": "prod-153",
@@ -2659,7 +2659,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image154.png"
   },
   {
     "id": "prod-154",
@@ -2676,7 +2676,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image155.jpeg"
   },
   {
     "id": "prod-155",
@@ -2693,7 +2693,7 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image156.jpeg"
   },
   {
     "id": "prod-156",
@@ -2710,11 +2710,130 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image153.jpeg"
   },
   {
     "id": "prod-157",
     "sku": "SKU-1156",
+    "name": "AGUA DE COCO LATA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "AGUA DE COCO LATA",
+    "brand": "AMAZONIA",
+    "unitMeasure": "12X500ML",
+    "unitsPerBox": 12,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image182.jpeg"
+  },
+  {
+    "id": "prod-158",
+    "sku": "SKU-1157",
+    "name": "AGUA  DE  COCO",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.49,
+    "stock": 9999,
+    "description": "AGUA  DE  COCO",
+    "brand": "AMAZONIA",
+    "unitMeasure": "12X500ML",
+    "unitsPerBox": 12,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image181.jpeg"
+  },
+  {
+    "id": "prod-159",
+    "sku": "SKU-1158",
+    "name": "AGUA DE COCO",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.49,
+    "stock": 9999,
+    "description": "AGUA DE COCO",
+    "brand": "AMAZONIA",
+    "unitMeasure": "12X1L",
+    "unitsPerBox": 12,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image181.jpeg"
+  },
+  {
+    "id": "prod-160",
+    "sku": "SKU-1159",
+    "name": "CHIA MANGO",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "CHIA MANGO",
+    "brand": "AMAZONIA",
+    "unitMeasure": "24X450ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image183.jpeg"
+  },
+  {
+    "id": "prod-161",
+    "sku": "SKU-1160",
+    "name": "CHIA MELOCOTÓN",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "CHIA MELOCOTÓN",
+    "brand": "AMAZONIA",
+    "unitMeasure": "24X450ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image185.jpeg"
+  },
+  {
+    "id": "prod-162",
+    "sku": "SKU-1161",
+    "name": "CHIA KIWI",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "CHIA KIWI",
+    "brand": "AMAZONIA",
+    "unitMeasure": "24X450ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image184.jpeg"
+  },
+  {
+    "id": "prod-163",
+    "sku": "SKU-1162",
+    "name": "CHIA PIÑA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "CHIA PIÑA",
+    "brand": "AMAZONIA",
+    "unitMeasure": "24X450ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image186.jpeg"
+  },
+  {
+    "id": "prod-164",
+    "sku": "SKU-1163",
     "name": "JUGO DE COCO CON PULPA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2727,11 +2846,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image157.png"
   },
   {
-    "id": "prod-158",
-    "sku": "SKU-1157",
+    "id": "prod-165",
+    "sku": "SKU-1164",
     "name": "JUGO DE MARACUYÁ",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2744,11 +2863,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image158.png"
   },
   {
-    "id": "prod-159",
-    "sku": "SKU-1158",
+    "id": "prod-166",
+    "sku": "SKU-1165",
     "name": "JUGO DE MANGO",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2761,11 +2880,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image159.png"
   },
   {
-    "id": "prod-160",
-    "sku": "SKU-1159",
+    "id": "prod-167",
+    "sku": "SKU-1166",
     "name": "JUGO DE TAMARINDO",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2778,14 +2897,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image160.jpeg"
   },
   {
-    "id": "prod-161",
-    "sku": "SKU-1160",
+    "id": "prod-168",
+    "sku": "SKU-1167",
     "name": "40'S",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.69,
     "stock": 9999,
     "description": "40'S",
@@ -2795,14 +2914,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image161.png"
   },
   {
-    "id": "prod-162",
-    "sku": "SKU-1161",
+    "id": "prod-169",
+    "sku": "SKU-1168",
     "name": "70'S DECAF",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 4.79,
     "stock": 9999,
     "description": "70'S DECAF",
@@ -2812,31 +2931,31 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image162.jpeg"
   },
   {
-    "id": "prod-163",
-    "sku": "SKU-1162",
-    "name": "ORIGINAL TEA",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "id": "prod-170",
+    "sku": "SKU-1169",
+    "name": "ORIGINAL TEA 40´S",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
-    "description": "ORIGINAL TEA",
+    "description": "ORIGINAL TEA 40´S",
     "brand": "TETLEYS",
     "unitMeasure": "40'S X12",
     "unitsPerBox": 1,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image163.png"
   },
   {
-    "id": "prod-164",
-    "sku": "SKU-1163",
+    "id": "prod-171",
+    "sku": "SKU-1170",
     "name": "TEA BAGS 40'S",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 1.89,
     "stock": 9999,
     "description": "TEA BAGS 40'S",
@@ -2846,14 +2965,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image164.png"
   },
   {
-    "id": "prod-165",
-    "sku": "SKU-1164",
+    "id": "prod-172",
+    "sku": "SKU-1171",
     "name": "TEA BAGS 210'S",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 7.99,
     "stock": 9999,
     "description": "TEA BAGS 210'S",
@@ -2863,14 +2982,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image165.jpeg"
   },
   {
-    "id": "prod-166",
-    "sku": "SKU-1165",
+    "id": "prod-173",
+    "sku": "SKU-1172",
     "name": "TEA BAGS 40'S DECAF",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 2.79,
     "stock": 9999,
     "description": "TEA BAGS 40'S DECAF",
@@ -2880,14 +2999,14 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image166.jpeg"
   },
   {
-    "id": "prod-167",
-    "sku": "SKU-1166",
+    "id": "prod-174",
+    "sku": "SKU-1173",
     "name": "GOLD COFFEE",
-    "categoryId": "cat-5",
-    "categoryName": "REFRESCOS",
+    "categoryId": "cat-4",
+    "categoryName": "ALIMENTACIÓN",
     "price": 3.29,
     "stock": 9999,
     "description": "GOLD COFFEE",
@@ -2897,11 +3016,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image167.jpeg"
   },
   {
-    "id": "prod-168",
-    "sku": "SKU-1167",
+    "id": "prod-175",
+    "sku": "SKU-1174",
     "name": "ORIGINAL",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2914,11 +3033,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image168.jpeg"
   },
   {
-    "id": "prod-169",
-    "sku": "SKU-1168",
+    "id": "prod-176",
+    "sku": "SKU-1175",
     "name": "ORANGE",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2931,11 +3050,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image169.jpeg"
   },
   {
-    "id": "prod-170",
-    "sku": "SKU-1169",
+    "id": "prod-177",
+    "sku": "SKU-1176",
     "name": "BLUE BURST",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2948,11 +3067,62 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image170.png"
   },
   {
-    "id": "prod-171",
-    "sku": "SKU-1170",
+    "id": "prod-178",
+    "sku": "SKU-1177",
+    "name": "ORIGINAL",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.69,
+    "stock": 9999,
+    "description": "ORIGINAL",
+    "brand": "IRN-BRU",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image174.jpeg"
+  },
+  {
+    "id": "prod-179",
+    "sku": "SKU-1178",
+    "name": "ORIGINAL",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.69,
+    "stock": 9999,
+    "description": "ORIGINAL",
+    "brand": "DR PEPPER",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image175.jpeg"
+  },
+  {
+    "id": "prod-180",
+    "sku": "SKU-1179",
+    "name": "ZERO LATA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.69,
+    "stock": 9999,
+    "description": "ZERO LATA",
+    "brand": "VIMTO",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image176.jpeg"
+  },
+  {
+    "id": "prod-181",
+    "sku": "SKU-1180",
     "name": "ORIGINAL LATA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2965,11 +3135,28 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image171.png"
   },
   {
-    "id": "prod-172",
-    "sku": "SKU-1171",
+    "id": "prod-182",
+    "sku": "SKU-1181",
+    "name": "ZERO LATA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.5,
+    "stock": 9999,
+    "description": "ZERO LATA",
+    "brand": "COCA-COLA",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image173.png"
+  },
+  {
+    "id": "prod-183",
+    "sku": "SKU-1182",
     "name": "ORIGINAL LATA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2982,11 +3169,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image172.jpeg"
   },
   {
-    "id": "prod-173",
-    "sku": "SKU-1172",
+    "id": "prod-184",
+    "sku": "SKU-1183",
     "name": "VANILLA LATA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -2999,11 +3186,45 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image177.jpeg"
   },
   {
-    "id": "prod-174",
-    "sku": "SKU-1173",
+    "id": "prod-185",
+    "sku": "SKU-1184",
+    "name": "STRAWBERRY WATER",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.69,
+    "stock": 9999,
+    "description": "STRAWBERRY WATER",
+    "brand": "ESSENCE",
+    "unitMeasure": "24X500ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image178.jpeg"
+  },
+  {
+    "id": "prod-186",
+    "sku": "SKU-1185",
+    "name": "LEMON WATER",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.69,
+    "stock": 9999,
+    "description": "LEMON WATER",
+    "brand": "ESSENCE",
+    "unitMeasure": "24X500ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image179.jpeg"
+  },
+  {
+    "id": "prod-187",
+    "sku": "SKU-1186",
     "name": "CHERRY LATA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -3016,11 +3237,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image187.jpeg"
   },
   {
-    "id": "prod-175",
-    "sku": "SKU-1174",
+    "id": "prod-188",
+    "sku": "SKU-1187",
     "name": "MAX CHERRY",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
@@ -3033,45 +3254,96 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image188.png"
   },
   {
-    "id": "prod-176",
-    "sku": "SKU-1175",
-    "name": "APPLE",
+    "id": "prod-189",
+    "sku": "SKU-1188",
+    "name": "APPLE LATA",
     "categoryId": "cat-5",
     "categoryName": "REFRESCOS",
     "price": 0.79,
     "stock": 9999,
-    "description": "APPLE",
+    "description": "APPLE LATA",
     "brand": "TANGO",
     "unitMeasure": "24X330ML",
     "unitsPerBox": 24,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image189.jpeg"
   },
   {
-    "id": "prod-177",
-    "sku": "SKU-1176",
-    "name": "STRAWBERRY/LIME",
+    "id": "prod-190",
+    "sku": "SKU-1189",
+    "name": "ORANGE LATA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.79,
+    "stock": 9999,
+    "description": "ORANGE LATA",
+    "brand": "TANGO",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image190.png"
+  },
+  {
+    "id": "prod-191",
+    "sku": "SKU-1190",
+    "name": "CHERRY LATA",
+    "categoryId": "cat-5",
+    "categoryName": "REFRESCOS",
+    "price": 0.79,
+    "stock": 9999,
+    "description": "CHERRY LATA",
+    "brand": "TANGO",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image191.png"
+  },
+  {
+    "id": "prod-192",
+    "sku": "SKU-1191",
+    "name": "ORIGINAL",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
     "price": 0.89,
     "stock": 9999,
-    "description": "STRAWBERRY/LIME",
+    "description": "ORIGINAL",
     "brand": "STRONGBOW",
     "unitMeasure": "24X500ML",
     "unitsPerBox": 24,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image192.png"
   },
   {
-    "id": "prod-178",
-    "sku": "SKU-1177",
+    "id": "prod-193",
+    "sku": "SKU-1192",
+    "name": "STRAWBERRY/LIME",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.49,
+    "stock": 9999,
+    "description": "STRAWBERRY/LIME",
+    "brand": "KOPPARBERG",
+    "unitMeasure": "24X500ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image193.png"
+  },
+  {
+    "id": "prod-194",
+    "sku": "SKU-1193",
     "name": "MIXED FRUITS",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3084,11 +3356,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image194.png"
   },
   {
-    "id": "prod-179",
-    "sku": "SKU-1178",
+    "id": "prod-195",
+    "sku": "SKU-1194",
     "name": "PEAR",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3101,11 +3373,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image195.jpeg"
   },
   {
-    "id": "prod-180",
-    "sku": "SKU-1179",
+    "id": "prod-196",
+    "sku": "SKU-1195",
     "name": "WILD BERRIES",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3118,11 +3390,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image196.png"
   },
   {
-    "id": "prod-181",
-    "sku": "SKU-1180",
+    "id": "prod-197",
+    "sku": "SKU-1196",
     "name": "LIME",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3135,11 +3407,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image197.png"
   },
   {
-    "id": "prod-182",
-    "sku": "SKU-1181",
+    "id": "prod-198",
+    "sku": "SKU-1197",
     "name": "WATERMELON",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3152,11 +3424,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image199.jpeg"
   },
   {
-    "id": "prod-183",
-    "sku": "SKU-1182",
+    "id": "prod-199",
+    "sku": "SKU-1198",
     "name": "ORANGE",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3169,62 +3441,96 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image198.png"
   },
   {
-    "id": "prod-184",
-    "sku": "SKU-1183",
+    "id": "prod-200",
+    "sku": "SKU-1199",
     "name": "PASSION FRUIT/MANGO",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.49,
+    "stock": 9999,
+    "description": "PASSION FRUIT/MANGO",
+    "brand": "BACARDI BREEZER",
+    "unitMeasure": "24X275ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image200.png"
+  },
+  {
+    "id": "prod-201",
+    "sku": "SKU-1200",
+    "name": "CREST CHARDONNAY",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
     "price": 3.89,
     "stock": 9999,
-    "description": "PASSION FRUIT/MANGO",
-    "brand": "HARDY'S",
+    "description": "CREST CHARDONNAY",
+    "brand": "HARDY´S",
     "unitMeasure": "6X750ML",
     "unitsPerBox": 6,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image201.png"
   },
   {
-    "id": "prod-185",
-    "sku": "SKU-1184",
-    "name": "SHIRAZ WINE",
+    "id": "prod-202",
+    "sku": "SKU-1201",
+    "name": "CREST ROSÉ",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
-    "price": 3.99,
+    "price": 3.89,
     "stock": 9999,
-    "description": "SHIRAZ WINE",
-    "brand": "JAM SHED",
+    "description": "CREST ROSÉ",
+    "brand": "HARDY´S",
     "unitMeasure": "6X750ML",
     "unitsPerBox": 6,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image202.jpeg"
   },
   {
-    "id": "prod-186",
-    "sku": "SKU-1185",
-    "name": "ROSE WINE",
+    "id": "prod-203",
+    "sku": "SKU-1202",
+    "name": "CREST SAUVIGNON BLANC",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
-    "price": 3.99,
+    "price": 3.89,
     "stock": 9999,
-    "description": "ROSE WINE",
-    "brand": "JAM SHED",
+    "description": "CREST SAUVIGNON BLANC",
+    "brand": "HARDY´S",
     "unitMeasure": "6X750ML",
     "unitsPerBox": 6,
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image203.jpeg"
   },
   {
-    "id": "prod-187",
-    "sku": "SKU-1186",
+    "id": "prod-204",
+    "sku": "SKU-1203",
+    "name": "MERLOT",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 3.89,
+    "stock": 9999,
+    "description": "MERLOT",
+    "brand": "HARDY´S",
+    "unitMeasure": "6X750ML",
+    "unitsPerBox": 6,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image204.jpeg"
+  },
+  {
+    "id": "prod-205",
+    "sku": "SKU-1204",
     "name": "IPA BEER",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3237,11 +3543,11 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image205.png"
   },
   {
-    "id": "prod-188",
-    "sku": "SKU-1187",
+    "id": "prod-206",
+    "sku": "SKU-1205",
     "name": "ORIGINAL BOTTLE",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
@@ -3254,15 +3560,15 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image206.png"
   },
   {
-    "id": "prod-189",
-    "sku": "SKU-1188",
+    "id": "prod-207",
+    "sku": "SKU-1206",
     "name": "SEX ON THE BEACH",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
-    "price": 1.05,
+    "price": 1.15,
     "stock": 9999,
     "description": "SEX ON THE BEACH",
     "brand": "LECOQ",
@@ -3271,15 +3577,15 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image207.png"
   },
   {
-    "id": "prod-190",
-    "sku": "SKU-1189",
+    "id": "prod-208",
+    "sku": "SKU-1207",
     "name": "MOJITO",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
-    "price": 1.05,
+    "price": 1.15,
     "stock": 9999,
     "description": "MOJITO",
     "brand": "LECOQ",
@@ -3288,15 +3594,49 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image208.png"
   },
   {
-    "id": "prod-191",
-    "sku": "SKU-1190",
+    "id": "prod-209",
+    "sku": "SKU-1208",
+    "name": "BLUE LAGOON",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.15,
+    "stock": 9999,
+    "description": "BLUE LAGOON",
+    "brand": "LECOQ",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image209.png"
+  },
+  {
+    "id": "prod-210",
+    "sku": "SKU-1209",
+    "name": "MARGARITA",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.15,
+    "stock": 9999,
+    "description": "MARGARITA",
+    "brand": "LECOQ",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image210.png"
+  },
+  {
+    "id": "prod-211",
+    "sku": "SKU-1210",
     "name": "PIÑA COLADA",
     "categoryId": "cat-6",
     "categoryName": "BEBIDAS ALCOHOLICAS",
-    "price": 1.05,
+    "price": 1.15,
     "stock": 9999,
     "description": "PIÑA COLADA",
     "brand": "LECOQ",
@@ -3305,7 +3645,160 @@ export const products: Product[] = [
     "weightKg": 0,
     "iva": 21,
     "active": true,
-    "imageUrl": null
+    "imageUrl": "/products/image211.jpeg"
+  },
+  {
+    "id": "prod-212",
+    "sku": "SKU-1211",
+    "name": "ICE",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "ICE",
+    "brand": "SMIRNOFF",
+    "unitMeasure": "24X275ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image213.png"
+  },
+  {
+    "id": "prod-213",
+    "sku": "SKU-1212",
+    "name": "ICE",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 3.89,
+    "stock": 9999,
+    "description": "ICE",
+    "brand": "SMIRNOFF",
+    "unitMeasure": "6X700ML",
+    "unitsPerBox": 6,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image212.png"
+  },
+  {
+    "id": "prod-214",
+    "sku": "SKU-1213",
+    "name": "WKD BLUE",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.39,
+    "stock": 9999,
+    "description": "WKD BLUE",
+    "brand": "WKD",
+    "unitMeasure": "24X275ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image214.jpeg"
+  },
+  {
+    "id": "prod-215",
+    "sku": "SKU-1214",
+    "name": "GUINNESS   CAN",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 0.89,
+    "stock": 9999,
+    "description": "GUINNESS   CAN",
+    "brand": "GUIINNESS",
+    "unitMeasure": "24X440ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image215.png"
+  },
+  {
+    "id": "prod-216",
+    "sku": "SKU-1215",
+    "name": "JOHN SMITH CAN",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 0.99,
+    "stock": 9999,
+    "description": "JOHN SMITH CAN",
+    "brand": "JOHN SMITH",
+    "unitMeasure": "24X500ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image216.jpeg"
+  },
+  {
+    "id": "prod-217",
+    "sku": "SKU-1216",
+    "name": "ORIGINAL BLUE",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.19,
+    "stock": 9999,
+    "description": "ORIGINAL BLUE",
+    "brand": "HARTWALL",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image217.png"
+  },
+  {
+    "id": "prod-218",
+    "sku": "SKU-1217",
+    "name": "VODKA LIME",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.19,
+    "stock": 9999,
+    "description": "VODKA LIME",
+    "brand": "HARTWALL",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image218.png"
+  },
+  {
+    "id": "prod-219",
+    "sku": "SKU-1218",
+    "name": "GIN   AND PINEAPPLE",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.19,
+    "stock": 9999,
+    "description": "GIN   AND PINEAPPLE",
+    "brand": "HARTWALL",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image219.jpeg"
+  },
+  {
+    "id": "prod-220",
+    "sku": "SKU-1219",
+    "name": "STRONG",
+    "categoryId": "cat-6",
+    "categoryName": "BEBIDAS ALCOHOLICAS",
+    "price": 1.19,
+    "stock": 9999,
+    "description": "STRONG",
+    "brand": "HARTWALL",
+    "unitMeasure": "24X330ML",
+    "unitsPerBox": 24,
+    "weightKg": 0,
+    "iva": 21,
+    "active": true,
+    "imageUrl": "/products/image220.jpeg"
   }
 ];
 export const subcategories: Subcategory[] = [];
