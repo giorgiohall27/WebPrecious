@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ThreeDMarquee } from '../../components/ui/3d-marquee';
 import { useProducts } from '../../store/productsStore';
+import { useAuth } from '../../store/authStore';
 
 type CategoryStyle = {
   icon: LucideIcon;
@@ -30,9 +31,12 @@ const DEFAULT_CATEGORY_STYLE: CategoryStyle = {
 
 const CATEGORY_STYLE_MAP: Record<string, CategoryStyle> = {
   SWEETS: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/sweets.jpg' },
+  CHUCHES: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/sweets.jpg' },
   CHOCOLATES: { icon: UtensilsCrossed, gradient: 'from-amber-900 to-amber-600', image: '/categories/chocolates.jpg' },
+  CHOCOLATE: { icon: UtensilsCrossed, gradient: 'from-amber-900 to-amber-600', image: '/categories/chocolates.jpg' },
   SNACKS: { icon: Flame, gradient: 'from-orange-900 to-orange-500', image: '/categories/snacks.jpg' },
   ALIMENTACION: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.jpg' },
+  ALIMENTACIÓN: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.jpg' },
   REFRESCOS: {
     icon: GlassWater,
     gradient: 'from-cyan-900 to-cyan-600',
@@ -49,7 +53,9 @@ export default function ClientDashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { products, categories } = useProducts();
+  const { isLoggedIn, isSuperAdmin } = useAuth();
   const isEs = i18n.language === 'es';
+  const canViewSensitive = isLoggedIn || isSuperAdmin;
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
   const promoProducts = useMemo(
@@ -164,7 +170,9 @@ export default function ClientDashboard() {
               <div className="p-3">
                 <p className="text-xs text-surface-400 mb-0.5">{product.brand}</p>
                 <p className="text-sm font-semibold text-surface-900 line-clamp-2 leading-tight">{product.name}</p>
-                <p className="text-primary-600 font-bold text-sm mt-1.5">EUR {product.price.toFixed(2)}</p>
+                <p className="text-primary-600 font-bold text-sm mt-1.5">
+                  {canViewSensitive ? `EUR ${product.price.toFixed(2)}` : t('catalog.priceHidden')}
+                </p>
               </div>
             </button>
           ))}
