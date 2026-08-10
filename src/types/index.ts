@@ -85,7 +85,7 @@ export interface Order {
   totalItems: number;
   totalAmount: number;
   notes?: string;
-  status: 'pending' | 'authorization_pending' | 'processing' | 'completed' | 'cancelled';
+  status: 'pending' | 'authorization_pending' | 'accepted' | 'rejected' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
   estimatedDelivery: string;
 }
