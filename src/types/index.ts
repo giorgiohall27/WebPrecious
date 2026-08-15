@@ -40,6 +40,7 @@ export interface Product {
 export interface CartItem {
   product: Product;
   quantity: number;
+  unitPriceOverride?: number;
 }
 
 export interface Company {
@@ -100,6 +101,8 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  iva?: number;
+  unitsPerBox?: number;
   availabilityStatus?: OrderItemAvailability;
   adminNote?: string;
 }

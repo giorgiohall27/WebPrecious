@@ -8,10 +8,12 @@ import {
   ShieldCheck,
   ShoppingBag,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useAuth } from '../../store/authStore';
 
 export default function ClientLogin() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isLoggedIn, isSuperAdmin, loginWithPin, loginSuperAdminWithPin } = useAuth();
@@ -30,7 +32,7 @@ export default function ClientLogin() {
       return;
     }
     if (!preferredAdmin && isLoggedIn) {
-      navigate('/catalog', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [isLoggedIn, isSuperAdmin, navigate, preferredAdmin]);
 
@@ -52,7 +54,7 @@ export default function ClientLogin() {
     const result = await loginWithPin(pin);
     setCompanyLoading(false);
     if (result.success) {
-      navigate('/catalog');
+      navigate('/');
     } else {
       setCompanyError(result.error || 'PIN incorrecto');
     }
@@ -98,9 +100,9 @@ export default function ClientLogin() {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-5xl">
           <div className="text-center mb-8">
-            <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Portal B2B Mayorista</p>
+            <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">{t('auth.loginPortalLabel')}</p>
             <h1 className="text-4xl lg:text-5xl font-black text-surface-900 tracking-[0.16em] uppercase">Precious Spain</h1>
-            <p className="text-sm text-surface-500 mt-3">Elige tu acceso</p>
+            <p className="text-sm text-surface-500 mt-3">{t('auth.chooseAccess')}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -115,15 +117,15 @@ export default function ClientLogin() {
                     <Building2 className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold mb-1">Empresa</h2>
-                    <p className="text-sm text-white/65">Acceso privado por PIN de 6 digitos.</p>
+                    <h2 className="text-2xl font-bold mb-1">{t('auth.companyAccess')}</h2>
+                    <p className="text-sm text-white/65">{t('auth.companyPinAccess')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="p-7 space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-surface-700 mb-2">PIN de empresa</label>
+                  <label className="block text-sm font-semibold text-surface-700 mb-2">{t('auth.companyPin')}</label>
                   <div className="relative">
                     <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
                     <input
@@ -152,7 +154,7 @@ export default function ClientLogin() {
                   disabled={companyLoading || pin.length !== 6}
                   className="w-full flex items-center justify-center gap-2 bg-[#0C1E35] hover:bg-[#162d4d] disabled:bg-surface-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-colors text-sm shadow-lg shadow-[#0C1E35]/20"
                 >
-                  {companyLoading ? 'Verificando...' : 'Entrar como empresa'}
+                  {companyLoading ? t('auth.verifying') : t('auth.enterAsCompany')}
                   {!companyLoading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>
@@ -170,14 +172,14 @@ export default function ClientLogin() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold mb-1">Super Admin</h2>
-                    <p className="text-sm text-white/65">Panel interno de gestion.</p>
+                    <p className="text-sm text-white/65">{t('auth.adminPanelInternal')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="p-7 space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-surface-700 mb-2">PIN Super Admin</label>
+                  <label className="block text-sm font-semibold text-surface-700 mb-2">{t('auth.superAdminPin')}</label>
                   <div className="relative">
                     <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
                     <input
@@ -206,7 +208,7 @@ export default function ClientLogin() {
                   disabled={adminLoading || adminPin.length !== 6}
                   className="w-full flex items-center justify-center gap-2 bg-surface-900 hover:bg-[#162d4d] disabled:bg-surface-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-colors text-sm shadow-lg shadow-surface-900/20"
                 >
-                  {adminLoading ? 'Verificando...' : 'Entrar al panel'}
+                  {adminLoading ? t('auth.verifying') : t('auth.enterAdminPanel')}
                   {!adminLoading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>

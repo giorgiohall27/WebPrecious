@@ -1,13 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   Beer,
   Candy,
+  Check,
   Flame,
   GlassWater,
+  Minus,
   Package,
+  Plus,
+  ShoppingCart,
   Star,
   Tag,
   UtensilsCrossed,
@@ -16,6 +20,8 @@ import {
 import { ThreeDMarquee } from '../../components/ui/3d-marquee';
 import { useProducts } from '../../store/productsStore';
 import { useAuth } from '../../store/authStore';
+import { usePromotions } from '../../store/promotionsStore';
+import { useCart } from '../../store/cartStore';
 
 type CategoryStyle = {
   icon: LucideIcon;
@@ -52,15 +58,52 @@ const CATEGORY_STYLE_MAP: Record<string, CategoryStyle> = {
 export default function ClientDashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { products, categories } = useProducts();
+  const { products, categories, adjustStock } = useProducts();
+  const { addItem } = useCart();
+  const { promotions } = usePromotions();
   const { isLoggedIn, isSuperAdmin } = useAuth();
   const isEs = i18n.language === 'es';
   const canViewSensitive = isLoggedIn || isSuperAdmin;
+  const [promoQuantities, setPromoQuantities] = useState<Record<string, number>>({});
+  const [addedPromos, setAddedPromos] = useState<Record<string, boolean>>({});
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
+  const marqueeImages = useMemo(() => {
+    const productsWithImages = activeProducts.filter(product => product.imageUrl);
+    const byCategory = new Map<string, string[]>();
+
+    productsWithImages.forEach(product => {
+      const categoryId = product.categoryId || 'all';
+      byCategory.set(categoryId, [...(byCategory.get(categoryId) ?? []), product.imageUrl!]);
+    });
+
+    const mixedImages: string[] = [];
+    const categoryImageGroups = Array.from(byCategory.values());
+    const maxGroupLength = Math.max(0, ...categoryImageGroups.map(group => group.length));
+
+    for (let index = 0; index < maxGroupLength && mixedImages.length < 24; index += 1) {
+      categoryImageGroups.forEach(group => {
+        if (group[index] && mixedImages.length < 24) mixedImages.push(group[index]);
+      });
+    }
+
+    const fallbackImages = productsWithImages.map(product => product.imageUrl!);
+    while (mixedImages.length < 24 && fallbackImages.length > 0) {
+      mixedImages.push(fallbackImages[mixedImages.length % fallbackImages.length]);
+    }
+
+    return mixedImages;
+  }, [activeProducts]);
   const promoProducts = useMemo(
-    () => activeProducts.filter(product => product.imageUrl).slice(0, 6),
-    [activeProducts],
+    () =>
+      promotions
+        .filter(promotion => promotion.active)
+        .map(promotion => ({
+          promotion,
+          product: activeProducts.find(product => product.id === promotion.productId),
+        }))
+        .filter(row => row.product),
+    [activeProducts, promotions],
   );
   const homeCategories = useMemo(
     () =>
@@ -74,29 +117,26 @@ export default function ClientDashboard() {
     [categories],
   );
 
+  const getPromoQty = (productId: string) => promoQuantities[productId] || 0;
+  const setPromoQty = (productId: string, quantity: number) => {
+    setPromoQuantities(prev => ({ ...prev, [productId]: Math.max(0, quantity) }));
+  };
+
+  const handleAddPromo = (product: typeof activeProducts[number], promoPrice: number) => {
+    const boxes = getPromoQty(product.id);
+    if (boxes <= 0) return;
+    addItem(product, boxes, promoPrice);
+    adjustStock(product.id, -(boxes * (product.unitsPerBox || 1)));
+    setAddedPromos(prev => ({ ...prev, [product.id]: true }));
+    setTimeout(() => setAddedPromos(prev => ({ ...prev, [product.id]: false })), 1500);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 animate-fade-in space-y-12">
       <div className="relative overflow-hidden rounded-2xl bg-[#0C1E35] text-white" style={{ minHeight: 'min(480px, 78vh)' }}>
         <div className="absolute inset-0">
           <ThreeDMarquee
-            images={[
-              'https://images.unsplash.com/photo-1510626176961-4b57d4fbad03?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1521986329282-0436c1f1e212?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&h=280&fit=crop',
-              'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=280&fit=crop',
-            ]}
+            images={marqueeImages}
             className="w-full h-full"
           />
         </div>
@@ -133,6 +173,7 @@ export default function ClientDashboard() {
         </div>
       </div>
 
+      {promoProducts.length > 0 && (
       <section>
         <div className="flex items-center gap-3 mb-6">
           <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center">
@@ -149,10 +190,9 @@ export default function ClientDashboard() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {promoProducts.map(product => (
-            <button
+          {promoProducts.map(({ promotion, product }) => product && (
+            <div
               key={product.id}
-              onClick={() => navigate(`/catalog?category=${product.categoryId}`)}
               className="group relative bg-white rounded-xl border border-surface-200 hover:border-primary-300 hover:shadow-lg transition-all overflow-hidden text-left"
             >
               <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-amber-400 text-[#0C1E35] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
@@ -164,21 +204,53 @@ export default function ClientDashboard() {
                 <img
                   src={product.imageUrl || 'https://via.placeholder.com/400'}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
 
               <div className="p-3">
                 <p className="text-xs text-surface-400 mb-0.5">{product.brand}</p>
-                <p className="text-sm font-semibold text-surface-900 line-clamp-2 leading-tight">{product.name}</p>
+                <button
+                  onClick={() => navigate(`/catalog?category=${product.categoryId}`)}
+                  className="text-sm font-semibold text-surface-900 line-clamp-2 leading-tight text-left hover:text-primary-600"
+                >
+                  {product.name}
+                </button>
                 <p className="text-primary-600 font-bold text-sm mt-1.5">
-                  {canViewSensitive ? `EUR ${product.price.toFixed(2)}` : t('catalog.priceHidden')}
+                  {canViewSensitive ? (
+                    <>
+                      <span className="text-surface-400 line-through mr-1">EUR {product.price.toFixed(2)}</span>
+                      EUR {promotion.promoPrice.toFixed(2)}
+                    </>
+                  ) : t('catalog.priceHidden')}
                 </p>
+                {canViewSensitive && (
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
+                      <button onClick={() => setPromoQty(product.id, getPromoQty(product.id) - 1)} className="px-2 py-1.5 hover:bg-surface-50">
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-8 text-center text-xs font-bold">{getPromoQty(product.id)}</span>
+                      <button onClick={() => setPromoQty(product.id, getPromoQty(product.id) + 1)} className="px-2 py-1.5 hover:bg-surface-50">
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleAddPromo(product, promotion.promoPrice)}
+                      disabled={getPromoQty(product.id) <= 0}
+                      className={`p-2 rounded-lg text-white transition-colors ${addedPromos[product.id] ? 'bg-emerald-500' : getPromoQty(product.id) <= 0 ? 'bg-surface-300 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
+                      title={t('catalog.addToOrder')}
+                    >
+                      {addedPromos[product.id] ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
+                    </button>
+                  </div>
+                )}
               </div>
-            </button>
+            </div>
           ))}
         </div>
       </section>
+      )}
 
       <section>
         <div className="text-center mb-6">

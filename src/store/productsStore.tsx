@@ -3,6 +3,7 @@ import { Category, Product, CartItem, Subcategory } from '../types';
 import { mockCategories, mockProducts, mockSubcategories } from '../data/mockData';
 import { supabase, supabaseEnabled } from '../lib/supabase';
 import { useAuth } from './authStore';
+import { normalizeProductPackaging } from '../utils/productPackaging';
 
 interface ProductsContextType {
   products: Product[];
@@ -23,7 +24,7 @@ interface ProductsContextType {
 const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
 
 function toProduct(row: any): Product {
-  return {
+  return normalizeProductPackaging({
     id: row.id,
     sku: row.sku,
     name: row.name,
@@ -41,7 +42,7 @@ function toProduct(row: any): Product {
     weightKg: row.weight_kg ? Number(row.weight_kg) : undefined,
     iva: row.iva ?? 21,
     active: row.active,
-  };
+  });
 }
 
 function fromProduct(product: Product) {
@@ -113,7 +114,7 @@ function fromSubcategory(subcategory: Subcategory) {
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
   const { companySessionToken, superAdminSessionToken } = useAuth();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>(() => mockProducts.map(normalizeProductPackaging));
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [subcategories, setSubcategories] = useState<Subcategory[]>(mockSubcategories);
   const [loading, setLoading] = useState(false);
@@ -123,7 +124,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   const refreshCatalog = useCallback(async () => {
     if (!supabaseEnabled) return;
     if (!catalogToken) {
-      setProducts(mockProducts);
+      setProducts(mockProducts.map(normalizeProductPackaging));
       setCategories(mockCategories);
       setSubcategories(mockSubcategories);
       return;
@@ -164,15 +165,16 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const upsertProduct = useCallback(async (product: Product) => {
+    const normalizedProduct = normalizeProductPackaging(product);
     setProducts(prev => {
-      const exists = prev.some(item => item.id === product.id);
-      return exists ? prev.map(item => item.id === product.id ? product : item) : [product, ...prev];
+      const exists = prev.some(item => item.id === normalizedProduct.id);
+      return exists ? prev.map(item => item.id === normalizedProduct.id ? normalizedProduct : item) : [normalizedProduct, ...prev];
     });
 
     if (supabaseEnabled && superAdminSessionToken) {
       const { data, error } = await supabase.rpc('admin_upsert_product', {
         p_admin_token: superAdminSessionToken,
-        p_product: fromProduct(product),
+        p_product: fromProduct(normalizedProduct),
       });
       if (error) {
         console.error('Error saving product:', error);

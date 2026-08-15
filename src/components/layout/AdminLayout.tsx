@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2 } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2, Monitor, Tag } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useState } from 'react';
 import { useAuth } from '../../store/authStore';
@@ -10,7 +10,9 @@ const navItems = [
   { key: 'companies', label: 'Empresas', path: '/admin/companies', icon: Building2 },
   { key: 'products', label: 'Productos', path: '/admin/products', icon: Package },
   { key: 'categories', label: 'Categorias', path: '/admin/categories', icon: FolderTree },
+  { key: 'promotions', label: 'Promociones', path: '/admin/promotions', icon: Tag },
   { key: 'orders', label: 'Pedidos', path: '/admin/orders', icon: ClipboardList },
+  { key: 'viewWeb', label: 'Ver web', path: '/', icon: Monitor },
 ];
 
 export default function AdminLayout() {
@@ -52,7 +54,7 @@ export default function AdminLayout() {
                   id={`admin-nav-${item.key}`}
                 >
                   <item.icon className="w-5 h-5" />
-                  {item.label}
+                  {item.key === 'viewWeb' ? t('nav.viewWeb') : item.key === 'promotions' ? t('nav.promotions') : item.label}
                 </Link>
               );
             })}

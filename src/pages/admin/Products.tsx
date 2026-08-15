@@ -15,6 +15,7 @@ import {
 import Papa from 'papaparse';
 import { Product } from '../../types';
 import { useProducts } from '../../store/productsStore';
+import { inferUnitsPerBox, normalizeProductPackaging } from '../../utils/productPackaging';
 
 type ProductDraft = {
   sku: string;
@@ -24,6 +25,7 @@ type ProductDraft = {
   iva: string;
   brand: string;
   unitMeasure: string;
+  unitsPerBox: string;
   description: string;
   imageUrl: string;
 };
@@ -37,6 +39,7 @@ function emptyDraft(categoryId = 'cat-1'): ProductDraft {
     iva: '21',
     brand: '',
     unitMeasure: '',
+    unitsPerBox: '',
     description: '',
     imageUrl: '',
   };
@@ -51,6 +54,7 @@ function draftFromProduct(product: Product): ProductDraft {
     iva: String(product.iva ?? 21),
     brand: product.brand ?? '',
     unitMeasure: product.unitMeasure ?? '',
+    unitsPerBox: String(inferUnitsPerBox(product.description, product.unitMeasure, product.name) ?? product.unitsPerBox ?? ''),
     description: product.description ?? '',
     imageUrl: product.imageUrl ?? '',
   };
@@ -66,6 +70,7 @@ export default function Products() {
   const [showProductModal, setShowProductModal] = useState(false);
   const [productDraft, setProductDraft] = useState<ProductDraft>(emptyDraft);
   const [productBeingEdited, setProductBeingEdited] = useState<Product | null>(null);
+  const [productPendingDelete, setProductPendingDelete] = useState<Product | null>(null);
   const [csvData, setCsvData] = useState<any[]>([]);
   const [csvSummary, setCsvSummary] = useState<{ new: number; updated: number; errors: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -82,6 +87,14 @@ export default function Products() {
     });
   }, [products, search, categoryFilter]);
 
+  const getCategoryLabel = (category?: { key?: string; name?: string }) =>
+    category?.key ? t(`categoryNames.${category.key}`, { defaultValue: category.name ?? '' }) : category?.name ?? '';
+
+  const getProductCategoryLabel = (product: Product) => {
+    const category = categories.find(item => item.id === product.categoryId);
+    return getCategoryLabel(category) || product.categoryName || '';
+  };
+
   const openAddProduct = () => {
     setProductBeingEdited(null);
     setProductDraft(emptyDraft(categories[0]?.id ?? 'cat-1'));
@@ -95,14 +108,24 @@ export default function Products() {
   };
 
   const setDraftField = (field: keyof ProductDraft, value: string) => {
-    setProductDraft(prev => ({ ...prev, [field]: value }));
+    setProductDraft(prev => {
+      const next = { ...prev, [field]: value };
+      if (field === 'unitMeasure' || field === 'description' || field === 'name') {
+        const currentInference = inferUnitsPerBox(prev.unitMeasure, prev.description);
+        const nextInference = inferUnitsPerBox(next.unitMeasure, next.description);
+        if (nextInference && (!prev.unitsPerBox || Number.parseInt(prev.unitsPerBox, 10) === currentInference)) {
+          next.unitsPerBox = String(nextInference);
+        }
+      }
+      return next;
+    });
   };
 
   const buildProductFromDraft = (): Product => {
     const category = categories.find(item => item.id === productDraft.categoryId) ?? categories[0];
     const id = productBeingEdited?.id ?? `prod-admin-${Date.now()}`;
 
-    return {
+    return normalizeProductPackaging({
       id,
       sku: productDraft.sku.trim(),
       name: productDraft.name.trim(),
@@ -113,10 +136,11 @@ export default function Products() {
       description: productDraft.description.trim() || productDraft.name.trim(),
       brand: productDraft.brand.trim(),
       unitMeasure: productDraft.unitMeasure.trim(),
+      unitsPerBox: Math.max(1, Number.parseInt(productDraft.unitsPerBox, 10) || inferUnitsPerBox(productDraft.description, productDraft.unitMeasure, productDraft.name) || 1),
       imageUrl: productDraft.imageUrl.trim() || null,
       iva: Number.parseFloat(productDraft.iva) === 10 ? 10 : 21,
       active: true,
-    };
+    });
   };
 
   const handleProductSave = (event: React.FormEvent) => {
@@ -180,6 +204,7 @@ export default function Products() {
         description: row.descripcion || row.nombre,
         brand: row.marca || '',
         unitMeasure: row.unidad_medida || 'unidad',
+        unitsPerBox: inferUnitsPerBox(row.descripcion, row.unidad_medida, row.nombre) || existing?.unitsPerBox || 1,
         active: true,
         imageUrl: existing?.imageUrl ?? null,
         iva: existing?.iva ?? 21,
@@ -191,10 +216,14 @@ export default function Products() {
     setCsvSummary(null);
   };
 
-  const deleteProduct = (id: string) => {
-    if (confirm(t('products.deleteConfirm'))) {
-      removeProduct(id);
-    }
+  const deleteProduct = (product: Product) => {
+    setProductPendingDelete(product);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (!productPendingDelete) return;
+    removeProduct(productPendingDelete.id);
+    setProductPendingDelete(null);
   };
 
   const exportCSV = () => {
@@ -249,7 +278,7 @@ export default function Products() {
         <div className="relative">
           <select value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)} className="input-field pr-8 appearance-none min-w-[180px]" id="category-filter">
             <option value="">{t('common.all')} {t('nav.categories')}</option>
-            {categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+            {categories.map(category => <option key={category.id} value={category.id}>{getCategoryLabel(category)}</option>)}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 pointer-events-none" />
         </div>
@@ -265,19 +294,20 @@ export default function Products() {
                 <th className="table-header">{t('products.category')}</th>
                 <th className="table-header">{t('products.price')}</th>
                 <th className="table-header">{t('products.brand')}</th>
+                <th className="table-header">{t('products.iva')}</th>
                 <th className="table-header text-right">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-12 text-surface-400">{t('products.noProducts')}</td></tr>
+                <tr><td colSpan={7} className="text-center py-12 text-surface-400">{t('products.noProducts')}</td></tr>
               ) : (
                 filtered.map(product => (
                   <tr key={product.id} className="hover:bg-surface-50 transition-colors">
                     <td className="table-cell font-mono text-xs text-surface-500">{product.sku}</td>
                     <td className="table-cell font-medium text-surface-900">{product.name}</td>
                     <td className="table-cell">
-                      <span className="text-xs text-surface-600">{product.categoryName}</span>
+                      <span className="text-xs text-surface-600">{getProductCategoryLabel(product)}</span>
                       {product.subcategoryName && <span className="text-xs text-surface-400"> / {product.subcategoryName}</span>}
                     </td>
                     <td className="table-cell">
@@ -298,12 +328,13 @@ export default function Products() {
                       )}
                     </td>
                     <td className="table-cell text-sm text-surface-500">{product.brand || '-'}</td>
+                    <td className="table-cell text-sm font-semibold text-surface-700">IVA {product.iva ?? 0}%</td>
                     <td className="table-cell text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button className="btn-icon" onClick={() => openEditProduct(product)} title={t('common.edit')}>
                           <Edit3 className="w-4 h-4" />
                         </button>
-                        <button className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => deleteProduct(product.id)} title={t('common.delete')}>
+                        <button className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => deleteProduct(product)} title={t('common.delete')}>
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -323,20 +354,29 @@ export default function Products() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleProductSave} className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl animate-slide-up overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100">
-              <h2 className="text-lg font-bold text-surface-900">{productBeingEdited ? 'Editar producto' : 'Nuevo producto'}</h2>
+              <h2 className="text-lg font-bold text-surface-900">{productBeingEdited ? t('products.editProduct') : t('products.newProduct')}</h2>
               <button type="button" onClick={() => setShowProductModal(false)} className="btn-icon"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input className={inputClass} placeholder="SKU" value={productDraft.sku} onChange={event => setDraftField('sku', event.target.value)} required />
-              <input className={inputClass} placeholder="Nombre" value={productDraft.name} onChange={event => setDraftField('name', event.target.value)} required />
+              <input className={inputClass} placeholder={t('products.sku')} value={productDraft.sku} onChange={event => setDraftField('sku', event.target.value)} required />
+              <input className={inputClass} placeholder={t('products.name')} value={productDraft.name} onChange={event => setDraftField('name', event.target.value)} required />
               <select className={inputClass} value={productDraft.categoryId} onChange={event => setDraftField('categoryId', event.target.value)}>
-                {categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+                {categories.map(category => <option key={category.id} value={category.id}>{getCategoryLabel(category)}</option>)}
               </select>
-              <input className={inputClass} placeholder="Marca" value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
-              <input className={inputClass} type="number" step="0.01" placeholder="Precio" value={productDraft.price} onChange={event => setDraftField('price', event.target.value)} required />
-              <input className={inputClass} placeholder="Unidad / caja" value={productDraft.unitMeasure} onChange={event => setDraftField('unitMeasure', event.target.value)} />
+              <input className={inputClass} placeholder={t('products.brand')} value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
+              <input className={inputClass} type="number" step="0.01" placeholder={t('products.price')} value={productDraft.price} onChange={event => setDraftField('price', event.target.value)} required />
+              <input className={inputClass} placeholder={t('products.unitsPerBox')} value={productDraft.unitMeasure} onChange={event => setDraftField('unitMeasure', event.target.value)} />
+              <input
+                className={inputClass}
+                type="number"
+                min="1"
+                step="1"
+                placeholder={t('products.boxUnits')}
+                value={productDraft.unitsPerBox}
+                onChange={event => setDraftField('unitsPerBox', event.target.value)}
+              />
               <div className="sm:col-span-2">
-                <label className="input-label">IVA del producto</label>
+                <label className="input-label">{t('products.productIva')}</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -354,16 +394,37 @@ export default function Products() {
                   </button>
                 </div>
               </div>
-              <input className={inputClass} placeholder="URL imagen" value={productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
-              <textarea className={`${inputClass} sm:col-span-2 min-h-[84px] resize-none`} placeholder="Descripcion" value={productDraft.description} onChange={event => setDraftField('description', event.target.value)} />
+              <input className={inputClass} placeholder={t('products.image')} value={productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
+              <textarea className={`${inputClass} sm:col-span-2 min-h-[84px] resize-none`} placeholder={t('products.description')} value={productDraft.description} onChange={event => setDraftField('description', event.target.value)} />
             </div>
             <div className="px-6 py-4 border-t border-surface-100 flex justify-end gap-3">
               <button type="button" onClick={() => setShowProductModal(false)} className="btn-secondary">{t('common.cancel')}</button>
               <button type="submit" className="btn-primary">
-                <Save className="w-4 h-4" /> Guardar producto
+                <Save className="w-4 h-4" /> {t('products.saveProduct')}
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {productPendingDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-up overflow-hidden">
+            <div className="px-6 py-5 border-b border-surface-100">
+              <h2 className="text-lg font-bold text-surface-900">{t('products.deleteTitle')}</h2>
+              <p className="text-sm text-surface-500 mt-2">
+                {t('products.deleteConfirm')} <span className="font-semibold text-surface-900">{productPendingDelete.name}</span>
+              </p>
+            </div>
+            <div className="px-6 py-4 flex justify-end gap-3">
+              <button type="button" onClick={() => setProductPendingDelete(null)} className="btn-secondary">
+                {t('common.no')}
+              </button>
+              <button type="button" onClick={confirmDeleteProduct} className="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-200">
+                {t('common.yes')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

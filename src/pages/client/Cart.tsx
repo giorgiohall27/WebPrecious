@@ -11,7 +11,7 @@ import { notifyAdminNewOrder } from '../../lib/orderEmails';
 export default function Cart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { items, removeItem, updateQuantity, getGroupedByCategory, getCategoryTotal, getTotal, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, getGroupedByCategory, getCategoryTotal, getSubtotal, getTaxTotal, getTotal, clearCart } = useCart();
   const { adjustStock } = useProducts();
   const { addOrder } = useOrders();
   const { userProfile } = useAuth();
@@ -26,18 +26,21 @@ export default function Cart() {
   const deliveryAddr  = userProfile?.deliveryAddress ?? '';
 
   const grouped = getGroupedByCategory();
+  const subtotal = getSubtotal();
+  const taxTotal = getTaxTotal();
   const total = getTotal();
   const totalLines = items.length;
 
-  const handleRemove = (productId: string, qty: number) => {
-    adjustStock(productId, qty);
+  const handleRemove = (productId: string, boxes: number, unitsPerBox: number) => {
+    adjustStock(productId, boxes * unitsPerBox);
     removeItem(productId);
   };
 
-  const handleUpdateQty = (productId: string, oldQty: number, newQty: number) => {
-    const delta = oldQty - newQty; // positive = restoring stock, negative = consuming more
-    adjustStock(productId, delta);
-    updateQuantity(productId, newQty);
+  const handleUpdateQty = (productId: string, oldBoxes: number, newBoxes: number, unitsPerBox: number) => {
+    const clampedBoxes = Math.max(1, newBoxes);
+    const deltaBoxes = oldBoxes - clampedBoxes; // positive = restoring stock, negative = consuming more
+    adjustStock(productId, deltaBoxes * unitsPerBox);
+    updateQuantity(productId, clampedBoxes);
   };
 
   const handleSendOrder = async () => {
@@ -65,8 +68,10 @@ export default function Cart() {
         name: i.product.name,
         categoryName: i.product.categoryName || '',
         quantity: i.quantity,
-        unitPrice: i.product.price,
-        subtotal: i.product.price * i.quantity,
+        unitPrice: (i.unitPriceOverride ?? i.product.price) * (i.product.unitsPerBox || 1),
+        subtotal: (i.unitPriceOverride ?? i.product.price) * (i.product.unitsPerBox || 1) * i.quantity * (1 + ((i.product.iva ?? 0) / 100)),
+        iva: i.product.iva ?? 0,
+        unitsPerBox: i.product.unitsPerBox || 1,
       })),
       totalItems: itemsSnapshot.length,
       totalAmount: totalSnapshot,
@@ -132,8 +137,11 @@ export default function Cart() {
               {/* Items */}
               {catItems.map(item => {
                 const unitsPerBox = item.product.unitsPerBox || 1;
-                const boxCount = Math.round(item.quantity / unitsPerBox);
-                const boxPrice = item.product.price * unitsPerBox;
+                const unitPrice = item.unitPriceOverride ?? item.product.price;
+                const boxPrice = unitPrice * unitsPerBox;
+                const lineSubtotal = boxPrice * item.quantity;
+                const lineTax = lineSubtotal * ((item.product.iva ?? 0) / 100);
+                const lineTotal = lineSubtotal + lineTax;
                 return (
                   <div key={item.product.id} className="px-6 py-4 flex items-center gap-4 border-t border-surface-100 first:border-t-0">
                     {/* Product Image */}
@@ -154,37 +162,40 @@ export default function Cart() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-surface-900 text-sm truncate">{item.product.name}</p>
-                      <p className="text-xs text-surface-400">{item.product.sku} · {boxPrice.toFixed(2)} €/caja{unitsPerBox > 1 ? ` (${unitsPerBox} uds × €${item.product.price.toFixed(2)})` : ''}</p>
+                      <p className="text-xs text-surface-400">
+                        {item.product.sku} · {boxPrice.toFixed(2)} {t('cart.perBox')}{unitsPerBox > 1 ? ` (${unitsPerBox} ${t('cart.unitsShort')} x €${unitPrice.toFixed(2)})` : ''} · IVA {item.product.iva ?? 0}%
+                      </p>
                     </div>
 
                     {/* Quantity (in boxes) */}
                     <div className="flex flex-col items-center">
                       {unitsPerBox > 1 && (
-                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">Cajas</span>
+                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
                       )}
                       <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
-                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity - unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Minus className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity - 1, unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Minus className="w-3.5 h-3.5" /></button>
                         <input
                           type="number"
-                          value={boxCount}
+                          value={item.quantity}
                           onChange={e => {
                             const newBoxes = parseInt(e.target.value) || 1;
-                            handleUpdateQty(item.product.id, item.quantity, newBoxes * unitsPerBox);
+                            handleUpdateQty(item.product.id, item.quantity, newBoxes, unitsPerBox);
                           }}
                           className="w-14 text-center text-sm border-x border-surface-200 py-1.5 focus:outline-none"
                           min="1"
                         />
-                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity + unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Plus className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleUpdateQty(item.product.id, item.quantity, item.quantity + 1, unitsPerBox)} className="px-2 py-1.5 hover:bg-surface-50"><Plus className="w-3.5 h-3.5" /></button>
                       </div>
                     </div>
 
                     {/* Subtotal */}
                     <div className="text-right w-24 shrink-0">
-                      <p className="font-bold text-surface-900">{(item.product.price * item.quantity).toFixed(2)} €</p>
+                      <p className="font-bold text-surface-900">{lineTotal.toFixed(2)} €</p>
+                      <p className="text-[10px] text-surface-400">IVA {lineTax.toFixed(2)} €</p>
                     </div>
 
                     {/* Remove */}
-                    <button onClick={() => handleRemove(item.product.id, item.quantity)} className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0">
+                    <button onClick={() => handleRemove(item.product.id, item.quantity, unitsPerBox)} className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -213,6 +224,14 @@ export default function Cart() {
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-surface-500">{t('cart.totalLines')}</span>
                 <span className="font-medium">{totalLines}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-surface-500">{t('cart.subtotal')}</span>
+                <span className="font-medium">{subtotal.toFixed(2)} €</span>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-3">
+                <span className="text-surface-500">{t('cart.ivaTotal')}</span>
+                <span className="font-medium">{taxTotal.toFixed(2)} €</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-surface-900">{t('cart.grandTotal')}</span>

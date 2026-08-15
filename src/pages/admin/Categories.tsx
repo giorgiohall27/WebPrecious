@@ -24,6 +24,8 @@ export default function Categories() {
 
   const getSubcats = (catId: string) => subcategories.filter(sc => sc.categoryId === catId);
   const getProductCount = (catId: string) => products.filter(p => p.categoryId === catId).length;
+  const getCategoryLabel = (category: { key?: string; name: string }) =>
+    category.key ? t(`categoryNames.${category.key}`, { defaultValue: category.name }) : category.name;
 
   const addItem = () => {
     if (!newName.trim()) return;
@@ -103,8 +105,8 @@ export default function Categories() {
                     <Icon className="w-5 h-5 text-primary-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-surface-900">{cat.name}</h3>
-                    <p className="text-xs text-surface-400">{subcats.length} subcategorías · {productCount} {t('categories.productsCount').toLowerCase()}</p>
+                    <h3 className="font-semibold text-surface-900">{getCategoryLabel(cat)}</h3>
+                    <p className="text-xs text-surface-400">{subcats.length} {t('categories.subcategoriesCount')} · {productCount} {t('categories.productsCount').toLowerCase()}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={e => { e.stopPropagation(); toggleActive(cat.id); }}
@@ -125,7 +127,7 @@ export default function Categories() {
                     {subcats.map(sc => (
                       <div key={sc.id} className="flex items-center gap-4 px-6 py-3 pl-20 hover:bg-surface-100/50 transition-colors">
                         <GripVertical className="w-3.5 h-3.5 text-surface-300" />
-                        <span className="text-sm text-surface-700 flex-1">{sc.name}</span>
+                        <span className="text-sm text-surface-700 flex-1">{getCategoryLabel(sc)}</span>
                         <button
                           onClick={() => toggleSubcategoryActive(sc.id)}
                           className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${sc.active ? 'bg-green-50 text-green-700' : 'bg-surface-200 text-surface-500'}`}
@@ -163,7 +165,7 @@ export default function Categories() {
                   <label className="input-label">{t('categories.parentCategory')}</label>
                   <select value={selectedParent} onChange={e => setSelectedParent(e.target.value)} className="input-field">
                     <option value="">—</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {categories.map(c => <option key={c.id} value={c.id}>{getCategoryLabel(c)}</option>)}
                   </select>
                 </div>
               )}
