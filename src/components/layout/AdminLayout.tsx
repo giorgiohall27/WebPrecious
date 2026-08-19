@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2, Monitor, Tag } from 'lucide-react';
+import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2, Monitor, Tag, FilePlus2 } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useState } from 'react';
 import { useAuth } from '../../store/authStore';
 
 const navItems = [
   { key: 'dashboard', label: 'Panel', path: '/admin/dashboard', icon: LayoutDashboard },
-  { key: 'companies', label: 'Empresas', path: '/admin/companies', icon: Building2 },
+  { key: 'companies', label: 'Clientes', path: '/admin/companies', icon: Building2 },
+  { key: 'preorders', label: 'Preventa', path: '/admin/preorders', icon: FilePlus2 },
   { key: 'products', label: 'Productos', path: '/admin/products', icon: Package },
   { key: 'categories', label: 'Categorias', path: '/admin/categories', icon: FolderTree },
   { key: 'promotions', label: 'Promociones', path: '/admin/promotions', icon: Tag },

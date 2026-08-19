@@ -37,7 +37,7 @@ const needsLargerProductImage = (product: Product) => {
 export default function Catalog() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
   const { products, categories, subcategories, adjustStock } = useProducts();
 
   const selectedCategory    = searchParams.get('category') || '';
@@ -55,6 +55,15 @@ export default function Catalog() {
   useEffect(() => {
     setSelectedSubcategory(subFromUrl);
   }, [selectedCategory, subFromUrl]);
+
+  useEffect(() => {
+    setQuantities(current => Object.fromEntries(
+      Object.keys(current).map(productId => [
+        productId,
+        cartItems.filter(item => item.product.id === productId).reduce((total, item) => total + item.quantity, 0),
+      ]),
+    ));
+  }, [cartItems]);
 
   const subcatsForCategory = selectedCategory
     ? subcategories.filter(sc => sc.categoryId === selectedCategory && sc.active)

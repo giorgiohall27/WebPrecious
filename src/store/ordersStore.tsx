@@ -7,6 +7,7 @@ import { useAuth } from './authStore';
 interface OrdersContextType {
   orders: Order[];
   addOrder: (order: Order) => Promise<Order | null>;
+  addAdminPreorder: (order: Order) => Promise<Order | null>;
   updateOrderStatus: (orderId: string, status: Order['status']) => Promise<Order | null>;
   updateOrderWithItemDecisions: (
     orderId: string,
@@ -31,11 +32,14 @@ function toOrder(row: any): Order {
     items: row.order_items?.map((i: any) => ({
       productId: i.product_id,
       sku: i.sku,
+      brand: i.brand ?? undefined,
       name: i.name,
       categoryName: i.category_name ?? '',
       quantity: i.quantity,
       unitPrice: Number(i.unit_price),
       subtotal: Number(i.subtotal),
+      iva: i.iva != null ? Number(i.iva) : undefined,
+      unitsPerBox: i.units_per_box ?? undefined,
       availabilityStatus: i.availability_status ?? undefined,
       adminNote: i.admin_note ?? undefined,
     })) ?? [],
@@ -96,6 +100,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       p_items: order.items.map(item => ({
         product_id: item.productId,
         quantity: item.quantity,
+        unit_price: item.unitPrice,
       })),
     });
 
@@ -108,6 +113,37 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     setOrders(prev => [savedOrder, ...prev]);
     return savedOrder;
   }, [companySessionToken]);
+
+  const addAdminPreorder = useCallback(async (order: Order) => {
+    if (!supabaseEnabled) {
+      setOrders(prev => [order, ...prev]);
+      return order;
+    }
+    if (!superAdminSessionToken) return null;
+
+    const { data, error } = await supabase.rpc('admin_create_preorder', {
+      p_admin_token: superAdminSessionToken,
+      p_company_id: order.companyId,
+      p_order: {
+        id: order.id,
+        order_id: order.orderId,
+        notes: order.notes ?? null,
+        estimated_delivery: order.estimatedDelivery,
+      },
+      p_items: order.items.map(item => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+    });
+    if (error || !data) {
+      console.error('Error saving preorder:', error);
+      return null;
+    }
+    const savedOrder = toOrder(data);
+    setOrders(prev => [savedOrder, ...prev]);
+    return savedOrder;
+  }, [superAdminSessionToken]);
 
   const updateOrderStatus = useCallback(async (orderId: string, status: Order['status']) => {
     if (!supabaseEnabled) {
@@ -188,7 +224,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
   }, [superAdminSessionToken]);
 
   return React.createElement(OrdersContext.Provider, {
-    value: { orders, addOrder, updateOrderStatus, updateOrderWithItemDecisions, refreshOrders },
+    value: { orders, addOrder, addAdminPreorder, updateOrderStatus, updateOrderWithItemDecisions, refreshOrders },
     children,
   });
 }

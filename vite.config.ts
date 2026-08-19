@@ -48,9 +48,13 @@ function resendDevApi(): Plugin {
         const itemsHtml = (payload.items ?? []).map((item: any) => `
           <tr>
             <td style="padding:8px;border-bottom:1px solid #e5e7eb">${item.sku ?? '-'}</td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${item.brand ?? '-'}</td>
             <td style="padding:8px;border-bottom:1px solid #e5e7eb">${item.name}</td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center">${item.unitsPerBox ?? 1}</td>
             <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center">${item.quantity}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${item.availabilityStatus === 'unavailable' ? 'No llegará' : 'Sí llegará'}</td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right">${Number(item.unitPrice ?? 0).toFixed(2)} €</td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center">${item.iva ?? 0}%</td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right">${Number(item.subtotal ?? 0).toFixed(2)} €</td>
           </tr>
         `).join('');
 
@@ -60,8 +64,11 @@ function resendDevApi(): Plugin {
             <p><strong>Empresa:</strong> ${payload.companyName ?? ''}</p>
             <p><strong>Email:</strong> ${payload.companyEmail ?? ''}</p>
             <p><strong>Dirección:</strong> ${payload.deliveryAddress ?? ''}</p>
-            <table style="width:100%;border-collapse:collapse">${itemsHtml}</table>
-            ${payload.totalAmount ? `<h2>Total: ${Number(payload.totalAmount).toFixed(2)} €</h2>` : ''}
+            <table style="width:100%;border-collapse:collapse">
+              <thead><tr style="background:#f8fafc"><th>SKU</th><th>Marca</th><th>Producto</th><th>Uds./caja</th><th>Cajas</th><th>Precio/caja</th><th>IVA</th><th>Total con IVA</th></tr></thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+            ${payload.totalAmount != null ? `<h2>Total: ${Number(payload.totalAmount).toFixed(2)} €</h2>` : ''}
           </div>
         `;
 

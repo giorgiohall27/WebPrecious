@@ -123,7 +123,9 @@
     "noRecentOrders": "No recent orders yet",
     "expandOrder": "View products",
     "collapseOrder": "Hide products",
-    "shopByCategory": "Shop by Category"
+    "shopByCategory": "Shop by Category",
+    "weeklyPromotions": "Promotions of the Week",
+    "weeklyPromotionsSubtitle": "A special selection of featured products"
   },
   "categoryNames": {
     "allCategories": "All Categories",
@@ -303,6 +305,13 @@
     "ivaTotal": "VAT",
     "notes": "Notes / Observations",
     "notesPlaceholder": "Add any special instructions for the supplier...",
+    "notesUnlimited": "No word limit.",
+    "drawerTitle": "Your cart",
+    "drawerEmptySubtitle": "Add products and they will appear here without leaving the page.",
+    "keepShopping": "Continue shopping",
+    "reviewAndSend": "Review and send order",
+    "unitsPerBoxLabel": "units per box",
+    "promotionProduct": "Promotional product",
     "companyData": "Company Details",
     "sendOrder": "Send Order",
     "sending": "Sending...",

@@ -123,7 +123,9 @@
     "noRecentOrders": "暂无最近订单",
     "expandOrder": "查看产品",
     "collapseOrder": "收起",
-    "shopByCategory": "按分类购物"
+    "shopByCategory": "按分类购物",
+    "weeklyPromotions": "本周促销",
+    "weeklyPromotionsSubtitle": "精选特色产品"
   },
   "categoryNames": {
     "allCategories": "所有分类",
@@ -303,6 +305,13 @@
     "ivaTotal": "VAT",
     "notes": "备注/说明",
     "notesPlaceholder": "为供应商添加特殊说明...",
+    "notesUnlimited": "无字数限制。",
+    "drawerTitle": "您的购物车",
+    "drawerEmptySubtitle": "添加产品后，它们会显示在这里，无需离开当前页面。",
+    "keepShopping": "继续购物",
+    "reviewAndSend": "检查并发送订单",
+    "unitsPerBoxLabel": "每箱件数",
+    "promotionProduct": "促销产品",
     "companyData": "公司信息",
     "sendOrder": "提交订单",
     "sending": "提交中...",

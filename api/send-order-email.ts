@@ -1,9 +1,12 @@
 type OrderEmailItem = {
   sku?: string;
+  brand?: string;
   name: string;
   quantity: number;
   unitPrice?: number;
   subtotal?: number;
+  iva?: number;
+  unitsPerBox?: number;
   availabilityStatus?: 'available' | 'unavailable';
   adminNote?: string;
 };
@@ -43,8 +46,12 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
     return `
       <tr>
         <td style="padding:10px;border-bottom:1px solid #e5e7eb">${escapeHtml(item.sku || '-')}</td>
+        <td style="padding:10px;border-bottom:1px solid #e5e7eb">${escapeHtml(item.brand || '-')}</td>
         <td style="padding:10px;border-bottom:1px solid #e5e7eb">${escapeHtml(item.name)}</td>
+        <td style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:center">${escapeHtml(item.unitsPerBox ?? 1)}</td>
         <td style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:center">${escapeHtml(item.quantity)}</td>
+        <td style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right">${formatMoney(item.unitPrice)}</td>
+        <td style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:center">${escapeHtml(item.iva ?? 0)}%</td>
         <td style="padding:10px;border-bottom:1px solid #e5e7eb;text-align:right">${formatMoney(item.subtotal)}</td>
         ${includeAvailability ? `<td style="padding:10px;border-bottom:1px solid #e5e7eb">${availability}${item.adminNote ? `<br><small>${escapeHtml(item.adminNote)}</small>` : ''}</td>` : ''}
       </tr>
@@ -56,9 +63,13 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
       <thead>
         <tr style="background:#f8fafc">
           <th style="padding:10px;text-align:left">SKU</th>
+          <th style="padding:10px;text-align:left">Marca</th>
           <th style="padding:10px;text-align:left">Producto</th>
-          <th style="padding:10px;text-align:center">Cantidad</th>
-          <th style="padding:10px;text-align:right">Subtotal</th>
+          <th style="padding:10px;text-align:center">Uds./caja</th>
+          <th style="padding:10px;text-align:center">Cajas</th>
+          <th style="padding:10px;text-align:right">Precio/caja</th>
+          <th style="padding:10px;text-align:center">IVA</th>
+          <th style="padding:10px;text-align:right">Total con IVA</th>
           ${includeAvailability ? '<th style="padding:10px;text-align:left">Disponibilidad</th>' : ''}
         </tr>
       </thead>

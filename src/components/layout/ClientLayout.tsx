@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
+import CartDrawer from '../cart/CartDrawer';
 import { useCart } from '../../store/cartStore';
 import { useAuth } from '../../store/authStore';
 
@@ -28,6 +29,7 @@ export default function ClientLayout() {
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -80,9 +82,15 @@ export default function ClientLayout() {
 
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
               {isLoggedIn && (
-                <Link
-                  to="/cart"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCartOpen(true);
+                    setUserMenuOpen(false);
+                    setNotifOpen(false);
+                  }}
                   className="relative flex items-center gap-1.5 px-3 py-2 text-white/70 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
+                  aria-label="Abrir carrito"
                 >
                   <ShoppingCart style={{ width: '18px', height: '18px' }} />
                   <span className="hidden sm:inline text-sm font-medium">{t('nav.cart')}</span>
@@ -91,7 +99,7 @@ export default function ClientLayout() {
                       {itemCount > 99 ? '99+' : itemCount}
                     </span>
                   )}
-                </Link>
+                </button>
               )}
 
               <LanguageSwitcher />
@@ -202,16 +210,24 @@ export default function ClientLayout() {
       </main>
 
       <footer className="bg-[#0C1E35] border-t border-white/5 py-6 px-4 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-primary-500/30 flex items-center justify-center">
               <ShoppingBag className="w-3 h-3 text-primary-300" />
             </div>
-            <span className="text-sm font-medium text-white">Precious Spain</span>
+            <div>
+              <span className="text-sm font-bold text-white">PRECIOUS SPAIN S.L.</span>
+              <p className="text-xs text-white/45 mt-0.5">CIF B93450534</p>
+            </div>
           </div>
-          <p className="text-xs text-white/30">(c) 2026 Precious Spain - Portal B2B Mayorista</p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5 text-xs text-white/65">
+            <a href="tel:+34648227263" className="hover:text-white transition-colors">+34 648 227 263</a>
+            <a href="mailto:giorgiohall27@gmail.com" className="hover:text-white transition-colors">giorgiohall27@gmail.com</a>
+          </div>
+          <p className="text-xs text-white/30">© 2026 Precious Spain · Portal B2B Mayorista</p>
         </div>
       </footer>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }

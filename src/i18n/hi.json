@@ -123,7 +123,9 @@
     "noRecentOrders": "अभी तक कोई हाल का ऑर्डर नहीं",
     "expandOrder": "उत्पाद देखें",
     "collapseOrder": "छुपाएं",
-    "shopByCategory": "श्रेणी के अनुसार खरीदें"
+    "shopByCategory": "श्रेणी के अनुसार खरीदें",
+    "weeklyPromotions": "सप्ताह के प्रमोशन",
+    "weeklyPromotionsSubtitle": "विशेष उत्पादों का चयन"
   },
   "categoryNames": {
     "allCategories": "सभी श्रेणियाँ",
@@ -303,6 +305,13 @@
     "ivaTotal": "VAT",
     "notes": "नोट्स / टिप्पणियाँ",
     "notesPlaceholder": "आपूर्तिकर्ता के लिए विशेष निर्देश जोड़ें...",
+    "notesUnlimited": "शब्दों की कोई सीमा नहीं है।",
+    "drawerTitle": "आपका कार्ट",
+    "drawerEmptySubtitle": "उत्पाद जोड़ें और वे पेज छोड़े बिना यहाँ दिखाई देंगे।",
+    "keepShopping": "खरीदारी जारी रखें",
+    "reviewAndSend": "ऑर्डर की समीक्षा करें और भेजें",
+    "unitsPerBoxLabel": "प्रति बॉक्स इकाइयाँ",
+    "promotionProduct": "प्रमोशनल उत्पाद",
     "companyData": "कंपनी विवरण",
     "sendOrder": "ऑर्डर भेजें",
     "sending": "भेजा जा रहा है...",

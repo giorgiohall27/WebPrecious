@@ -19,6 +19,7 @@ type CompanyDraft = Omit<ManagedCompany, 'id' | 'createdAt'>;
 
 function createEmptyDraft(pin: string): CompanyDraft {
   return {
+    legalName: '',
     name: '',
     cif: '',
     email: '',
@@ -33,6 +34,7 @@ function createEmptyDraft(pin: string): CompanyDraft {
 
 function toDraft(company: ManagedCompany): CompanyDraft {
   return {
+    legalName: company.legalName ?? '',
     name: company.name,
     cif: company.cif,
     email: company.email,
@@ -68,8 +70,8 @@ export default function Companies() {
     const query = search.trim().toLowerCase();
     if (!query) return companies;
     return companies.filter(company =>
-      [company.name, company.cif, company.email, company.contactPerson, company.pin]
-        .some(value => value.toLowerCase().includes(query))
+      [company.legalName, company.name, company.cif, company.email, company.contactPerson, company.pin]
+        .some(value => (value ?? '').toLowerCase().includes(query))
     );
   }, [companies, search]);
 
@@ -170,8 +172,8 @@ export default function Companies() {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Super Admin</p>
-          <h1 className="text-2xl font-bold text-surface-900">Empresas y PINs</h1>
-          <p className="text-sm text-surface-500 mt-1">Alta, acceso y datos comerciales de cada empresa.</p>
+          <h1 className="text-2xl font-bold text-surface-900">Clientes</h1>
+          <p className="text-sm text-surface-500 mt-1">Crea clientes y gestiona sus datos fiscales, comerciales, de contacto y entrega.</p>
         </div>
         <div className="relative w-full lg:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
@@ -186,7 +188,7 @@ export default function Companies() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Empresas', value: companies.length, icon: Building2, color: 'bg-primary-600 text-white' },
+          { label: 'Clientes', value: companies.length, icon: Building2, color: 'bg-primary-600 text-white' },
           { label: 'Activas', value: activeCompanies, icon: Check, color: 'bg-emerald-500 text-white' },
           { label: 'Pausadas', value: inactiveCompanies, icon: Power, color: 'bg-surface-800 text-white' },
         ].map(item => (
@@ -215,13 +217,14 @@ export default function Companies() {
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold">Nueva empresa</h2>
+              <h2 className="font-bold">Nuevo cliente</h2>
               <p className="text-xs text-white/60">Se genera un PIN unico de 6 digitos.</p>
             </div>
           </div>
 
           <div className="p-5 space-y-3">
-            <input className={inputClass} placeholder="Nombre empresa" value={draft.name} onChange={event => setDraftField('name', event.target.value)} required />
+            <input className={inputClass} placeholder="Nombre fiscal" value={draft.legalName ?? ''} onChange={event => setDraftField('legalName', event.target.value)} required />
+            <input className={inputClass} placeholder="Nombre de la empresa" value={draft.name} onChange={event => setDraftField('name', event.target.value)} required />
             <input className={inputClass} placeholder="CIF / NIF" value={draft.cif} onChange={event => setDraftField('cif', event.target.value)} />
             <input className={inputClass} placeholder="Email" type="email" value={draft.email} onChange={event => setDraftField('email', event.target.value)} />
             <input className={inputClass} placeholder="Telefono" value={draft.phone} onChange={event => setDraftField('phone', event.target.value)} />
@@ -264,7 +267,7 @@ export default function Companies() {
 
             <button type="submit" className="btn-primary w-full justify-center">
               <Plus className="w-4 h-4" />
-              Crear empresa
+              Crear cliente
             </button>
           </div>
         </form>
@@ -284,6 +287,7 @@ export default function Companies() {
                         {company.active ? 'Activa' : 'Pausada'}
                       </span>
                     </div>
+                    <p className="text-sm text-surface-600 font-medium">Nombre fiscal: {company.legalName || '-'}</p>
                     <p className="text-xs text-surface-400">{company.cif || 'Sin CIF'} - {company.email || 'Sin email'}</p>
                   </div>
 
@@ -306,7 +310,8 @@ export default function Companies() {
                 {editing && currentDraft ? (
                   <div className="border-t border-surface-100 bg-surface-50 p-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <input className={inputClass} placeholder="Nombre empresa" value={currentDraft.name} onChange={event => setEditField('name', event.target.value)} />
+                      <input className={inputClass} placeholder="Nombre fiscal" value={currentDraft.legalName ?? ''} onChange={event => setEditField('legalName', event.target.value)} required />
+                      <input className={inputClass} placeholder="Nombre de la empresa" value={currentDraft.name} onChange={event => setEditField('name', event.target.value)} required />
                       <input className={inputClass} placeholder="CIF / NIF" value={currentDraft.cif} onChange={event => setEditField('cif', event.target.value)} />
                       <input className={inputClass} placeholder="Email" type="email" value={currentDraft.email} onChange={event => setEditField('email', event.target.value)} />
                       <input className={inputClass} placeholder="Telefono" value={currentDraft.phone} onChange={event => setEditField('phone', event.target.value)} />

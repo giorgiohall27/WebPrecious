@@ -1,9 +1,11 @@
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export interface Promotion {
   productId: string;
   promoPrice: number;
   active: boolean;
+  startsAt: string;
+  endsAt: string;
 }
 
 interface PromotionsContextType {
@@ -20,7 +22,10 @@ function readPromotions() {
   if (typeof window === 'undefined') return [];
   try {
     const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed.filter(item => item.productId && Number(item.promoPrice) >= 0) : [];
+    const now = Date.now();
+    return Array.isArray(parsed) ? parsed.filter(item =>
+      item.productId && Number(item.promoPrice) >= 0 && item.endsAt && new Date(item.endsAt).getTime() > now
+    ) : [];
   } catch {
     return [];
   }
@@ -49,6 +54,21 @@ export function PromotionsProvider({ children }: { children: ReactNode }) {
   const clearPromotions = useCallback(() => {
     writePromotions([]);
   }, [writePromotions]);
+
+  useEffect(() => {
+    const removeExpired = () => {
+      const now = Date.now();
+      setPromotions(current => {
+        const active = current.filter(item => item.endsAt && new Date(item.endsAt).getTime() > now);
+        if (active.length === current.length) return current;
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(active));
+        return active;
+      });
+    };
+    removeExpired();
+    const timer = window.setInterval(removeExpired, 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const value = useMemo(
     () => ({ promotions, upsertPromotion, removePromotion, clearPromotions }),

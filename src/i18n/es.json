@@ -123,7 +123,9 @@
     "noRecentOrders": "Aún no hay pedidos recientes",
     "expandOrder": "Ver productos",
     "collapseOrder": "Ocultar productos",
-    "shopByCategory": "Comprar por Categoría"
+    "shopByCategory": "Comprar por Categoría",
+    "weeklyPromotions": "Promociones de la Semana",
+    "weeklyPromotionsSubtitle": "Selección especial de productos destacados"
   },
   "categoryNames": {
     "allCategories": "Todas las Categorías",
@@ -303,6 +305,13 @@
     "ivaTotal": "IVA",
     "notes": "Notas / Observaciones",
     "notesPlaceholder": "Añade instrucciones especiales para el proveedor...",
+    "notesUnlimited": "Sin límite de palabras.",
+    "drawerTitle": "Tu carrito",
+    "drawerEmptySubtitle": "Añade productos y aparecerán aquí sin salir de la página.",
+    "keepShopping": "Seguir comprando",
+    "reviewAndSend": "Revisar y enviar pedido",
+    "unitsPerBoxLabel": "unidades por caja",
+    "promotionProduct": "Producto en promoción",
     "companyData": "Datos de la Empresa",
     "sendOrder": "Enviar Pedido",
     "sending": "Enviando...",

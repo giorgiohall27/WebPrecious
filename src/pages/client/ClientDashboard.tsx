@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -56,16 +56,24 @@ const CATEGORY_STYLE_MAP: Record<string, CategoryStyle> = {
 };
 
 export default function ClientDashboard() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { products, categories, adjustStock } = useProducts();
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
   const { promotions } = usePromotions();
   const { isLoggedIn, isSuperAdmin } = useAuth();
-  const isEs = i18n.language === 'es';
   const canViewSensitive = isLoggedIn || isSuperAdmin;
   const [promoQuantities, setPromoQuantities] = useState<Record<string, number>>({});
   const [addedPromos, setAddedPromos] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setPromoQuantities(current => Object.fromEntries(
+      Object.keys(current).map(productId => [
+        productId,
+        cartItems.filter(item => item.product.id === productId).reduce((total, item) => total + item.quantity, 0),
+      ]),
+    ));
+  }, [cartItems]);
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
   const marqueeImages = useMemo(() => {
@@ -181,10 +189,10 @@ export default function ClientDashboard() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-surface-900">
-              {isEs ? 'Promociones de la Semana' : 'Promotions of the Week'}
+              {t('clientDashboard.weeklyPromotions')}
             </h2>
             <p className="text-xs text-surface-400 mt-0.5">
-              {isEs ? 'Seleccion especial de productos destacados' : 'Special selection of featured products'}
+              {t('clientDashboard.weeklyPromotionsSubtitle')}
             </p>
           </div>
         </div>
@@ -289,7 +297,9 @@ export default function ClientDashboard() {
                   <div className="w-8 h-8 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center backdrop-blur-sm">
                     <Icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-white font-bold text-base drop-shadow-lg">{category.name}</span>
+                  <span className="text-white font-bold text-base drop-shadow-lg">
+                    {t(`categoryNames.${category.key}`, { defaultValue: category.name })}
+                  </span>
                 </div>
               </button>
             );

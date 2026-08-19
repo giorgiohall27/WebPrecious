@@ -1,8 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, Tag, Trash2 } from 'lucide-react';
+import { CalendarClock, Plus, Search, Tag, Trash2 } from 'lucide-react';
 import { useProducts } from '../../store/productsStore';
 import { usePromotions } from '../../store/promotionsStore';
+
+const toLocalDateValue = (date: Date) => {
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return offsetDate.toISOString().slice(0, 10);
+};
+
+const isValid24HourTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 export default function Promotions() {
   const { t } = useTranslation();
@@ -11,6 +18,10 @@ export default function Promotions() {
   const [search, setSearch] = useState('');
   const [selectedProductId, setSelectedProductId] = useState('');
   const [promoPrice, setPromoPrice] = useState('');
+  const [endDate, setEndDate] = useState(() => toLocalDateValue(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)));
+  const [endTime, setEndTime] = useState('23:59');
+  const promotionEnd = isValid24HourTime(endTime) ? new Date(`${endDate}T${endTime}:00`) : null;
+  const validPromotionEnd = Boolean(promotionEnd && !Number.isNaN(promotionEnd.getTime()) && promotionEnd.getTime() > Date.now());
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
   const promotionRows = useMemo(
@@ -40,7 +51,14 @@ export default function Promotions() {
     if (!selectedProduct) return;
     const price = Number.parseFloat(promoPrice);
     if (!Number.isFinite(price) || price < 0) return;
-    upsertPromotion({ productId: selectedProduct.id, promoPrice: price, active: true });
+    if (!promotionEnd || !validPromotionEnd) return;
+    upsertPromotion({
+      productId: selectedProduct.id,
+      promoPrice: price,
+      active: true,
+      startsAt: new Date().toISOString(),
+      endsAt: promotionEnd.toISOString(),
+    });
     setSelectedProductId('');
     setPromoPrice('');
     setSearch('');
@@ -61,7 +79,7 @@ export default function Promotions() {
       </div>
 
       <div className="card p-5 space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_180px_auto] gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_150px_160px_110px_auto] gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
@@ -80,9 +98,33 @@ export default function Promotions() {
             onChange={event => setPromoPrice(event.target.value)}
             placeholder={t('promotions.promoPrice')}
           />
+          <label className="relative">
+            <CalendarClock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+            <input
+              className="input-field pl-10"
+              type="date"
+              min={toLocalDateValue(new Date())}
+              value={endDate}
+              onChange={event => setEndDate(event.target.value)}
+              aria-label="Fecha de finalización"
+            />
+          </label>
+          <label>
+            <input
+              className={`input-field font-mono ${endTime && !isValid24HourTime(endTime) ? 'border-red-400 focus:border-red-400' : ''}`}
+              type="text"
+              inputMode="numeric"
+              maxLength={5}
+              value={endTime}
+              onChange={event => setEndTime(event.target.value.replace(/[^0-9:]/g, '').slice(0, 5))}
+              placeholder="HH:mm"
+              aria-label="Hora de finalización en formato de 24 horas"
+              title="Formato de 24 horas: HH:mm (00:00–23:59)"
+            />
+          </label>
           <button
             onClick={handleAddPromotion}
-            disabled={!selectedProduct || !promoPrice}
+            disabled={!selectedProduct || !promoPrice || !validPromotionEnd}
             className="btn-primary disabled:bg-surface-300 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" /> {t('promotions.add')}
@@ -137,6 +179,9 @@ export default function Promotions() {
                 <div className="text-right">
                   <p className="text-xs text-surface-400 line-through">EUR {product.price.toFixed(2)}</p>
                   <p className="text-lg font-black text-amber-600">EUR {promotion.promoPrice.toFixed(2)}</p>
+                  <p className="text-[11px] text-surface-500 mt-1">
+                    Hasta {new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(promotion.endsAt))}
+                  </p>
                 </div>
                 <button onClick={() => removePromotion(product.id)} className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50">
                   <Trash2 className="w-4 h-4" />

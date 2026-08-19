@@ -27,6 +27,7 @@ const defaultSuperAdmins: SuperAdmin[] = [
 const defaultCompanies: ManagedCompany[] = [
   {
     id: 'comp-hotel-costa-demo',
+    legalName: 'Hotel Costa Demo S.L.',
     name: 'Hotel Costa Demo',
     cif: 'B12345678',
     email: 'compras@hotelcosta.es',
@@ -41,6 +42,7 @@ const defaultCompanies: ManagedCompany[] = [
   },
   {
     id: 'comp-market-sol',
+    legalName: 'Market Sol S.L.',
     name: 'Market Sol S.L.',
     cif: 'B23456789',
     email: 'pedidos@marketsol.es',
@@ -55,6 +57,7 @@ const defaultCompanies: ManagedCompany[] = [
   },
   {
     id: 'comp-restaurante-marina',
+    legalName: 'Restaurante Marina S.L.',
     name: 'Restaurante Marina',
     cif: 'B34567890',
     email: 'compras@restaurantemarina.es',
@@ -122,6 +125,7 @@ function toCompany(row: any): ManagedCompany {
 
   return {
     id: row.id,
+    legalName: row.legal_name ?? row.legalName ?? '',
     name: row.name,
     cif: row.cif ?? '',
     email: row.email ?? '',
@@ -139,6 +143,7 @@ function toCompany(row: any): ManagedCompany {
 function companyToPayload(company: Partial<CompanyInput> & { id?: string }) {
   return {
     id: company.id,
+    legal_name: company.legalName,
     name: company.name,
     cif: company.cif,
     email: company.email,
@@ -376,6 +381,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const addCompany = async (company: CompanyInput): ActionResult<{ company?: ManagedCompany }> => {
     const name = company.name.trim();
     if (!name) return { success: false, error: 'La empresa necesita un nombre' };
+    const legalName = company.legalName?.trim() ?? '';
+    if (!legalName) return { success: false, error: 'El cliente necesita un nombre fiscal' };
 
     const cleanPin = normalizePin(company.pin);
     if (cleanPin.length !== 6) return { success: false, error: 'El PIN debe tener 6 digitos' };
@@ -384,6 +391,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...company,
       id: createCompanyId(name),
       name,
+      legalName,
       pin: cleanPin,
       pinHint: cleanPin.slice(-2),
       active: company.active,
@@ -423,6 +431,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (cleanUpdates.name !== undefined && !cleanUpdates.name.trim()) {
       return { success: false, error: 'La empresa necesita un nombre' };
     }
+    if (cleanUpdates.legalName !== undefined && !cleanUpdates.legalName.trim()) {
+      return { success: false, error: 'El nombre fiscal es obligatorio' };
+    }
 
     if (supabaseEnabled) {
       if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
@@ -449,6 +460,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...company,
       ...cleanUpdates,
       name: cleanUpdates.name?.trim() ?? company.name,
+      legalName: cleanUpdates.legalName?.trim() ?? company.legalName,
       pin: cleanPin || company.pin,
       pinHint: cleanPin ? cleanPin.slice(-2) : company.pinHint,
     };

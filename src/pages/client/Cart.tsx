@@ -52,7 +52,7 @@ export default function Cart() {
     const now = new Date();
     const delivery = new Date(now);
     delivery.setDate(delivery.getDate() + 3);
-    const savedOrder = await addOrder({
+    const order = {
       id: `ord-${Date.now()}`,
       orderId,
       companyId: userProfile?.id ?? 'comp-pin',
@@ -65,6 +65,7 @@ export default function Cart() {
       items: itemsSnapshot.map(i => ({
         productId: i.product.id,
         sku: i.product.sku,
+        brand: i.product.brand || '',
         name: i.product.name,
         categoryName: i.product.categoryName || '',
         quantity: i.quantity,
@@ -76,22 +77,25 @@ export default function Cart() {
       totalItems: itemsSnapshot.length,
       totalAmount: totalSnapshot,
       notes: notes || undefined,
-      status: 'authorization_pending',
+      status: 'authorization_pending' as const,
       createdAt: now.toISOString(),
       estimatedDelivery: delivery.toISOString().split('T')[0],
-    });
+    };
+    const savedOrder = await addOrder(order);
 
     if (savedOrder) {
-      notifyAdminNewOrder(savedOrder);
+      const emailOrder = { ...order, id: savedOrder.id, orderId: savedOrder.orderId };
+      const emailSent = await notifyAdminNewOrder(emailOrder);
       clearCart();
       navigate('/order-confirmation', {
         state: {
           orderId: savedOrder.orderId,
-          total: savedOrder.totalAmount,
-          totalLines: savedOrder.totalItems,
+          total: order.totalAmount,
+          totalLines: order.totalItems,
           notes,
         },
       });
+      if (!emailSent) window.alert('El pedido se ha guardado, pero el correo no pudo enviarse. Contacta con Precious Spain.');
     } else {
       setSending(false);
       alert('No se pudo enviar el pedido. Revisa la sesión e inténtalo de nuevo.');
@@ -161,7 +165,14 @@ export default function Cart() {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-surface-900 text-sm truncate">{item.product.name}</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-primary-600 break-words">
+                        {item.product.brand || 'Sin marca'}
+                      </p>
+                      <p className="font-medium text-surface-900 text-sm break-words mt-0.5">{item.product.name}</p>
+                      <p className="text-xs text-surface-500 mt-1">{unitsPerBox} {t('cart.unitsPerBoxLabel')}</p>
+                      {item.unitPriceOverride !== undefined && (
+                        <span className="inline-flex my-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase">{t('cart.promotionProduct')}</span>
+                      )}
                       <p className="text-xs text-surface-400">
                         {item.product.sku} · {boxPrice.toFixed(2)} {t('cart.perBox')}{unitsPerBox > 1 ? ` (${unitsPerBox} ${t('cart.unitsShort')} x €${unitPrice.toFixed(2)})` : ''} · IVA {item.product.iva ?? 0}%
                       </p>
@@ -260,6 +271,7 @@ export default function Cart() {
                 className="input-field min-h-[80px] resize-none text-sm"
                 placeholder={t('cart.notesPlaceholder')}
               />
+              <p className="text-[11px] text-surface-400 mt-1">{t('cart.notesUnlimited')}</p>
             </div>
 
             {/* Send Order */}

@@ -47,6 +47,7 @@ create table if not exists public.super_admins (
 
 create table if not exists public.companies (
   id text primary key,
+  legal_name text not null default '',
   name text not null,
   cif text default '',
   email text default '',

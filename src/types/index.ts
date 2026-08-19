@@ -45,6 +45,7 @@ export interface CartItem {
 
 export interface Company {
   id: string;
+  legalName?: string;
   name: string;
   cif: string;
   email: string;
@@ -96,6 +97,7 @@ export type OrderItemAvailability = 'available' | 'unavailable';
 export interface OrderItem {
   productId: string;
   sku: string;
+  brand?: string;
   name: string;
   categoryName: string;
   quantity: number;

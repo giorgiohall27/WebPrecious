@@ -2,7 +2,7 @@ import { Order } from '../types';
 
 const sendOrderEmail = async (mode: 'new_order' | 'accepted' | 'accepted_modified' | 'rejected', order: Order) => {
   try {
-    await fetch('/api/send-order-email', {
+    const response = await fetch('/api/send-order-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -18,8 +18,14 @@ const sendOrderEmail = async (mode: 'new_order' | 'accepted' | 'accepted_modifie
         items: order.items,
       }),
     });
+    if (!response.ok) {
+      console.error('Order email API rejected the request:', response.status, await response.text());
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error('Order email could not be sent:', error);
+    return false;
   }
 };
 

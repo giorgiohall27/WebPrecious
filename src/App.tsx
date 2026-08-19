@@ -18,6 +18,7 @@ import Categories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
 import Companies from './pages/admin/Companies';
 import Promotions from './pages/admin/Promotions';
+import Preorders from './pages/admin/Preorders';
 
 // Client Pages
 import ClientLogin from './pages/client/Login';
@@ -75,6 +76,7 @@ export default function App() {
               <Route path="/admin/products" element={<Products />} />
               <Route path="/admin/categories" element={<Categories />} />
               <Route path="/admin/promotions" element={<Promotions />} />
+              <Route path="/admin/preorders" element={<Preorders />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
             </Route>
 
