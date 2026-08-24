@@ -84,8 +84,11 @@ export default function Cart() {
     const savedOrder = await addOrder(order);
 
     if (savedOrder) {
-      const emailOrder = { ...order, id: savedOrder.id, orderId: savedOrder.orderId };
-      const emailSent = await notifyAdminNewOrder(emailOrder);
+      const emailSent = await notifyAdminNewOrder({
+        ...order,
+        id: savedOrder.id,
+        orderId: savedOrder.orderId,
+      });
       clearCart();
       navigate('/order-confirmation', {
         state: {

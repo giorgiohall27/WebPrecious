@@ -5,6 +5,16 @@ import { Order, OrderItemAvailability } from '../../types';
 import { useOrders } from '../../store/ordersStore';
 import { notifyCustomerOrderDecision } from '../../lib/orderEmails';
 
+const PREORDER_CREATOR_PATTERN = /^\[PREVENTA CREADA POR:\s*([^\]]+)\]\s*/i;
+
+const getPreorderDetails = (notes?: string) => {
+  const match = notes?.match(PREORDER_CREATOR_PATTERN);
+  return {
+    creator: match?.[1]?.trim() ?? '',
+    notes: notes?.replace(PREORDER_CREATOR_PATTERN, '').trim() ?? '',
+  };
+};
+
 type ItemDecision = {
   availabilityStatus: OrderItemAvailability;
   adminNote: string;
@@ -151,6 +161,7 @@ export default function Orders() {
             const groups = groupItemsByCategory(order);
             const isBeingModified = modifyingOrderId === order.id;
             const decisionsForOrder = itemDecisions[order.id] ?? {};
+            const preorderDetails = getPreorderDetails(order.notes);
 
             return (
               <div key={order.id} className="card overflow-hidden">
@@ -301,9 +312,15 @@ export default function Orders() {
                       </div>
                     ))}
 
-                    {order.notes && (
+                    {preorderDetails.creator && (
+                      <div className="px-6 py-3 bg-blue-50 text-sm text-blue-800 border-t border-blue-100">
+                        <strong>Preventa creada por:</strong> {preorderDetails.creator}
+                      </div>
+                    )}
+
+                    {preorderDetails.notes && (
                       <div className="px-6 py-3 bg-amber-50 text-sm text-amber-800 border-t border-amber-100">
-                        <strong>Notas:</strong> {order.notes}
+                        <strong>Notas:</strong> {preorderDetails.notes}
                       </div>
                     )}
 

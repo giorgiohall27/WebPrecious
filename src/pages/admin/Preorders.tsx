@@ -4,7 +4,7 @@ import { useAuth } from '../../store/authStore';
 import { useOrders } from '../../store/ordersStore';
 import { useProducts } from '../../store/productsStore';
 import { notifyAdminNewOrder } from '../../lib/orderEmails';
-import { Product } from '../../types';
+import { Order, Product } from '../../types';
 import { usePromotions } from '../../store/promotionsStore';
 
 type PreorderLine = { product: Product; quantity: number; unitPrice: number; isPromotion: boolean };
@@ -14,14 +14,17 @@ export default function Preorders() {
   const { products, categories } = useProducts();
   const { promotions } = usePromotions();
   const { addAdminPreorder } = useOrders();
+  const [createdBy, setCreatedBy] = useState('');
   const [companyId, setCompanyId] = useState('');
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [searchQuantities, setSearchQuantities] = useState<Record<string, number>>({});
   const [lines, setLines] = useState<PreorderLine[]>([]);
   const [notes, setNotes] = useState('');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [failedEmailOrder, setFailedEmailOrder] = useState<Order | null>(null);
 
   const selectedCompany = companies.find(company => company.id === companyId);
   const promotionByProductId = useMemo(
@@ -45,10 +48,26 @@ export default function Preorders() {
   }, { subtotal: 0, tax: 0, total: 0 }), [lines]);
 
   const addProduct = (product: Product) => {
+    const quantityToAdd = Math.max(1, searchQuantities[product.id] ?? 1);
     const promotion = promotionByProductId.get(product.id);
     setLines(current => current.some(line => line.product.id === product.id)
-      ? current.map(line => line.product.id === product.id ? { ...line, quantity: line.quantity + 1 } : line)
-      : [...current, { product, quantity: 1, unitPrice: promotion?.promoPrice ?? product.price, isPromotion: Boolean(promotion) }]);
+      ? current.map(line => line.product.id === product.id ? { ...line, quantity: line.quantity + quantityToAdd } : line)
+      : [...current, { product, quantity: quantityToAdd, unitPrice: promotion?.promoPrice ?? product.price, isPromotion: Boolean(promotion) }]);
+    setSearchQuantities(current => ({ ...current, [product.id]: 1 }));
+  };
+
+  const retryEmail = async () => {
+    if (!failedEmailOrder) return;
+    setSending(true);
+    setError('');
+    const sent = await notifyAdminNewOrder(failedEmailOrder);
+    if (sent) {
+      setMessage(`El correo de la preventa ${failedEmailOrder.orderId} se ha reenviado correctamente.`);
+      setFailedEmailOrder(null);
+    } else {
+      setError(`No se pudo reenviar el correo de la preventa ${failedEmailOrder.orderId}.`);
+    }
+    setSending(false);
   };
 
   const setQuantity = (productId: string, quantity: number) => {
@@ -60,6 +79,11 @@ export default function Preorders() {
   };
 
   const sendPreorder = async () => {
+    const creatorName = createdBy.trim();
+    if (!creatorName) {
+      setError('Escribe el nombre de la persona que prepara la preventa.');
+      return;
+    }
     if (!selectedCompany || lines.length === 0) return;
     setSending(true);
     setError('');
@@ -95,7 +119,9 @@ export default function Preorders() {
       }),
       totalItems: lines.length,
       totalAmount: totals.total,
-      notes: notes ? `[PREVENTA CREADA POR SUPER ADMIN] ${notes}` : '[PREVENTA CREADA POR SUPER ADMIN]',
+      notes: notes
+        ? `[PREVENTA CREADA POR: ${creatorName}] ${notes}`
+        : `[PREVENTA CREADA POR: ${creatorName}]`,
       status: 'pending' as const,
       createdAt: now.toISOString(),
       estimatedDelivery: delivery.toISOString().split('T')[0],
@@ -107,12 +133,20 @@ export default function Preorders() {
       setSending(false);
       return;
     }
-    const emailSent = await notifyAdminNewOrder({ ...order, id: saved.id, orderId: saved.orderId });
+    const emailSent = await notifyAdminNewOrder({
+      ...order,
+      id: saved.id,
+      orderId: saved.orderId,
+    });
+    const emailOrder = { ...order, id: saved.id, orderId: saved.orderId };
     setLines([]);
     setNotes('');
+    setCreatedBy('');
     if (emailSent) {
-      setMessage(`Preventa ${saved.orderId} creada y enviada al correo de Precious Spain.`);
+      setFailedEmailOrder(null);
+      setMessage(`Preventa ${saved.orderId} creada por ${creatorName} y enviada al correo de Precious Spain.`);
     } else {
+      setFailedEmailOrder(emailOrder);
       setError(`La preventa ${saved.orderId} se guardó, pero el correo no pudo enviarse. Revisa la configuración de correo.`);
     }
     setSending(false);
@@ -127,13 +161,30 @@ export default function Preorders() {
       </div>
 
       {(message || error) && (
-        <div className={`rounded-xl px-4 py-3 border text-sm font-medium flex items-center gap-2 ${error ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
-          {!error && <CheckCircle2 className="w-4 h-4" />}{error || message}
+        <div className={`rounded-xl px-4 py-3 border text-sm font-medium flex flex-wrap items-center gap-2 ${error ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+          {!error && <CheckCircle2 className="w-4 h-4" />}<span className="flex-1">{error || message}</span>
+          {error && failedEmailOrder && (
+            <button type="button" onClick={retryEmail} disabled={sending} className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50">
+              {sending ? 'Reintentando…' : 'Reenviar correo'}
+            </button>
+          )}
         </div>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6 items-start">
         <section className="card p-5 space-y-4">
+          <label className="block">
+            <span className="input-label">Nombre de quien prepara la preventa *</span>
+            <input
+              value={createdBy}
+              onChange={event => setCreatedBy(event.target.value)}
+              className="input-field"
+              placeholder="Ej. Giorgio"
+              autoComplete="name"
+              required
+            />
+            <span className="mt-1 block text-[11px] text-surface-400">Este nombre aparecerá en el pedido y en el email.</span>
+          </label>
           <label className="block">
             <span className="input-label">Cliente</span>
             <select value={companyId} onChange={event => setCompanyId(event.target.value)} className="input-field" required>
@@ -167,8 +218,9 @@ export default function Preorders() {
             {filteredProducts.map(product => {
               const promotion = promotionByProductId.get(product.id);
               const unitPrice = promotion?.promoPrice ?? product.price;
+              const searchQuantity = searchQuantities[product.id] ?? 1;
               return (
-              <button key={product.id} type="button" onClick={() => addProduct(product)} className="w-full flex items-center gap-3 p-3 text-left hover:bg-primary-50 transition-colors">
+              <div key={product.id} className="w-full flex flex-col sm:flex-row sm:items-center gap-3 p-3 hover:bg-primary-50 transition-colors">
                 <div className="w-12 h-12 rounded-lg bg-surface-50 border border-surface-100 overflow-hidden shrink-0">
                   {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-1" />}
                 </div>
@@ -182,8 +234,27 @@ export default function Preorders() {
                   <p className="text-[11px] text-surface-400">{unitPrice.toFixed(2)} € / unidad · {product.unitsPerBox || 1} uds.</p>
                   {promotion && <p className="text-[10px] text-surface-400 line-through">Antes: {(product.price * (product.unitsPerBox || 1)).toFixed(2)} € / caja</p>}
                 </div>
-                <Plus className="w-4 h-4 text-primary-600" />
-              </button>
+                <div className="flex items-center justify-end gap-2 shrink-0">
+                  <label className="text-[11px] font-semibold text-surface-500">
+                    Cajas
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={searchQuantity}
+                      onChange={event => setSearchQuantities(current => ({
+                        ...current,
+                        [product.id]: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
+                      }))}
+                      className="ml-2 w-16 rounded-lg border border-surface-200 bg-white px-2 py-2 text-center text-sm font-bold focus:border-primary-500 focus:outline-none"
+                      aria-label={`Cantidad de cajas de ${product.name}`}
+                    />
+                  </label>
+                  <button type="button" onClick={() => addProduct(product)} className="rounded-lg bg-primary-600 p-2.5 text-white hover:bg-primary-700" aria-label={`Añadir ${searchQuantity} cajas de ${product.name}`}>
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             );})}
           </div>
         </section>
@@ -229,7 +300,7 @@ export default function Preorders() {
             <textarea value={notes} onChange={event => setNotes(event.target.value)} className="input-field min-h-24 resize-none" placeholder="Notas para esta preventa" />
             <p className="text-[11px] text-surface-400 mt-1">Sin límite de palabras.</p>
           </div>
-          <button onClick={sendPreorder} disabled={!selectedCompany || lines.length === 0 || sending} className="btn-primary w-full justify-center disabled:bg-surface-300 disabled:cursor-not-allowed">
+          <button onClick={sendPreorder} disabled={!createdBy.trim() || !selectedCompany || lines.length === 0 || sending} className="btn-primary w-full justify-center disabled:bg-surface-300 disabled:cursor-not-allowed">
             <Send className="w-4 h-4" />{sending ? 'Enviando…' : 'Crear y enviar preventa'}
           </button>
           <p className="text-[11px] text-center text-surface-400">Se enviará a giorgiohall27@gmail.com</p>

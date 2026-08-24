@@ -1,11 +1,9 @@
 import { Order } from '../types';
 
+const wait = (milliseconds: number) => new Promise(resolve => window.setTimeout(resolve, milliseconds));
+
 const sendOrderEmail = async (mode: 'new_order' | 'accepted' | 'accepted_modified' | 'rejected', order: Order) => {
-  try {
-    const response = await fetch('/api/send-order-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+  const body = JSON.stringify({
         mode,
         orderId: order.orderId,
         companyName: order.companyName,
@@ -16,17 +14,24 @@ const sendOrderEmail = async (mode: 'new_order' | 'accepted' | 'accepted_modifie
         notes: order.notes,
         totalAmount: order.totalAmount,
         items: order.items,
-      }),
-    });
-    if (!response.ok) {
+      });
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch('/api/send-order-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      });
+      if (response.ok) return true;
       console.error('Order email API rejected the request:', response.status, await response.text());
-      return false;
+    } catch (error) {
+      console.error('Order email could not be sent:', error);
     }
-    return true;
-  } catch (error) {
-    console.error('Order email could not be sent:', error);
-    return false;
+    if (attempt < 2) await wait(600 * (attempt + 1));
   }
+  return false;
 };
 
 export const notifyAdminNewOrder = (order: Order) => sendOrderEmail('new_order', order);

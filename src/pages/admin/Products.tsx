@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle,
   ChevronDown,
@@ -11,6 +11,9 @@ import {
   Trash2,
   Upload,
   X,
+  Clipboard,
+  ImagePlus,
+  Minimize2,
 } from 'lucide-react';
 import Papa from 'papaparse';
 import { Product } from '../../types';
@@ -60,6 +63,17 @@ function draftFromProduct(product: Product): ProductDraft {
   };
 }
 
+const PRODUCT_DRAFT_KEY = 'precious-admin-product-draft';
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
+function getNextSku(products: Product[]) {
+  const highest = products.reduce((maximum, product) => {
+    const match = product.sku.match(/^(?:SKU-)?(\d+)$/i);
+    return match ? Math.max(maximum, Number.parseInt(match[1], 10)) : maximum;
+  }, 999);
+  return `SKU-${highest + 1}`;
+}
+
 export default function Products() {
   const { t } = useTranslation();
   const { products, categories, upsertProduct, removeProduct } = useProducts();
@@ -68,12 +82,14 @@ export default function Products() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showCSVModal, setShowCSVModal] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
+  const [productPanelMinimized, setProductPanelMinimized] = useState(false);
   const [productDraft, setProductDraft] = useState<ProductDraft>(emptyDraft);
   const [productBeingEdited, setProductBeingEdited] = useState<Product | null>(null);
   const [productPendingDelete, setProductPendingDelete] = useState<Product | null>(null);
   const [csvData, setCsvData] = useState<any[]>([]);
   const [csvSummary, setCsvSummary] = useState<{ new: number; updated: number; errors: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     return products.filter(product => {
@@ -97,14 +113,71 @@ export default function Products() {
 
   const openAddProduct = () => {
     setProductBeingEdited(null);
-    setProductDraft(emptyDraft(categories[0]?.id ?? 'cat-1'));
+    setProductDraft({ ...emptyDraft(categories[0]?.id ?? 'cat-1'), sku: getNextSku(products) });
+    setProductPanelMinimized(false);
     setShowProductModal(true);
   };
 
   const openEditProduct = (product: Product) => {
     setProductBeingEdited(product);
     setProductDraft(draftFromProduct(product));
+    setProductPanelMinimized(false);
     setShowProductModal(true);
+  };
+
+  useEffect(() => {
+    const savedDraft = sessionStorage.getItem(PRODUCT_DRAFT_KEY);
+    if (!savedDraft) return;
+    try {
+      const saved = JSON.parse(savedDraft) as { draft: ProductDraft; productId?: string };
+      setProductDraft(saved.draft);
+      setProductBeingEdited(saved.productId ? products.find(product => product.id === saved.productId) ?? null : null);
+      setShowProductModal(true);
+      setProductPanelMinimized(true);
+    } catch {
+      sessionStorage.removeItem(PRODUCT_DRAFT_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showProductModal) return;
+    sessionStorage.setItem(PRODUCT_DRAFT_KEY, JSON.stringify({
+      draft: productDraft,
+      productId: productBeingEdited?.id,
+    }));
+  }, [productBeingEdited?.id, productDraft, showProductModal]);
+
+  const closeProductPanel = () => {
+    setShowProductModal(false);
+    setProductBeingEdited(null);
+    sessionStorage.removeItem(PRODUCT_DRAFT_KEY);
+  };
+
+  const useImageFile = (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      window.alert('Selecciona un archivo de imagen.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      window.alert('La imagen no puede superar los 3 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setDraftField('imageUrl', String(reader.result ?? ''));
+    reader.readAsDataURL(file);
+  };
+
+  const pasteImage = async () => {
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      const imageType = clipboardItems.flatMap(item => item.types).find(type => type.startsWith('image/'));
+      const clipboardItem = clipboardItems.find(item => imageType && item.types.includes(imageType));
+      if (!clipboardItem || !imageType) throw new Error('No image');
+      useImageFile(new File([await clipboardItem.getType(imageType)], 'imagen-pegada', { type: imageType }));
+    } catch {
+      window.alert('No hay una imagen en el portapapeles o el navegador no permite acceder a ella.');
+    }
   };
 
   const setDraftField = (field: keyof ProductDraft, value: string) => {
@@ -143,9 +216,10 @@ export default function Products() {
     });
   };
 
-  const handleProductSave = (event: React.FormEvent) => {
+  const handleProductSave = async (event: React.FormEvent) => {
     event.preventDefault();
-    upsertProduct(buildProductFromDraft());
+    await upsertProduct(buildProductFromDraft());
+    sessionStorage.removeItem(PRODUCT_DRAFT_KEY);
     setShowProductModal(false);
     setProductBeingEdited(null);
     setProductDraft(emptyDraft(categories[0]?.id ?? 'cat-1'));
@@ -351,14 +425,21 @@ export default function Products() {
       </div>
 
       {showProductModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleProductSave} className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl animate-slide-up overflow-hidden">
+        <div className={`fixed z-50 right-3 bottom-3 sm:right-6 sm:bottom-6 w-[calc(100%-1.5rem)] sm:w-[560px] transition-all ${productPanelMinimized ? 'max-w-sm' : ''}`}>
+          <form onSubmit={handleProductSave} className="bg-white rounded-2xl border border-primary-100 shadow-2xl w-full overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100">
-              <h2 className="text-lg font-bold text-surface-900">{productBeingEdited ? t('products.editProduct') : t('products.newProduct')}</h2>
-              <button type="button" onClick={() => setShowProductModal(false)} className="btn-icon"><X className="w-5 h-5" /></button>
+              <div>
+                <h2 className="text-lg font-bold text-surface-900">{productBeingEdited ? t('products.editProduct') : t('products.newProduct')}</h2>
+                <p className="text-xs text-surface-400">El borrador se conserva mientras revisas la página.</p>
+              </div>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => setProductPanelMinimized(value => !value)} className="btn-icon" title={productPanelMinimized ? 'Abrir panel' : 'Minimizar panel'}><Minimize2 className="w-4 h-4" /></button>
+                <button type="button" onClick={closeProductPanel} className="btn-icon" title="Cerrar"><X className="w-5 h-5" /></button>
+              </div>
             </div>
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input className={inputClass} placeholder={t('products.sku')} value={productDraft.sku} onChange={event => setDraftField('sku', event.target.value)} required />
+            {!productPanelMinimized && <>
+            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[68vh] overflow-y-auto">
+              <label><span className="input-label">{t('products.sku')} automático</span><input className={`${inputClass} bg-surface-50 font-mono`} placeholder={t('products.sku')} value={productDraft.sku} onChange={event => setDraftField('sku', event.target.value)} required /></label>
               <input className={inputClass} placeholder={t('products.name')} value={productDraft.name} onChange={event => setDraftField('name', event.target.value)} required />
               <select className={inputClass} value={productDraft.categoryId} onChange={event => setDraftField('categoryId', event.target.value)}>
                 {categories.map(category => <option key={category.id} value={category.id}>{getCategoryLabel(category)}</option>)}
@@ -394,15 +475,39 @@ export default function Products() {
                   </button>
                 </div>
               </div>
-              <input className={inputClass} placeholder={t('products.image')} value={productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
+              <div className="sm:col-span-2 space-y-3">
+                <label className="input-label">Imagen del producto</label>
+                <div
+                  className="rounded-xl border-2 border-dashed border-surface-200 p-4 flex flex-col sm:flex-row items-center gap-4 bg-surface-50"
+                  onPaste={event => {
+                    const file = Array.from(event.clipboardData.files).find(item => item.type.startsWith('image/'));
+                    if (file) useImageFile(file);
+                  }}
+                >
+                  <div className="w-24 h-24 rounded-xl bg-white border border-surface-200 overflow-hidden flex items-center justify-center shrink-0">
+                    {productDraft.imageUrl ? <img src={productDraft.imageUrl} alt="Vista previa del producto" className="w-full h-full object-contain p-2" /> : <ImagePlus className="w-8 h-8 text-surface-300" />}
+                  </div>
+                  <div className="flex-1 space-y-2 text-center sm:text-left">
+                    <p className="text-sm text-surface-600">Elige una imagen del ordenador o pégala desde el portapapeles.</p>
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                      <button type="button" onClick={() => imageInputRef.current?.click()} className="btn-secondary text-xs"><Upload className="w-4 h-4" /> Elegir archivo</button>
+                      <button type="button" onClick={pasteImage} className="btn-secondary text-xs"><Clipboard className="w-4 h-4" /> Pegar imagen</button>
+                      {productDraft.imageUrl && <button type="button" onClick={() => setDraftField('imageUrl', '')} className="btn-secondary text-xs text-red-600">Quitar</button>}
+                    </div>
+                    <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={event => { useImageFile(event.target.files?.[0]); event.target.value = ''; }} />
+                  </div>
+                </div>
+                <input className={inputClass} placeholder="O pega la URL de la imagen" value={productDraft.imageUrl.startsWith('data:') ? '' : productDraft.imageUrl} onChange={event => setDraftField('imageUrl', event.target.value)} />
+              </div>
               <textarea className={`${inputClass} sm:col-span-2 min-h-[84px] resize-none`} placeholder={t('products.description')} value={productDraft.description} onChange={event => setDraftField('description', event.target.value)} />
             </div>
             <div className="px-6 py-4 border-t border-surface-100 flex justify-end gap-3">
-              <button type="button" onClick={() => setShowProductModal(false)} className="btn-secondary">{t('common.cancel')}</button>
+              <button type="button" onClick={closeProductPanel} className="btn-secondary">{t('common.cancel')}</button>
               <button type="submit" className="btn-primary">
                 <Save className="w-4 h-4" /> {t('products.saveProduct')}
               </button>
             </div>
+            </>}
           </form>
         </div>
       )}

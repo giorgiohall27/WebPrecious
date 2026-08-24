@@ -36,22 +36,22 @@ const DEFAULT_CATEGORY_STYLE: CategoryStyle = {
 };
 
 const CATEGORY_STYLE_MAP: Record<string, CategoryStyle> = {
-  SWEETS: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/sweets.jpg' },
-  CHUCHES: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/sweets.jpg' },
+  SWEETS: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/chuches.png' },
+  CHUCHES: { icon: Candy, gradient: 'from-pink-900 to-pink-500', image: '/categories/chuches.png' },
   CHOCOLATES: { icon: UtensilsCrossed, gradient: 'from-amber-900 to-amber-600', image: '/categories/chocolates.jpg' },
   CHOCOLATE: { icon: UtensilsCrossed, gradient: 'from-amber-900 to-amber-600', image: '/categories/chocolates.jpg' },
   SNACKS: { icon: Flame, gradient: 'from-orange-900 to-orange-500', image: '/categories/snacks.jpg' },
-  ALIMENTACION: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.jpg' },
-  ALIMENTACIÓN: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.jpg' },
+  ALIMENTACION: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.png' },
+  ALIMENTACIÓN: { icon: Package, gradient: 'from-rose-900 to-rose-600', image: '/categories/alimentacion.png' },
   REFRESCOS: {
     icon: GlassWater,
     gradient: 'from-cyan-900 to-cyan-600',
-    image: 'https://images.unsplash.com/photo-1527960471264-932f39eb5846?w=800',
+    image: '/categories/refrescos.png',
   },
   'BEBIDAS ALCOHOLICAS': {
     icon: Beer,
     gradient: 'from-emerald-900 to-emerald-600',
-    image: 'https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?w=800',
+    image: '/categories/bebidas-alcoholicas.png',
   },
 };
 
