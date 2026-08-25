@@ -7,6 +7,7 @@ import {
   KeyRound,
   ShieldCheck,
   ShoppingBag,
+  Truck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
@@ -16,25 +17,33 @@ export default function ClientLogin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isLoggedIn, isSuperAdmin, loginWithPin, loginSuperAdminWithPin } = useAuth();
+  const { isLoggedIn, isSuperAdmin, isSupplier, loginWithPin, loginSuperAdminWithPin, loginSupplierWithPin } = useAuth();
 
   const preferredAdmin = searchParams.get('mode') === 'admin';
+  const preferredSupplier = searchParams.get('mode') === 'supplier';
   const [pin, setPin] = useState('');
   const [adminPin, setAdminPin] = useState('');
+  const [supplierPin, setSupplierPin] = useState('');
   const [companyError, setCompanyError] = useState('');
   const [adminError, setAdminError] = useState('');
+  const [supplierError, setSupplierError] = useState('');
   const [companyLoading, setCompanyLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
+  const [supplierLoading, setSupplierLoading] = useState(false);
 
   useEffect(() => {
     if (preferredAdmin && isSuperAdmin) {
       navigate('/admin/dashboard', { replace: true });
       return;
     }
+    if (preferredSupplier && isSupplier) {
+      navigate('/supplier/preorders', { replace: true });
+      return;
+    }
     if (!preferredAdmin && isLoggedIn) {
       navigate('/', { replace: true });
     }
-  }, [isLoggedIn, isSuperAdmin, navigate, preferredAdmin]);
+  }, [isLoggedIn, isSuperAdmin, isSupplier, navigate, preferredAdmin, preferredSupplier]);
 
   const handlePinChange = (value: string) => {
     setPin(value.replace(/\D/g, '').slice(0, 6));
@@ -74,6 +83,16 @@ export default function ClientLogin() {
     }
   };
 
+  const handleSupplierSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSupplierError('');
+    setSupplierLoading(true);
+    const result = await loginSupplierWithPin(supplierPin);
+    setSupplierLoading(false);
+    if (result.success) navigate('/supplier/preorders');
+    else setSupplierError(result.error || 'Acceso denegado');
+  };
+
   return (
     <div className="min-h-screen bg-[#f4f6fa] flex flex-col">
       <div className="flex items-center justify-between px-6 py-4">
@@ -105,7 +124,7 @@ export default function ClientLogin() {
             <p className="text-sm text-surface-500 mt-3">{t('auth.chooseAccess')}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <form
               onSubmit={handleCompanySubmit}
               className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${preferredAdmin ? 'border-surface-200' : 'border-primary-200 ring-4 ring-primary-50'}`}
@@ -137,7 +156,7 @@ export default function ClientLogin() {
                       placeholder="000000"
                       value={pin}
                       onChange={event => handlePinChange(event.target.value)}
-                      autoFocus={!preferredAdmin}
+                      autoFocus={!preferredAdmin && !preferredSupplier}
                       required
                     />
                   </div>
@@ -156,6 +175,29 @@ export default function ClientLogin() {
                 >
                   {companyLoading ? t('auth.verifying') : t('auth.enterAsCompany')}
                   {!companyLoading && <ArrowRight className="w-4 h-4" />}
+                </button>
+              </div>
+            </form>
+
+            <form onSubmit={handleSupplierSubmit} className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${preferredSupplier ? 'border-primary-200 ring-4 ring-primary-50' : 'border-surface-200'}`}>
+              <div className="bg-primary-700 px-7 py-7 text-white">
+                <div className="flex items-start gap-4">
+                  <div className="w-13 h-13 rounded-2xl bg-white/12 border border-white/15 flex items-center justify-center shrink-0" style={{ width: 52, height: 52 }}><Truck className="w-7 h-7" /></div>
+                  <div><h2 className="text-2xl font-bold mb-1">Proveedor</h2><p className="text-sm text-white/70">Acceso para preparar preventas</p></div>
+                </div>
+              </div>
+              <div className="p-7 space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-surface-700 mb-2">PIN de proveedor</label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                    <input type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} className="w-full pl-12 pr-4 py-4 bg-surface-50 border border-surface-200 rounded-xl text-center text-2xl font-black tracking-[0.45em] focus:outline-none focus:ring-2 focus:ring-primary-500/30" placeholder="000000" value={supplierPin} onChange={event => { setSupplierPin(event.target.value.replace(/\D/g, '').slice(0, 6)); setSupplierError(''); }} required />
+                  </div>
+                </div>
+                {supplierError && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-medium">{supplierError}</div>}
+                <button type="submit" disabled={supplierLoading || supplierPin.length !== 6} className="w-full flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 disabled:bg-surface-300 text-white font-bold py-3.5 rounded-xl transition-colors text-sm">
+                  {supplierLoading ? t('auth.verifying') : 'Entrar como proveedor'}
+                  {!supplierLoading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>
             </form>

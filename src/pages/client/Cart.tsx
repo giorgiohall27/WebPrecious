@@ -7,6 +7,7 @@ import { useOrders } from '../../store/ordersStore';
 import { useAuth } from '../../store/authStore';
 import { useState } from 'react';
 import { notifyAdminNewOrder } from '../../lib/orderEmails';
+import { Order } from '../../types';
 
 export default function Cart() {
   const { t } = useTranslation();
@@ -17,6 +18,8 @@ export default function Cart() {
   const { userProfile } = useAuth();
   const [notes, setNotes] = useState('');
   const [sending, setSending] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [pendingSavedOrder, setPendingSavedOrder] = useState<Order | null>(null);
 
   const companyName   = userProfile?.name          ?? '';
   const companyCif    = userProfile?.cif            ?? '';
@@ -45,6 +48,7 @@ export default function Cart() {
 
   const handleSendOrder = async () => {
     setSending(true);
+    setEmailError('');
     const itemsSnapshot = [...items];
     const totalSnapshot = getTotal();
 
@@ -81,27 +85,36 @@ export default function Cart() {
       createdAt: now.toISOString(),
       estimatedDelivery: delivery.toISOString().split('T')[0],
     };
-    const savedOrder = await addOrder(order);
+    const savedOrder = pendingSavedOrder ?? await addOrder(order);
 
     if (savedOrder) {
-      const emailSent = await notifyAdminNewOrder({
+      const orderToEmail: Order = pendingSavedOrder ?? {
         ...order,
         id: savedOrder.id,
         orderId: savedOrder.orderId,
-      });
-      clearCart();
-      navigate('/order-confirmation', {
-        state: {
-          orderId: savedOrder.orderId,
-          total: order.totalAmount,
-          totalLines: order.totalItems,
-          notes,
-        },
-      });
-      if (!emailSent) window.alert('El pedido se ha guardado, pero el correo no pudo enviarse. Contacta con Precious Spain.');
+      };
+      const emailSent = await notifyAdminNewOrder(orderToEmail);
+
+      if (emailSent) {
+        setPendingSavedOrder(null);
+        clearCart();
+        navigate('/order-confirmation', {
+          state: {
+            orderId: orderToEmail.orderId,
+            total: orderToEmail.totalAmount,
+            totalLines: orderToEmail.totalItems,
+            notes: orderToEmail.notes,
+          },
+        });
+        return;
+      }
+
+      setPendingSavedOrder(orderToEmail);
+      setEmailError('El pedido se ha guardado, pero el correo no pudo enviarse. Pulsa de nuevo para reintentar el correo; no se creará otro pedido.');
+      setSending(false);
     } else {
       setSending(false);
-      alert('No se pudo enviar el pedido. Revisa la sesión e inténtalo de nuevo.');
+      setEmailError('No se pudo guardar el pedido. Revisa la sesión e inténtalo de nuevo.');
     }
   };
 
@@ -136,9 +149,9 @@ export default function Cart() {
           {Object.entries(grouped).map(([catName, catItems]) => (
             <div key={catName} className="card overflow-hidden">
               {/* Category Header */}
-              <div className="px-6 py-3 bg-primary-50 border-b border-primary-100 flex items-center justify-between">
-                <h3 className="font-semibold text-primary-700">{catName} <span className="text-primary-400 font-normal">({catItems.length} {t('cart.products')})</span></h3>
-                <span className="font-bold text-primary-700">{getCategoryTotal(catName).toFixed(2)} €</span>
+              <div className="px-4 sm:px-6 py-3 bg-primary-50 border-b border-primary-100 flex items-start justify-between gap-3">
+                <h3 className="min-w-0 font-semibold text-primary-700 break-words">{catName} <span className="text-primary-400 font-normal">({catItems.length} {t('cart.products')})</span></h3>
+                <span className="shrink-0 font-bold text-primary-700">{getCategoryTotal(catName).toFixed(2)} €</span>
               </div>
 
               {/* Items */}
@@ -150,9 +163,12 @@ export default function Cart() {
                 const lineTax = lineSubtotal * ((item.product.iva ?? 0) / 100);
                 const lineTotal = lineSubtotal + lineTax;
                 return (
-                  <div key={item.product.id} className="px-6 py-4 flex items-center gap-4 border-t border-surface-100 first:border-t-0">
+                  <div
+                    key={item.product.id}
+                    className="px-4 sm:px-6 py-4 grid grid-cols-[3.5rem_minmax(0,1fr)_auto_2.5rem] sm:grid-cols-[3.5rem_minmax(0,1fr)_auto_6rem_2.5rem] items-center gap-x-3 sm:gap-x-4 gap-y-3 border-t border-surface-100 first:border-t-0"
+                  >
                     {/* Product Image */}
-                    <div className="w-14 h-14 rounded-lg bg-surface-50 flex items-center justify-center shrink-0 overflow-hidden border border-surface-100">
+                    <div className="w-14 h-14 row-span-2 sm:row-span-1 rounded-lg bg-surface-50 flex items-center justify-center overflow-hidden border border-surface-100">
                       {item.product.imageUrl ? (
                         <img
                           src={item.product.imageUrl}
@@ -167,11 +183,11 @@ export default function Cart() {
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-primary-600 break-words">
+                    <div className="min-w-0 col-span-3 sm:col-span-1">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-primary-600 break-words [overflow-wrap:anywhere]">
                         {item.product.brand || 'Sin marca'}
                       </p>
-                      <p className="font-medium text-surface-900 text-sm break-words mt-0.5">{item.product.name}</p>
+                      <p className="font-medium text-surface-900 text-sm break-words [overflow-wrap:anywhere] mt-0.5">{item.product.name}</p>
                       <p className="text-xs text-surface-500 mt-1">{unitsPerBox} {t('cart.unitsPerBoxLabel')}</p>
                       {item.unitPriceOverride !== undefined && (
                         <span className="inline-flex my-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase">{t('cart.promotionProduct')}</span>
@@ -182,7 +198,7 @@ export default function Cart() {
                     </div>
 
                     {/* Quantity (in boxes) */}
-                    <div className="flex flex-col items-center">
+                    <div className="col-start-2 sm:col-start-auto flex flex-col items-start sm:items-center">
                       {unitsPerBox > 1 && (
                         <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
                       )}
@@ -203,13 +219,17 @@ export default function Cart() {
                     </div>
 
                     {/* Subtotal */}
-                    <div className="text-right w-24 shrink-0">
+                    <div className="col-start-3 sm:col-start-auto text-right min-w-[5.5rem]">
                       <p className="font-bold text-surface-900">{lineTotal.toFixed(2)} €</p>
                       <p className="text-[10px] text-surface-400">IVA {lineTax.toFixed(2)} €</p>
                     </div>
 
                     {/* Remove */}
-                    <button onClick={() => handleRemove(item.product.id, item.quantity, unitsPerBox)} className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0">
+                    <button
+                      onClick={() => handleRemove(item.product.id, item.quantity, unitsPerBox)}
+                      className="col-start-4 sm:col-start-auto btn-icon text-red-400 hover:text-red-600 hover:bg-red-50"
+                      aria-label={`${t('common.delete', 'Eliminar')} ${item.product.name}`}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -278,6 +298,11 @@ export default function Cart() {
             </div>
 
             {/* Send Order */}
+            {emailError && (
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {emailError}
+              </div>
+            )}
             <button
               onClick={handleSendOrder}
               disabled={sending}
@@ -287,7 +312,7 @@ export default function Cart() {
               {sending ? (
                 <>{t('cart.sending')}</>
               ) : (
-                <><Send className="w-5 h-5" /> {t('cart.sendOrder')}</>
+                <><Send className="w-5 h-5" /> {pendingSavedOrder ? 'Reintentar correo' : t('cart.sendOrder')}</>
               )}
             </button>
           </div>
@@ -295,7 +320,7 @@ export default function Cart() {
       </div>
 
       {/* Mobile sticky bottom bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 px-4 py-3 flex items-center justify-between gap-3 z-40 shadow-lg">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-3 z-40 shadow-lg">
         <div>
           <p className="text-xs text-surface-500">{t('cart.grandTotal')}</p>
           <p className="text-lg font-bold text-primary-600">{total.toFixed(2)} €</p>
@@ -305,7 +330,7 @@ export default function Cart() {
           disabled={sending}
           className="btn-primary py-3 px-6 text-sm"
         >
-          {sending ? t('cart.sending') : <><Send className="w-4 h-4" /> {t('cart.sendOrder')}</>}
+          {sending ? t('cart.sending') : <><Send className="w-4 h-4" /> {pendingSavedOrder ? 'Reintentar correo' : t('cart.sendOrder')}</>}
         </button>
       </div>
     </div>

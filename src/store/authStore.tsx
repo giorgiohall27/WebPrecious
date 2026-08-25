@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import { ManagedCompany, SuperAdmin } from '../types';
+import { ManagedCompany, ManagedSupplier, SuperAdmin } from '../types';
 import { supabase, supabaseEnabled } from '../lib/supabase';
 
 const SUPER_ADMIN_PASSWORD = 'Levi1234';
@@ -8,8 +8,11 @@ const COMPANIES_STORAGE_KEY = 'webprecious.companies.v2';
 const COMPANY_SESSION_KEY = 'webprecious.companySession.v3';
 const COMPANY_PROFILE_KEY = 'webprecious.companyProfile.v3';
 const SUPER_ADMIN_SESSION_KEY = 'webprecious.superAdminSession.v3';
+const SUPPLIER_SESSION_KEY = 'webprecious.supplierSession.v1';
+const SUPPLIER_PROFILE_KEY = 'webprecious.supplierProfile.v1';
 
 type CompanyInput = Omit<ManagedCompany, 'id' | 'createdAt'>;
+type SupplierInput = Omit<ManagedSupplier, 'id' | 'createdAt'>;
 type ActionResult<T = unknown> = Promise<{ success: boolean; error?: string } & T>;
 
 const defaultSuperAdmins: SuperAdmin[] = [
@@ -155,28 +158,66 @@ function companyToPayload(company: Partial<CompanyInput> & { id?: string }) {
   };
 }
 
+function toSupplier(row: any): ManagedSupplier {
+  const pin = row.pin ?? '';
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email ?? '',
+    phone: row.phone ?? '',
+    contactPerson: row.contact_person ?? '',
+    pin,
+    pinHint: row.pin_hint ?? (pin ? pin.slice(-2) : ''),
+    active: row.active,
+    createdAt: row.created_at ?? new Date().toISOString(),
+    notes: row.notes ?? '',
+  };
+}
+
+function supplierToPayload(supplier: Partial<SupplierInput> & { id?: string }) {
+  return {
+    id: supplier.id,
+    name: supplier.name,
+    email: supplier.email,
+    phone: supplier.phone,
+    contact_person: supplier.contactPerson,
+    active: supplier.active,
+    notes: supplier.notes ?? null,
+  };
+}
+
 interface AuthContextType {
   isLoggedIn: boolean;
   isGuest: boolean;
   isSuperAdmin: boolean;
+  isSupplier: boolean;
   userEmail: string | null;
   userProfile: ManagedCompany | null;
   currentCompany: ManagedCompany | null;
   companies: ManagedCompany[];
+  suppliers: ManagedSupplier[];
+  supplierProfile: ManagedSupplier | null;
   companySessionToken: string | null;
   superAdminSessionToken: string | null;
+  supplierSessionToken: string | null;
   loginWithPin: (pin: string) => ActionResult;
   login: (email: string, password: string) => ActionResult;
   loginAsSuperAdmin: (email: string, password: string) => ActionResult;
   loginSuperAdminWithPin: (pin: string) => ActionResult;
+  loginSupplierWithPin: (pin: string) => ActionResult;
   loginAsGuest: () => void;
   logout: () => void;
   logoutSuperAdmin: () => void;
+  logoutSupplier: () => void;
   addCompany: (company: CompanyInput) => ActionResult<{ company?: ManagedCompany }>;
   updateCompany: (id: string, updates: Partial<CompanyInput>) => ActionResult<{ company?: ManagedCompany }>;
   removeCompany: (id: string) => Promise<void>;
   generatePin: () => string;
   refreshCompanies: () => Promise<void>;
+  addSupplier: (supplier: SupplierInput) => ActionResult<{ supplier?: ManagedSupplier }>;
+  updateSupplier: (id: string, updates: Partial<SupplierInput>) => ActionResult<{ supplier?: ManagedSupplier }>;
+  removeSupplier: (id: string) => Promise<void>;
+  generateSupplierPin: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -193,19 +234,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [companySessionToken, setCompanySessionToken] = useState<string | null>(() => readText(COMPANY_SESSION_KEY));
   const [superAdminSessionToken, setSuperAdminSessionToken] = useState<string | null>(() => readText(SUPER_ADMIN_SESSION_KEY));
   const [isSuperAdmin, setIsSuperAdmin] = useState(() => Boolean(readText(SUPER_ADMIN_SESSION_KEY)));
+  const [suppliers, setSuppliers] = useState<ManagedSupplier[]>([]);
+  const [supplierSessionToken, setSupplierSessionToken] = useState<string | null>(() => readText(SUPPLIER_SESSION_KEY));
+  const [supplierProfile, setSupplierProfile] = useState<ManagedSupplier | null>(() => readJson<ManagedSupplier | null>(SUPPLIER_PROFILE_KEY, null));
+  const isSupplier = Boolean(supplierSessionToken && supplierProfile);
 
   const userEmail = currentCompany?.email ?? null;
 
   const refreshCompanies = async () => {
     if (!supabaseEnabled) return;
-    if (!superAdminSessionToken) {
+    if (!superAdminSessionToken && !supplierSessionToken) {
       setCompanies([]);
       return;
     }
 
-    const { data, error } = await supabase.rpc('list_admin_companies', {
-      p_admin_token: superAdminSessionToken,
-    });
+    const { data, error } = superAdminSessionToken
+      ? await supabase.rpc('list_admin_companies', { p_admin_token: superAdminSessionToken })
+      : await supabase.rpc('list_supplier_companies', { p_supplier_token: supplierSessionToken });
 
     if (error) {
       console.error('Error loading companies:', error);
@@ -213,6 +258,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     setCompanies((data ?? []).map(toCompany));
+  };
+
+  const refreshSuppliers = async () => {
+    if (!supabaseEnabled || !superAdminSessionToken) return;
+    const { data, error } = await supabase.rpc('list_admin_suppliers', { p_admin_token: superAdminSessionToken });
+    if (error) console.error('Error loading suppliers:', error);
+    else setSuppliers((data ?? []).map(toSupplier));
   };
 
   useEffect(() => {
@@ -257,8 +309,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setIsSuperAdmin(true);
       refreshCompanies();
+      refreshSuppliers();
     });
   }, [superAdminSessionToken]);
+
+  useEffect(() => {
+    if (!supabaseEnabled || !supplierSessionToken) return;
+    supabase.rpc('validate_supplier_session', { p_session_token: supplierSessionToken }).then(({ data, error }) => {
+      const supplier = data?.[0] ? toSupplier(data[0]) : null;
+      if (error || !supplier) {
+        setSupplierSessionToken(null);
+        setSupplierProfile(null);
+        removeStored(SUPPLIER_SESSION_KEY);
+        removeStored(SUPPLIER_PROFILE_KEY);
+        return;
+      }
+      setSupplierProfile(supplier);
+      writeJson(SUPPLIER_PROFILE_KEY, supplier);
+      refreshCompanies();
+    });
+  }, [supplierSessionToken]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || supabaseEnabled) return;
@@ -270,6 +340,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     do {
       pin = String(Math.floor(100000 + Math.random() * 900000));
     } while (companies.some(company => company.pin === pin));
+    return pin;
+  };
+
+  const generateSupplierPin = () => {
+    let pin = '';
+    do pin = String(Math.floor(100000 + Math.random() * 900000));
+    while (suppliers.some(supplier => supplier.pin === pin));
     return pin;
   };
 
@@ -346,6 +423,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
+  const loginSupplierWithPin = async (pin: string): ActionResult => {
+    const cleanPin = normalizePin(pin);
+    if (cleanPin.length !== 6) return { success: false, error: 'Introduce un PIN de 6 digitos' };
+    if (!supabaseEnabled) return { success: false, error: 'El acceso de proveedor requiere conexión a la base de datos' };
+    const { data, error } = await supabase.rpc('verify_supplier_pin', { p_pin: cleanPin });
+    const row = data?.[0];
+    if (error || !row?.session_token) return { success: false, error: 'PIN de proveedor incorrecto o bloqueado temporalmente' };
+    const supplier = toSupplier(row);
+    setSupplierSessionToken(row.session_token);
+    setSupplierProfile(supplier);
+    writeText(SUPPLIER_SESSION_KEY, row.session_token);
+    writeJson(SUPPLIER_PROFILE_KEY, supplier);
+    return { success: true };
+  };
+
   const loginAsGuest = () => {
     setCurrentCompany(null);
     setCompanySessionToken(null);
@@ -365,6 +457,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSuperAdminSessionToken(null);
     setCompanies(supabaseEnabled ? [] : companies);
     removeStored(SUPER_ADMIN_SESSION_KEY);
+  };
+
+  const logoutSupplier = () => {
+    setSupplierSessionToken(null);
+    setSupplierProfile(null);
+    setCompanies([]);
+    removeStored(SUPPLIER_SESSION_KEY);
+    removeStored(SUPPLIER_PROFILE_KEY);
+  };
+
+  const addSupplier = async (supplier: SupplierInput): ActionResult<{ supplier?: ManagedSupplier }> => {
+    const cleanPin = normalizePin(supplier.pin);
+    if (!supplier.name.trim()) return { success: false, error: 'El proveedor necesita un nombre' };
+    if (cleanPin.length !== 6) return { success: false, error: 'El PIN debe tener 6 digitos' };
+    if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
+    const { data, error } = await supabase.rpc('admin_create_supplier', {
+      p_admin_token: superAdminSessionToken,
+      p_supplier: supplierToPayload({ ...supplier, id: `supplier-${Date.now()}` }),
+      p_pin: cleanPin,
+    });
+    const created = data?.[0] ? toSupplier(data[0]) : null;
+    if (error || !created) return { success: false, error: error?.message || 'No se pudo crear el proveedor' };
+    setSuppliers(current => [created, ...current]);
+    return { success: true, supplier: created };
+  };
+
+  const updateSupplier = async (id: string, updates: Partial<SupplierInput>): ActionResult<{ supplier?: ManagedSupplier }> => {
+    if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
+    const cleanPin = updates.pin ? normalizePin(updates.pin) : '';
+    const { data, error } = await supabase.rpc('admin_update_supplier', {
+      p_admin_token: superAdminSessionToken,
+      p_supplier_id: id,
+      p_updates: supplierToPayload(updates),
+      p_pin: cleanPin || null,
+    });
+    const updated = data?.[0] ? toSupplier(data[0]) : null;
+    if (error || !updated) return { success: false, error: error?.message || 'No se pudo actualizar el proveedor' };
+    setSuppliers(current => current.map(item => item.id === id ? { ...updated, pin: updated.pin || cleanPin } : item));
+    return { success: true, supplier: updated };
+  };
+
+  const removeSupplier = async (id: string) => {
+    if (!superAdminSessionToken) return;
+    const { error } = await supabase.rpc('admin_delete_supplier', { p_admin_token: superAdminSessionToken, p_supplier_id: id });
+    if (!error) setSuppliers(current => current.filter(item => item.id !== id));
   };
 
   const ensureCompanyCanUsePinLocally = (pin: string, currentId?: string) => {
@@ -487,25 +624,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoggedIn: Boolean(currentCompany),
     isGuest: !currentCompany,
     isSuperAdmin,
+    isSupplier,
     userEmail,
     userProfile: currentCompany,
     currentCompany,
     companies,
+    suppliers,
+    supplierProfile,
     companySessionToken,
     superAdminSessionToken,
+    supplierSessionToken,
     loginWithPin,
     login: loginAsSuperAdmin,
     loginAsSuperAdmin,
     loginSuperAdminWithPin,
+    loginSupplierWithPin,
     loginAsGuest,
     logout,
     logoutSuperAdmin,
+    logoutSupplier,
     addCompany,
     updateCompany,
     removeCompany,
     generatePin,
     refreshCompanies,
-  }), [currentCompany, isSuperAdmin, userEmail, companies, companySessionToken, superAdminSessionToken]);
+    addSupplier,
+    updateSupplier,
+    removeSupplier,
+    generateSupplierPin,
+  }), [currentCompany, isSuperAdmin, isSupplier, userEmail, companies, suppliers, supplierProfile, companySessionToken, superAdminSessionToken, supplierSessionToken]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

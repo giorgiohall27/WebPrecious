@@ -321,13 +321,13 @@
   "orderConfirmation": {
     "title": "¡Pedido Confirmado!",
     "subtitle": "Tu pedido ha sido enviado con éxito",
+    "thankYou": "Muchas gracias por confiar en Precious Spain.",
     "orderNumber": "Número de Pedido",
     "emailSent": "Se ha enviado un email con los detalles del pedido al proveedor.",
     "summary": "Resumen del Pedido",
     "items": "Artículos",
     "total": "Total",
-    "backToCatalog": "Volver al Catálogo",
-    "downloadPDF": "Descargar PDF"
+    "backToCatalog": "Volver al Catálogo"
   },
   "orders": {
     "title": "Historial de Pedidos",

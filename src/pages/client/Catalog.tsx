@@ -29,11 +29,6 @@ const brandPriority = (brand: string, selectedCategoryName?: string) => {
 const isCadburyMultipack = (product: Product) =>
   product.brand?.toLowerCase() === 'cadbury' && product.name.toLowerCase().includes('multipack');
 
-const needsLargerProductImage = (product: Product) => {
-  const name = product.name.toLowerCase();
-  return product.brand?.toLowerCase().includes('reese') && (name.includes('nutrageous') || name.includes('overload'));
-};
-
 export default function Catalog() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -339,7 +334,7 @@ export default function Catalog() {
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className={`w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 ease-out ${needsLargerProductImage(product) ? 'p-0.5 sm:p-1 scale-110' : 'p-2.5 sm:p-4'}`}
+                          className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-300 ease-out"
                           onError={(e) => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';
@@ -467,7 +462,7 @@ export default function Catalog() {
                 <img
                   src={selectedProduct.imageUrl}
                   alt={selectedProduct.name}
-                  className={`w-full h-full object-contain ${needsLargerProductImage(selectedProduct) ? 'p-2 scale-110' : 'p-6'}`}
+                  className="w-full h-full object-contain p-6"
                   onError={e => {
                     const img = e.target as HTMLImageElement;
                     img.style.display = 'none';

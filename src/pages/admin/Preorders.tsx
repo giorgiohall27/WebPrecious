@@ -10,11 +10,11 @@ import { usePromotions } from '../../store/promotionsStore';
 type PreorderLine = { product: Product; quantity: number; unitPrice: number; isPromotion: boolean };
 
 export default function Preorders() {
-  const { companies } = useAuth();
+  const { companies, supplierProfile } = useAuth();
   const { products, categories } = useProducts();
   const { promotions } = usePromotions();
   const { addAdminPreorder } = useOrders();
-  const [createdBy, setCreatedBy] = useState('');
+  const [createdBy, setCreatedBy] = useState(() => supplierProfile?.contactPerson || supplierProfile?.name || '');
   const [companyId, setCompanyId] = useState('');
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -48,12 +48,12 @@ export default function Preorders() {
   }, { subtotal: 0, tax: 0, total: 0 }), [lines]);
 
   const addProduct = (product: Product) => {
-    const quantityToAdd = Math.max(1, searchQuantities[product.id] ?? 1);
+    const quantityToAdd = Math.max(1, searchQuantities[product.id] ?? 0);
     const promotion = promotionByProductId.get(product.id);
     setLines(current => current.some(line => line.product.id === product.id)
       ? current.map(line => line.product.id === product.id ? { ...line, quantity: line.quantity + quantityToAdd } : line)
       : [...current, { product, quantity: quantityToAdd, unitPrice: promotion?.promoPrice ?? product.price, isPromotion: Boolean(promotion) }]);
-    setSearchQuantities(current => ({ ...current, [product.id]: 1 }));
+    setSearchQuantities(current => ({ ...current, [product.id]: 0 }));
   };
 
   const retryEmail = async () => {
@@ -155,10 +155,18 @@ export default function Preorders() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Super Admin</p>
+        <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Área de proveedor</p>
         <h1 className="text-2xl font-bold text-surface-900">Crear preventa</h1>
-        <p className="text-sm text-surface-500 mt-1">Elige un cliente, prepara su pedido y envíalo al correo de la empresa.</p>
+        <p className="text-sm text-surface-500 mt-1">Elige un cliente, prepara su pedido y envíalo a Precious Spain.</p>
       </div>
+
+      {supplierProfile && (
+        <div className="card p-4 grid gap-2 sm:grid-cols-3 text-sm">
+          <div><span className="text-surface-400">Proveedor</span><p className="font-bold text-surface-900">{supplierProfile.name}</p></div>
+          <div><span className="text-surface-400">Contacto</span><p className="font-medium">{supplierProfile.contactPerson || 'Sin especificar'}</p></div>
+          <div><span className="text-surface-400">Datos</span><p className="font-medium">{supplierProfile.email} · {supplierProfile.phone}</p></div>
+        </div>
+      )}
 
       {(message || error) && (
         <div className={`rounded-xl px-4 py-3 border text-sm font-medium flex flex-wrap items-center gap-2 ${error ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
@@ -214,15 +222,18 @@ export default function Preorders() {
               <input value={search} onChange={event => setSearch(event.target.value)} className="input-field pl-10" placeholder="Buscar por nombre, SKU o marca" />
             </div>
           </div>
+          <p className="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">
+            Todas las cantidades empiezan en 0. Escribe las cajas que necesitas o pulsa + para añadir una caja.
+          </p>
           <div className="max-h-[560px] overflow-auto border border-surface-100 rounded-xl divide-y divide-surface-100">
             {filteredProducts.map(product => {
               const promotion = promotionByProductId.get(product.id);
               const unitPrice = promotion?.promoPrice ?? product.price;
-              const searchQuantity = searchQuantities[product.id] ?? 1;
+              const searchQuantity = searchQuantities[product.id] ?? 0;
               return (
               <div key={product.id} className="w-full flex flex-col sm:flex-row sm:items-center gap-3 p-3 hover:bg-primary-50 transition-colors">
-                <div className="w-12 h-12 rounded-lg bg-surface-50 border border-surface-100 overflow-hidden shrink-0">
-                  {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-1" />}
+                <div className="w-16 h-16 rounded-xl bg-white border border-surface-200 overflow-hidden shrink-0 flex items-center justify-center">
+                  {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-2" loading="lazy" />}
                 </div>
                 <div className="min-w-0 flex-1">
                   {promotion && <span className="inline-flex mb-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase">Promoción</span>}
@@ -239,18 +250,18 @@ export default function Preorders() {
                     Cajas
                     <input
                       type="number"
-                      min="1"
+                      min="0"
                       step="1"
                       value={searchQuantity}
                       onChange={event => setSearchQuantities(current => ({
                         ...current,
-                        [product.id]: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
+                        [product.id]: Math.max(0, Number.parseInt(event.target.value, 10) || 0),
                       }))}
                       className="ml-2 w-16 rounded-lg border border-surface-200 bg-white px-2 py-2 text-center text-sm font-bold focus:border-primary-500 focus:outline-none"
-                      aria-label={`Cantidad de cajas de ${product.name}`}
+                      aria-label={`Cantidad de cajas de ${product.name}. Empieza en cero`}
                     />
                   </label>
-                  <button type="button" onClick={() => addProduct(product)} className="rounded-lg bg-primary-600 p-2.5 text-white hover:bg-primary-700" aria-label={`Añadir ${searchQuantity} cajas de ${product.name}`}>
+                  <button type="button" onClick={() => addProduct(product)} className="rounded-lg bg-primary-600 p-2.5 text-white hover:bg-primary-700" aria-label={`Añadir ${searchQuantity || 1} cajas de ${product.name}`} title={searchQuantity > 0 ? `Añadir ${searchQuantity} cajas` : 'Añadir 1 caja'}>
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>

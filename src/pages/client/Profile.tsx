@@ -1,29 +1,22 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import {
   User, Building2, Mail, Phone, MapPin, LogIn, UserPlus,
-  ChevronDown, ChevronUp, Truck, Clock, Package, ArrowRight,
+  ChevronDown, ChevronUp, Truck, Clock, Package,
 } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
 import { useOrders } from '../../store/ordersStore';
-
-const statusStyles: Record<string, string> = {
-  pending:               'bg-amber-50 text-amber-700 border-amber-200',
-  authorization_pending: 'bg-orange-50 text-orange-700 border-orange-200',
-  accepted:              'bg-emerald-50 text-emerald-700 border-emerald-200',
-  rejected:              'bg-red-50 text-red-700 border-red-200',
-  processing:            'bg-blue-50 text-blue-700 border-blue-200',
-  completed:             'bg-emerald-50 text-emerald-700 border-emerald-200',
-  cancelled:             'bg-red-50 text-red-700 border-red-200',
-};
+import { useProducts } from '../../store/productsStore';
 
 export default function Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { userEmail, isGuest, userProfile } = useAuth();
   const { orders } = useOrders();
+  const { products } = useProducts();
   const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
+  const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
 
   const toggleOrder = (id: string) =>
     setExpandedOrders(prev => ({ ...prev, [id]: !prev[id] }));
@@ -109,15 +102,9 @@ export default function Profile() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-surface-900">{t('clientDashboard.recentOrders')}</h2>
+            <h2 className="text-lg font-semibold text-surface-900">{t('orders.title')}</h2>
             <p className="text-xs text-surface-400 mt-0.5">{orders.length} pedidos</p>
           </div>
-          <Link
-            to="/orders"
-            className="flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-700 font-semibold border border-primary-200 hover:border-primary-400 rounded-md px-3 py-1.5 transition-colors bg-white"
-          >
-            {t('dashboard.viewAll')} <ArrowRight className="w-3 h-3" />
-          </Link>
         </div>
 
         {orders.length === 0 ? (
@@ -139,9 +126,6 @@ export default function Profile() {
                       <p className="text-sm font-semibold text-surface-900 truncate">{order.orderId}</p>
                       <p className="text-xs text-surface-400 mt-0.5 truncate">{order.companyName}</p>
                     </div>
-                    <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border shrink-0 ${statusStyles[order.status]}`}>
-                      {t(`orders.${order.status}`)}
-                    </span>
                     <div className="hidden lg:flex items-center gap-1.5 text-xs text-surface-400 shrink-0">
                       <Truck className="w-3.5 h-3.5" />
                       {formatDate(order.estimatedDelivery)}
@@ -160,43 +144,53 @@ export default function Profile() {
                   {isExpanded && (
                     <div className="bg-surface-50 border-t border-surface-100">
                       <div className="sm:hidden flex gap-3 px-5 pt-3 pb-1">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusStyles[order.status]}`}>
-                          {t(`orders.${order.status}`)}
-                        </span>
                         <span className="flex items-center gap-1 text-xs text-surface-400">
                           <Truck className="w-3.5 h-3.5" /> {formatDate(order.estimatedDelivery)}
                         </span>
                       </div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm min-w-[460px]">
-                          <thead>
-                            <tr className="text-xs text-surface-400 uppercase border-b border-surface-200">
-                              <th className="text-left px-5 py-2">{t('products.name')}</th>
-                              <th className="text-right px-5 py-2">{t('cart.quantity')}</th>
-                              <th className="text-right px-5 py-2">{t('cart.unitPrice')}</th>
-                              <th className="text-right px-5 py-2">{t('cart.subtotal')}</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-surface-100">
-                            {order.items.map((item, i) => (
-                              <tr key={i} className="hover:bg-white transition-colors">
-                                <td className="px-5 py-2.5">
+                      <div className="text-sm">
+                        <div className="hidden md:grid md:grid-cols-[minmax(180px,2fr)_repeat(4,minmax(100px,1fr))] gap-4 px-5 py-2 text-xs font-semibold text-surface-400 uppercase border-b border-surface-200">
+                          <span>{t('products.name')}</span>
+                          <span className="text-right">Unidades por caja</span>
+                          <span className="text-right">Cajas pedidas</span>
+                          <span className="text-right">Precio por unidad</span>
+                          <span className="text-right">Subtotal</span>
+                        </div>
+                        <div className="divide-y divide-surface-100">
+                          {order.items.map((item, i) => {
+                            const catalogProduct = productsById.get(item.productId);
+                            const unitsPerBox = Math.max(catalogProduct?.unitsPerBox ?? item.unitsPerBox ?? 1, 1);
+                            const pricePerUnit = item.unitPrice / unitsPerBox;
+                            return (
+                              <div key={`${item.productId}-${i}`} className="grid grid-cols-2 md:grid-cols-[minmax(180px,2fr)_repeat(4,minmax(100px,1fr))] gap-x-4 gap-y-3 px-5 py-4 hover:bg-white transition-colors">
+                                <div className="col-span-2 md:col-span-1">
                                   <p className="font-medium text-surface-800">{item.name}</p>
                                   <p className="text-xs text-surface-400">{item.categoryName}</p>
-                                </td>
-                                <td className="text-right px-5 py-2.5 text-surface-600">{item.quantity}</td>
-                                <td className="text-right px-5 py-2.5 text-surface-600">€{item.unitPrice.toFixed(2)}</td>
-                                <td className="text-right px-5 py-2.5 font-semibold text-surface-900">€{item.subtotal.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                          <tfoot>
-                            <tr className="border-t-2 border-surface-200 bg-white">
-                              <td colSpan={3} className="text-right px-5 py-3 text-sm font-medium text-surface-500">Total</td>
-                              <td className="text-right px-5 py-3 font-bold text-surface-900">€{order.totalAmount.toFixed(2)}</td>
-                            </tr>
-                          </tfoot>
-                        </table>
+                                </div>
+                                <div className="md:text-right">
+                                  <p className="md:hidden text-[10px] font-semibold uppercase text-surface-400">Unidades por caja</p>
+                                  <p className="text-surface-700">{unitsPerBox}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="md:hidden text-[10px] font-semibold uppercase text-surface-400">Cajas pedidas</p>
+                                  <p className="text-surface-700">{item.quantity}</p>
+                                </div>
+                                <div className="md:text-right">
+                                  <p className="md:hidden text-[10px] font-semibold uppercase text-surface-400">Precio por unidad</p>
+                                  <p className="text-surface-700">€{pricePerUnit.toFixed(2)}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="md:hidden text-[10px] font-semibold uppercase text-surface-400">Subtotal</p>
+                                  <p className="font-bold text-surface-900">€{item.subtotal.toFixed(2)}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center justify-between gap-4 border-t-2 border-surface-200 bg-white px-5 py-4">
+                          <span className="font-semibold text-surface-600">Total del pedido</span>
+                          <span className="text-lg font-bold text-primary-700">€{order.totalAmount.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
                   )}

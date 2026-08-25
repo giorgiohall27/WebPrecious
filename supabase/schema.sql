@@ -134,6 +134,8 @@ create table if not exists public.order_items (
   category_name text default '',
   quantity integer not null default 1,
   unit_price numeric(12, 3) not null default 0,
+  units_per_box integer,
+  iva numeric(5, 2),
   subtotal numeric(12, 2) not null default 0,
   availability_status text not null default 'available'
     check (availability_status in ('available', 'unavailable')),
@@ -999,6 +1001,25 @@ begin
 end;
 $$;
 
+create or replace function public.list_company_orders(p_company_token text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_company_id text;
+begin
+  v_company_id := public.require_company_session(p_company_token);
+
+  return coalesce((
+    select jsonb_agg(public.order_with_items_json(o.id) order by o.created_at desc)
+    from public.orders o
+    where o.company_id = v_company_id
+  ), '[]'::jsonb);
+end;
+$$;
+
 create or replace function public.admin_update_order_status(p_admin_token text, p_order_id text, p_status text)
 returns jsonb
 language plpgsql
@@ -1091,6 +1112,7 @@ grant execute on function public.admin_delete_category(text, text) to anon, auth
 grant execute on function public.admin_upsert_subcategory(text, jsonb) to anon, authenticated;
 grant execute on function public.admin_delete_subcategory(text, text) to anon, authenticated;
 grant execute on function public.create_order(text, jsonb, jsonb) to anon, authenticated;
+grant execute on function public.list_company_orders(text) to anon, authenticated;
 grant execute on function public.list_admin_orders(text) to anon, authenticated;
 grant execute on function public.admin_update_order_status(text, text, text) to anon, authenticated;
 grant execute on function public.admin_update_order_with_item_decisions(text, text, jsonb) to anon, authenticated;

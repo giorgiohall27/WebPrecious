@@ -321,13 +321,13 @@
   "orderConfirmation": {
     "title": "Order Confirmed!",
     "subtitle": "Your order has been sent successfully",
+    "thankYou": "Thank you very much for trusting Precious Spain.",
     "orderNumber": "Order Number",
     "emailSent": "An email with the order details has been sent to the supplier.",
     "summary": "Order Summary",
     "items": "Items",
     "total": "Total",
-    "backToCatalog": "Back to Catalog",
-    "downloadPDF": "Download PDF"
+    "backToCatalog": "Back to Catalog"
   },
   "orders": {
     "title": "Order History",

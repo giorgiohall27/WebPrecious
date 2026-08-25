@@ -19,6 +19,7 @@ import AdminOrders from './pages/admin/Orders';
 import Companies from './pages/admin/Companies';
 import Promotions from './pages/admin/Promotions';
 import Preorders from './pages/admin/Preorders';
+import Suppliers from './pages/admin/Suppliers';
 
 // Client Pages
 import ClientLogin from './pages/client/Login';
@@ -37,6 +38,11 @@ function RequireCompany({ children }: { children: JSX.Element }) {
 function RequireSuperAdmin({ children }: { children: JSX.Element }) {
   const { isSuperAdmin } = useAuth();
   return isSuperAdmin ? children : <Navigate to="/admin" replace />;
+}
+
+function RequireSupplier({ children }: { children: JSX.Element }) {
+  const { isSupplier } = useAuth();
+  return isSupplier ? children : <Navigate to="/login?mode=supplier" replace />;
 }
 
 export default function App() {
@@ -66,6 +72,10 @@ export default function App() {
               <Route path="/profile" element={<Profile />} />
             </Route>
 
+            <Route element={<RequireSupplier><ClientLayout /></RequireSupplier>}>
+              <Route path="/supplier/preorders" element={<Preorders />} />
+            </Route>
+
             {/* Admin Auth */}
             <Route path="/admin" element={<Navigate to="/login?mode=admin" replace />} />
 
@@ -76,7 +86,7 @@ export default function App() {
               <Route path="/admin/products" element={<Products />} />
               <Route path="/admin/categories" element={<Categories />} />
               <Route path="/admin/promotions" element={<Promotions />} />
-              <Route path="/admin/preorders" element={<Preorders />} />
+              <Route path="/admin/suppliers" element={<Suppliers />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
             </Route>
 

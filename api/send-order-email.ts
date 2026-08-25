@@ -1,3 +1,5 @@
+declare const process: { env: Record<string, string | undefined> };
+
 type OrderEmailItem = {
   sku?: string;
   brand?: string;
@@ -25,6 +27,7 @@ type OrderEmailPayload = {
 };
 
 const DEFAULT_ORDER_NOTIFICATION_EMAIL = 'giorgiohall27@gmail.com';
+const DEFAULT_FROM_EMAIL = 'Precious Spain <onboarding@resend.dev>';
 
 const escapeHtml = (value: unknown) =>
   String(value ?? '')
@@ -202,10 +205,11 @@ export default async function handler(req: any, res: any) {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
+  const from = process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
 
-  if (!apiKey || !from) {
-    return res.status(500).json({ error: 'Missing Resend environment variables' });
+  if (!apiKey) {
+    console.error('[send-order-email] RESEND_API_KEY is not configured');
+    return res.status(500).json({ error: 'Email service is not configured' });
   }
 
   const payload = req.body as OrderEmailPayload;
@@ -215,26 +219,46 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Missing recipient email' });
   }
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': `precious-${payload.mode}-${payload.orderId}`.slice(0, 256),
-    },
-    body: JSON.stringify({
-      from,
-      to: [email.to],
-      subject: email.subject,
-      html: email.html,
-    }),
-  });
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Idempotency-Key': `precious-${payload.mode}-${payload.orderId}`.slice(0, 256),
+      },
+      body: JSON.stringify({
+        from,
+        to: [email.to],
+        subject: email.subject,
+        html: email.html,
+      }),
+    });
 
-  const data = await response.json().catch(() => ({}));
+    const data = await response.json().catch(() => ({}));
 
-  if (!response.ok) {
-    return res.status(response.status).json({ error: 'Resend email failed', details: data });
+    if (!response.ok) {
+      console.error('[send-order-email] Resend rejected the email', {
+        status: response.status,
+        orderId: payload.orderId,
+        mode: payload.mode,
+        details: data,
+      });
+      return res.status(response.status).json({ error: 'Resend email failed', details: data });
+    }
+
+    console.log('[send-order-email] Email accepted by Resend', {
+      orderId: payload.orderId,
+      mode: payload.mode,
+      emailId: data?.id,
+    });
+    return res.status(200).json({ ok: true, data });
+  } catch (error) {
+    console.error('[send-order-email] Unexpected email error', {
+      orderId: payload.orderId,
+      mode: payload.mode,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return res.status(502).json({ error: 'Email provider unavailable' });
   }
-
-  return res.status(200).json({ ok: true, data });
 }

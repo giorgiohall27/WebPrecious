@@ -113,13 +113,13 @@ function fromSubcategory(subcategory: Subcategory) {
 }
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
-  const { companySessionToken, superAdminSessionToken } = useAuth();
+  const { companySessionToken, superAdminSessionToken, supplierSessionToken } = useAuth();
   const [products, setProducts] = useState<Product[]>(() => mockProducts.map(normalizeProductPackaging));
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [subcategories, setSubcategories] = useState<Subcategory[]>(mockSubcategories);
   const [loading, setLoading] = useState(false);
 
-  const catalogToken = companySessionToken || superAdminSessionToken;
+  const catalogToken = companySessionToken || superAdminSessionToken || supplierSessionToken;
 
   const refreshCatalog = useCallback(async () => {
     if (!supabaseEnabled) return;

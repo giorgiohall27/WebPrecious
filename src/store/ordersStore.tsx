@@ -53,26 +53,26 @@ function toOrder(row: any): Order {
 }
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
-  const { companySessionToken, superAdminSessionToken } = useAuth();
+  const { companySessionToken, superAdminSessionToken, supplierSessionToken } = useAuth();
   const [orders, setOrders] = useState<Order[]>(supabaseEnabled ? [] : mockOrders);
 
   const refreshOrders = useCallback(async () => {
     if (!supabaseEnabled) return;
-    if (!superAdminSessionToken) {
+    if (!superAdminSessionToken && !companySessionToken) {
       setOrders([]);
       return;
     }
 
-    const { data, error } = await supabase.rpc('list_admin_orders', {
-      p_admin_token: superAdminSessionToken,
-    });
+    const { data, error } = superAdminSessionToken
+      ? await supabase.rpc('list_admin_orders', { p_admin_token: superAdminSessionToken })
+      : await supabase.rpc('list_company_orders', { p_company_token: companySessionToken });
     if (error) {
       console.error('Error loading orders:', error);
       return;
     }
 
     setOrders((data ?? []).map(toOrder));
-  }, [superAdminSessionToken]);
+  }, [companySessionToken, superAdminSessionToken]);
 
   useEffect(() => {
     refreshOrders();
@@ -119,10 +119,12 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       setOrders(prev => [order, ...prev]);
       return order;
     }
-    if (!superAdminSessionToken) return null;
+    if (!superAdminSessionToken && !supplierSessionToken) return null;
 
-    const { data, error } = await supabase.rpc('admin_create_preorder', {
-      p_admin_token: superAdminSessionToken,
+    const rpcName = supplierSessionToken ? 'supplier_create_preorder' : 'admin_create_preorder';
+    const tokenParam = supplierSessionToken ? { p_supplier_token: supplierSessionToken } : { p_admin_token: superAdminSessionToken };
+    const { data, error } = await supabase.rpc(rpcName, {
+      ...tokenParam,
       p_company_id: order.companyId,
       p_order: {
         id: order.id,
@@ -143,7 +145,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     const savedOrder = toOrder(data);
     setOrders(prev => [savedOrder, ...prev]);
     return savedOrder;
-  }, [superAdminSessionToken]);
+  }, [supplierSessionToken, superAdminSessionToken]);
 
   const updateOrderStatus = useCallback(async (orderId: string, status: Order['status']) => {
     if (!supabaseEnabled) {

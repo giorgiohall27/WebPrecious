@@ -69,16 +69,7 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-surface-900">{order.totalAmount.toFixed(2)} €</p>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    order.status === 'completed' ? 'bg-green-50 text-green-700' :
-                    order.status === 'accepted' ? 'bg-emerald-50 text-emerald-700' :
-                    order.status === 'rejected' ? 'bg-red-50 text-red-700' :
-                    order.status === 'pending' ? 'bg-amber-50 text-amber-700' :
-                    order.status === 'processing' ? 'bg-blue-50 text-blue-700' :
-                    'bg-red-50 text-red-700'
-                  }`}>
-                    {t(`orders.${order.status}`)}
-                  </span>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Pedido recibido</span>
                 </div>
               </div>
             ))}

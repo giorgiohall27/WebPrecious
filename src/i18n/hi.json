@@ -319,6 +319,7 @@
     "maxStock": "अधिकतम उपलब्ध"
   },
   "orderConfirmation": {
+    "thankYou": "Precious Spain पर भरोसा करने के लिए बहुत-बहुत धन्यवाद।",
     "title": "ऑर्डर की पुष्टि हो गई!",
     "subtitle": "आपका ऑर्डर सफलतापूर्वक भेज दिया गया है",
     "orderNumber": "ऑर्डर नंबर",
@@ -326,8 +327,7 @@
     "summary": "ऑर्डर सारांश",
     "items": "आइटम",
     "total": "कुल",
-    "backToCatalog": "कैटलॉग पर वापस",
-    "downloadPDF": "PDF डाउनलोड करें"
+    "backToCatalog": "कैटलॉग पर वापस"
   },
   "orders": {
     "title": "ऑर्डर इतिहास",

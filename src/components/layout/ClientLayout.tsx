@@ -23,7 +23,7 @@ export default function ClientLayout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getItemCount } = useCart();
-  const { isLoggedIn, isSuperAdmin, userEmail, logout, logoutSuperAdmin, userProfile } = useAuth();
+  const { isLoggedIn, isSuperAdmin, isSupplier, userEmail, logout, logoutSuperAdmin, logoutSupplier, userProfile, supplierProfile } = useAuth();
   const itemCount = getItemCount();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,6 +41,7 @@ export default function ClientLayout() {
     setUserMenuOpen(false);
     logout();
     if (isSuperAdmin) logoutSuperAdmin();
+    if (isSupplier) logoutSupplier();
     navigate('/');
   };
 
@@ -60,7 +61,7 @@ export default function ClientLayout() {
             </button>
 
             <Link
-              to="/"
+              to={isSupplier ? '/supplier/preorders' : '/'}
               className="p-2 text-white/70 hover:text-white hover:bg-white/8 rounded-lg transition-colors shrink-0"
               aria-label="Home"
             >
@@ -81,7 +82,7 @@ export default function ClientLayout() {
             </form>
 
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
-              {isLoggedIn && (
+              {isLoggedIn && !isSupplier && (
                 <button
                   type="button"
                   onClick={() => {
@@ -104,9 +105,9 @@ export default function ClientLayout() {
 
               <LanguageSwitcher />
 
-              {(isLoggedIn || isSuperAdmin) ? (
+              {(isLoggedIn || isSuperAdmin || isSupplier) ? (
                 <>
-                  {isLoggedIn && (
+                  {isLoggedIn && !isSupplier && (
                     <div className="relative">
                       <button
                         onClick={() => {
@@ -151,8 +152,8 @@ export default function ClientLayout() {
                     {userMenuOpen && (
                       <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-surface-200 rounded-xl shadow-dropdown overflow-hidden z-50 animate-fade-in">
                         <div className="px-4 py-3 border-b border-surface-100">
-                          <p className="text-sm font-semibold text-surface-900">{userProfile?.name ?? (isSuperAdmin ? 'Super Admin' : 'Empresa')}</p>
-                          <p className="text-xs text-surface-400">{userEmail ?? 'Panel de administración'}</p>
+                          <p className="text-sm font-semibold text-surface-900">{supplierProfile?.name ?? userProfile?.name ?? (isSuperAdmin ? 'Super Admin' : 'Empresa')}</p>
+                          <p className="text-xs text-surface-400">{supplierProfile?.email || userEmail || 'Panel de administración'}</p>
                         </div>
                         <div className="p-2 space-y-1">
                           {isSuperAdmin && (
@@ -177,6 +178,15 @@ export default function ClientLayout() {
                             >
                               <User className="w-4 h-4 text-primary-600" />
                               Mi perfil
+                            </button>
+                          )}
+                          {isSupplier && (
+                            <button
+                              onClick={() => { setUserMenuOpen(false); navigate('/supplier/preorders'); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 hover:bg-surface-50 rounded-lg transition-colors font-medium"
+                            >
+                              <ShoppingBag className="w-4 h-4 text-primary-600" />
+                              Crear preventa
                             </button>
                           )}
                           <button

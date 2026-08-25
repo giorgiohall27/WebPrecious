@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
-import { CheckCircle, ArrowLeft, Mail, Download } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Mail } from 'lucide-react';
 
 export default function OrderConfirmation() {
   const { t } = useTranslation();
@@ -20,6 +20,9 @@ export default function OrderConfirmation() {
 
       <h1 className="text-3xl font-bold text-surface-900 mb-3">{t('orderConfirmation.title')}</h1>
       <p className="text-lg text-surface-500 mb-8">{t('orderConfirmation.subtitle')}</p>
+      <p className="text-xl font-semibold text-primary-700 mb-8">
+        {t('orderConfirmation.thankYou')}
+      </p>
 
       {/* Order Card */}
       <div className="card p-8 text-left mb-8">
@@ -53,15 +56,11 @@ export default function OrderConfirmation() {
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <div className="flex items-center justify-center">
         <Link to="/catalog" className="btn-primary">
           <ArrowLeft className="w-4 h-4" />
           {t('orderConfirmation.backToCatalog')}
         </Link>
-        <button className="btn-secondary">
-          <Download className="w-4 h-4" />
-          {t('orderConfirmation.downloadPDF')}
-        </button>
       </div>
     </div>
   );

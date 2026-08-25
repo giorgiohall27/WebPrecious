@@ -73,6 +73,19 @@ export interface SuperAdmin {
   notes?: string;
 }
 
+export interface ManagedSupplier {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  contactPerson: string;
+  pin: string;
+  pinHint?: string;
+  active: boolean;
+  createdAt: string;
+  notes?: string;
+}
+
 export interface Order {
   id: string;
   orderId: string;
