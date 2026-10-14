@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '../../utils/dateFormat';
 import { useLocation, Link } from 'react-router-dom';
 import { CheckCircle, ArrowLeft, Mail } from 'lucide-react';
 
@@ -44,7 +45,7 @@ export default function OrderConfirmation() {
           </div>
           <div>
             <p className="text-xs text-surface-400">{t('orders.date')}</p>
-            <p className="text-lg font-semibold">{new Date().toLocaleDateString()}</p>
+            <p className="text-lg font-semibold">{formatDate(new Date())}</p>
           </div>
         </div>
 

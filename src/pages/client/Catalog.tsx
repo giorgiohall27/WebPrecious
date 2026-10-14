@@ -2,13 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  ShoppingCart, Plus, Minus, Check,
-  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Lock,
+  Plus, Minus,
+  Wine, UtensilsCrossed, SprayCan, Package, HeartPulse, X, Lock, Tag,
 } from 'lucide-react';
-import { Product } from '../../types';
+import { CartItem, Product } from '../../types';
 import { useCart } from '../../store/cartStore';
 import { useProducts } from '../../store/productsStore';
 import { useAuth } from '../../store/authStore';
+import { usePromotions } from '../../store/promotionsStore';
 
 const iconMap: Record<string, any> = {
   wine: Wine,
@@ -29,35 +30,61 @@ const brandPriority = (brand: string, selectedCategoryName?: string) => {
 const isCadburyMultipack = (product: Product) =>
   product.brand?.toLowerCase() === 'cadbury' && product.name.toLowerCase().includes('multipack');
 
+const quantitiesFromCart = (items: CartItem[]) => items.reduce<Record<string, number>>((totals, item) => {
+  totals[item.product.id] = (totals[item.product.id] ?? 0) + item.quantity;
+  return totals;
+}, {});
+
 export default function Catalog() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { addItem, items: cartItems } = useCart();
+  const { addItem, updateQuantity, items: cartItems } = useCart();
   const { products, categories, subcategories, adjustStock } = useProducts();
+  const { promotions } = usePromotions();
 
   const selectedCategory    = searchParams.get('category') || '';
   const searchQuery         = searchParams.get('search')   || '';
+  const productFromUrl      = searchParams.get('product')  || '';
   const subFromUrl          = searchParams.get('sub')      || '';
   const selectedBrand       = searchParams.get('brand')    || '';
 
   const [selectedSubcategory, setSelectedSubcategory] = useState(subFromUrl);
-  const [quantities, setQuantities]   = useState<Record<string, number>>({});
-  const [addedItems, setAddedItems]   = useState<Record<string, boolean>>({});
+  const [quantities, setQuantities]   = useState<Record<string, number>>(() => quantitiesFromCart(cartItems));
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { isLoggedIn, isSuperAdmin } = useAuth();
   const canViewSensitive = isLoggedIn || isSuperAdmin;
+
+  const promotionByProductId = useMemo(() => {
+    const now = Date.now();
+    return new Map(
+      promotions
+        .filter(promotion =>
+          promotion.active &&
+          new Date(promotion.startsAt).getTime() <= now &&
+          new Date(promotion.endsAt).getTime() > now
+        )
+        .map(promotion => [promotion.productId, promotion]),
+    );
+  }, [promotions]);
 
   useEffect(() => {
     setSelectedSubcategory(subFromUrl);
   }, [selectedCategory, subFromUrl]);
 
   useEffect(() => {
-    setQuantities(current => Object.fromEntries(
-      Object.keys(current).map(productId => [
-        productId,
-        cartItems.filter(item => item.product.id === productId).reduce((total, item) => total + item.quantity, 0),
-      ]),
-    ));
+    if (!productFromUrl) return;
+    const product = products.find(item => item.id === productFromUrl && item.active);
+    if (product) setSelectedProduct(product);
+  }, [productFromUrl, products]);
+
+  useEffect(() => {
+    const cartQuantities = quantitiesFromCart(cartItems);
+    setQuantities(current => {
+      const trackedProductIds = new Set([...Object.keys(current), ...Object.keys(cartQuantities)]);
+      return Object.fromEntries(
+        Array.from(trackedProductIds, productId => [productId, cartQuantities[productId] ?? 0]),
+      );
+    });
   }, [cartItems]);
 
   const subcatsForCategory = selectedCategory
@@ -116,7 +143,6 @@ export default function Catalog() {
   const setCategory = (catId: string) => {
     const params: Record<string, string> = {};
     if (catId) params.category = catId;
-    if (searchQuery) params.search = searchQuery;
     setSearchParams(params);
   };
 
@@ -124,7 +150,6 @@ export default function Catalog() {
     const params: Record<string, string> = {};
     if (selectedCategory) params.category = selectedCategory;
     if (subId) params.sub = subId;
-    if (searchQuery) params.search = searchQuery;
     setSearchParams(params);
   };
 
@@ -132,27 +157,26 @@ export default function Catalog() {
     const params: Record<string, string> = {};
     if (selectedCategory) params.category = selectedCategory;
     if (selectedSubcategory) params.sub = selectedSubcategory;
-    if (searchQuery) params.search = searchQuery;
     if (brand) params.brand = brand;
     setSearchParams(params);
   };
 
   const getQty = (id: string) => quantities[id] || 0;
-  const setQty = (id: string, val: number) => {
-    const clamped = Math.max(0, val);
-    setQuantities(prev => ({ ...prev, [id]: clamped }));
-  };
-
-  const handleAdd = (product: Product) => {
-    const requestedBoxes = getQty(product.id);
-    if (requestedBoxes <= 0) return;
+  const setQty = (product: Product, val: number) => {
+    const previousBoxes = getQty(product.id);
     const multiplier = product.unitsPerBox || 1;
-    const totalUnits = requestedBoxes * multiplier;
-    
-    addItem(product, requestedBoxes);
-    adjustStock(product.id, -totalUnits);
-    setAddedItems(prev => ({ ...prev, [product.id]: true }));
-    setTimeout(() => setAddedItems(prev => ({ ...prev, [product.id]: false })), 1500);
+    const availableAdditionalBoxes = Math.max(0, Math.floor(product.stock / multiplier));
+    const requestedBoxes = Math.min(Math.max(0, val), previousBoxes + availableAdditionalBoxes);
+    if (requestedBoxes === previousBoxes) return;
+    const promotion = promotionByProductId.get(product.id);
+
+    setQuantities(prev => ({ ...prev, [product.id]: requestedBoxes }));
+    if (previousBoxes === 0 && requestedBoxes > 0) {
+      addItem(product, requestedBoxes, promotion?.promoPrice);
+    } else {
+      updateQuantity(product.id, requestedBoxes);
+    }
+    adjustStock(product.id, -(requestedBoxes - previousBoxes) * multiplier);
   };
 
 
@@ -321,7 +345,10 @@ export default function Catalog() {
                   </div>
                   <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {brandProducts.map(product => {
-                const isAdded = addedItems[product.id];
+                const promotion = promotionByProductId.get(product.id);
+                const discountPercentage = promotion && product.price > 0
+                  ? Math.max(0, Math.round((1 - promotion.promoPrice / product.price) * 100))
+                  : 0;
                 return (
                   <div key={product.id} className="card overflow-hidden group hover:shadow-card-hover hover:border-surface-300 transition-all duration-150 flex flex-col">
 
@@ -359,6 +386,12 @@ export default function Catalog() {
                           {product.unitMeasure}
                         </span>
                       )}
+                      {promotion && (
+                        <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-amber-400 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-[#0C1E35] shadow-md sm:left-2.5 sm:top-2.5 sm:text-[10px]">
+                          <Tag className="h-3 w-3" />
+                          {t('cart.promotionProduct')}
+                        </span>
+                      )}
                     </div>
 
                     {/* Info Section */}
@@ -383,46 +416,53 @@ export default function Catalog() {
 
                       {canViewSensitive ? (
                         <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <div className="flex flex-col items-start sm:items-center sm:mr-2">
-                            {product.unitsPerBox && product.unitsPerBox > 1 && (
-                              <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
+                          <div className="flex items-center sm:mr-2">
+                            {getQty(product.id) === 0 ? (
+                              <button
+                                type="button"
+                                onClick={(event) => { event.stopPropagation(); setQty(product, 1); }}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white shadow-md transition-all hover:bg-primary-700 active:scale-95"
+                                aria-label={`Añadir una caja de ${product.name}`}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            ) : (
+                              <div className="flex items-center overflow-hidden rounded-lg border border-primary-200 bg-white shadow-sm">
+                                <button
+                                  type="button"
+                                  onClick={(event) => { event.stopPropagation(); setQty(product, getQty(product.id) - 1); }}
+                                  className="px-2 py-2 text-surface-600 transition-colors hover:bg-surface-100"
+                                  aria-label={`Restar una caja de ${product.name}`}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </button>
+                                <span className="min-w-9 border-x border-primary-100 px-1 py-2 text-center text-xs font-black text-primary-700" aria-label={`${getQty(product.id)} cajas en el carrito`}>
+                                  {getQty(product.id)}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(event) => { event.stopPropagation(); setQty(product, getQty(product.id) + 1); }}
+                                  className="px-2 py-2 text-primary-700 transition-colors hover:bg-primary-50"
+                                  aria-label={`Añadir otra caja de ${product.name}`}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
                             )}
-                            <div className="flex items-center bg-surface-50 border border-surface-200 rounded-lg overflow-hidden shrink-0">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) - 1); }}
-                                className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
-                              >
-                                <Minus className="w-3.5 h-3.5" />
-                              </button>
-                              <span className="w-8 text-center text-xs font-bold text-surface-800">
-                                {getQty(product.id)}
-                              </span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setQty(product.id, getQty(product.id) + 1); }}
-                                className="px-2 py-1.5 hover:bg-surface-200 transition-colors text-surface-600"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
                           </div>
                           <div className="text-left sm:text-right flex flex-col items-stretch sm:items-end">
                             <div className="flex items-center justify-between sm:justify-end gap-2">
-                              <span className="text-base sm:text-2xl font-black text-surface-900 leading-none">
-                                EUR {product.price.toFixed(2)}
-                              </span>
-                              <button
-                                onClick={() => handleAdd(product)}
-                                disabled={getQty(product.id) <= 0}
-                                className={`p-2 rounded-lg transition-all duration-150 shrink-0 ${
-                                  isAdded
-                                    ? 'bg-emerald-500 text-white shadow-lg scale-95'
-                                    : getQty(product.id) <= 0
-                                      ? 'bg-surface-300 text-white cursor-not-allowed'
-                                    : 'bg-primary-600 hover:bg-primary-700 text-white shadow-md active:scale-95'
-                                }`}
-                              >
-                                {isAdded ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                              </button>
+                              {promotion ? (
+                                <div className="flex flex-col items-start sm:items-end">
+                                  <span className="text-[11px] font-semibold text-surface-400 line-through">EUR {product.price.toFixed(2)}</span>
+                                  <span className="text-base sm:text-2xl font-black text-amber-600 leading-none">EUR {promotion.promoPrice.toFixed(2)}</span>
+                                  {discountPercentage > 0 && <span className="mt-1 text-[10px] font-black text-emerald-600">-{discountPercentage}%</span>}
+                                </div>
+                              ) : (
+                                <span className="text-base sm:text-2xl font-black text-surface-900 leading-none">
+                                  EUR {product.price.toFixed(2)}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -491,6 +531,11 @@ export default function Catalog() {
                   {selectedProduct.brand}
                 </span>
               )}
+              {promotionByProductId.has(selectedProduct.id) && (
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-[#0C1E35] shadow-sm">
+                  <Tag className="h-3 w-3" /> {t('cart.promotionProduct')}
+                </span>
+              )}
             </div>
 
             {/* Body */}
@@ -517,8 +562,11 @@ export default function Catalog() {
               <div className="flex items-center justify-between gap-3 bg-surface-50 p-4 rounded-xl border border-surface-100">
                 {canViewSensitive ? (
                   <div className="flex flex-col">
-                    <p className="text-2xl font-bold text-surface-900 leading-none">
-                      EUR {selectedProduct.price.toFixed(2)}
+                    {promotionByProductId.has(selectedProduct.id) && (
+                      <p className="mb-1 text-xs font-semibold text-surface-400 line-through">EUR {selectedProduct.price.toFixed(2)}</p>
+                    )}
+                    <p className={`text-2xl font-bold leading-none ${promotionByProductId.has(selectedProduct.id) ? 'text-amber-600' : 'text-surface-900'}`}>
+                      EUR {(promotionByProductId.get(selectedProduct.id)?.promoPrice ?? selectedProduct.price).toFixed(2)}
                     </p>
                     <p className="text-[10px] text-surface-400 mt-1 uppercase font-bold tracking-wider">{t('catalog.perUnit')}</p>
                   </div>
@@ -530,41 +578,39 @@ export default function Catalog() {
                 )}
 
                 {canViewSensitive ? (
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-center">
-                      {selectedProduct.unitsPerBox && selectedProduct.unitsPerBox > 1 && (
-                        <span className="text-[9px] text-surface-400 font-bold uppercase mb-0.5">{t('cart.boxes')}</span>
-                      )}
-                      <div className="flex items-center bg-white border border-surface-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="flex items-center">
+                    {getQty(selectedProduct.id) === 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setQty(selectedProduct, 1)}
+                        className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md transition-all hover:bg-primary-700 active:scale-95"
+                        aria-label={`Añadir una caja de ${selectedProduct.name}`}
+                      >
+                        <Plus className="h-5 w-5" />
+                      </button>
+                    ) : (
+                      <div className="flex items-center overflow-hidden rounded-xl border border-primary-200 bg-white shadow-sm">
                         <button
-                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) - 1)}
-                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                          type="button"
+                          onClick={() => setQty(selectedProduct, getQty(selectedProduct.id) - 1)}
+                          className="px-3 py-3 text-surface-600 transition-colors hover:bg-surface-100"
+                          aria-label={`Restar una caja de ${selectedProduct.name}`}
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-10 text-center text-sm font-bold text-surface-800">
+                        <span className="w-11 border-x border-primary-100 py-3 text-center text-sm font-black text-primary-700" aria-label={`${getQty(selectedProduct.id)} cajas en el carrito`}>
                           {getQty(selectedProduct.id)}
                         </span>
                         <button
-                          onClick={() => setQty(selectedProduct.id, getQty(selectedProduct.id) + 1)}
-                          className="px-3 py-2 hover:bg-surface-100 transition-colors text-surface-600"
+                          type="button"
+                          onClick={() => setQty(selectedProduct, getQty(selectedProduct.id) + 1)}
+                          className="px-3 py-3 text-primary-700 transition-colors hover:bg-primary-50"
+                          aria-label={`Añadir otra caja de ${selectedProduct.name}`}
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        handleAdd(selectedProduct);
-                        setTimeout(() => setSelectedProduct(null), 600);
-                      }}
-                      disabled={getQty(selectedProduct.id) <= 0}
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md bg-primary-600 hover:bg-primary-700 text-white active:scale-95"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      {t('catalog.addToOrder')}
-                    </button>
+                    )}
                   </div>
                 ) : (
                   <Link

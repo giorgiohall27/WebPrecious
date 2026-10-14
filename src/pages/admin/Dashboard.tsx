@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '../../utils/dateFormat';
 import { Package, ClipboardList, FolderTree, TrendingUp, ArrowUpRight, Building2, KeyRound } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
 import { Link } from 'react-router-dom';
@@ -65,7 +66,7 @@ export default function Dashboard() {
               <div key={order.id} className="px-6 py-4 flex items-center justify-between hover:bg-surface-50 transition-colors">
                 <div>
                   <p className="text-sm font-semibold text-surface-900">{order.companyName}</p>
-                  <p className="text-xs text-surface-400">{order.orderId} · {new Date(order.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-surface-400">{order.orderId} · {formatDate(order.createdAt)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-surface-900">{order.totalAmount.toFixed(2)} €</p>

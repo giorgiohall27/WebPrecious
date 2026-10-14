@@ -1,26 +1,25 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarClock, Plus, Search, Tag, Trash2 } from 'lucide-react';
+import { CalendarClock, Check, Plus, Search, Tag, Trash2 } from 'lucide-react';
 import { useProducts } from '../../store/productsStore';
 import { usePromotions } from '../../store/promotionsStore';
-
-const toLocalDateValue = (date: Date) => {
-  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-  return offsetDate.toISOString().slice(0, 10);
-};
+import { formatDate, formatDateTime, parseDayMonthYear } from '../../utils/dateFormat';
 
 const isValid24HourTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 export default function Promotions() {
   const { t } = useTranslation();
   const { products } = useProducts();
-  const { promotions, upsertPromotion, removePromotion, clearPromotions } = usePromotions();
+  const { promotions, upsertPromotions, removePromotion, clearPromotions } = usePromotions();
   const [search, setSearch] = useState('');
-  const [selectedProductId, setSelectedProductId] = useState('');
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [promoPrice, setPromoPrice] = useState('');
-  const [endDate, setEndDate] = useState(() => toLocalDateValue(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)));
+  const [endDate, setEndDate] = useState(() => formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)));
   const [endTime, setEndTime] = useState('23:59');
-  const promotionEnd = isValid24HourTime(endTime) ? new Date(`${endDate}T${endTime}:00`) : null;
+  const parsedEndDate = parseDayMonthYear(endDate);
+  const promotionEnd = parsedEndDate && isValid24HourTime(endTime)
+    ? new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth(), parsedEndDate.getDate(), Number(endTime.slice(0, 2)), Number(endTime.slice(3, 5)))
+    : null;
   const validPromotionEnd = Boolean(promotionEnd && !Number.isNaN(promotionEnd.getTime()) && promotionEnd.getTime() > Date.now());
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
@@ -45,23 +44,41 @@ export default function Promotions() {
     );
   }, [activeProducts, search]);
 
-  const selectedProduct = activeProducts.find(product => product.id === selectedProductId);
-
   const handleAddPromotion = () => {
-    if (!selectedProduct) return;
+    if (selectedProductIds.length === 0) return;
     const price = Number.parseFloat(promoPrice);
     if (!Number.isFinite(price) || price < 0) return;
     if (!promotionEnd || !validPromotionEnd) return;
-    upsertPromotion({
-      productId: selectedProduct.id,
+    const startsAt = new Date().toISOString();
+    const endsAt = promotionEnd.toISOString();
+    upsertPromotions(selectedProductIds.map(productId => ({
+      productId,
       promoPrice: price,
       active: true,
-      startsAt: new Date().toISOString(),
-      endsAt: promotionEnd.toISOString(),
-    });
-    setSelectedProductId('');
+      startsAt,
+      endsAt,
+    })));
+    setSelectedProductIds([]);
     setPromoPrice('');
     setSearch('');
+  };
+
+  const toggleProduct = (productId: string) => {
+    setSelectedProductIds(current =>
+      current.includes(productId)
+        ? current.filter(id => id !== productId)
+        : [...current, productId]
+    );
+  };
+
+  const filteredProductIds = filteredProducts.map(product => product.id);
+  const allFilteredSelected = filteredProductIds.length > 0 && filteredProductIds.every(id => selectedProductIds.includes(id));
+
+  const toggleAllFiltered = () => {
+    setSelectedProductIds(current => {
+      if (allFilteredSelected) return current.filter(id => !filteredProductIds.includes(id));
+      return Array.from(new Set([...current, ...filteredProductIds]));
+    });
   };
 
   return (
@@ -102,11 +119,13 @@ export default function Promotions() {
             <CalendarClock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
               className="input-field pl-10"
-              type="date"
-              min={toLocalDateValue(new Date())}
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
               value={endDate}
-              onChange={event => setEndDate(event.target.value)}
-              aria-label="Fecha de finalización"
+              onChange={event => setEndDate(event.target.value.replace(/[^0-9/]/g, '').slice(0, 10))}
+              placeholder="DD/MM/AAAA"
+              aria-label="Fecha de finalización en formato día, mes y año"
             />
           </label>
           <label>
@@ -124,26 +143,43 @@ export default function Promotions() {
           </label>
           <button
             onClick={handleAddPromotion}
-            disabled={!selectedProduct || !promoPrice || !validPromotionEnd}
+            disabled={selectedProductIds.length === 0 || !promoPrice || !validPromotionEnd}
             className="btn-primary disabled:bg-surface-300 disabled:cursor-not-allowed"
           >
-            <Plus className="w-4 h-4" /> {t('promotions.add')}
+            <Plus className="w-4 h-4" /> Crear {selectedProductIds.length || ''} {selectedProductIds.length === 1 ? 'promoción' : 'promociones'}
           </button>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-50 px-4 py-3 text-sm">
+          <span className="font-semibold text-primary-800">
+            {selectedProductIds.length === 0 ? 'Selecciona uno o varios productos' : `${selectedProductIds.length} productos seleccionados`}
+          </span>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={toggleAllFiltered} className="font-bold text-primary-700 hover:text-primary-900">
+              {allFilteredSelected ? 'Quitar los visibles' : 'Seleccionar los visibles'}
+            </button>
+            {selectedProductIds.length > 0 && (
+              <button type="button" onClick={() => setSelectedProductIds([])} className="font-bold text-surface-500 hover:text-surface-800">
+                Limpiar selección
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="max-h-72 overflow-auto border border-surface-100 rounded-xl divide-y divide-surface-100">
           {filteredProducts.map(product => {
-            const selected = selectedProductId === product.id;
+            const selected = selectedProductIds.includes(product.id);
             return (
               <button
                 key={product.id}
                 type="button"
-                onClick={() => {
-                  setSelectedProductId(product.id);
-                  setPromoPrice(String(product.price));
-                }}
+                onClick={() => toggleProduct(product.id)}
+                aria-pressed={selected}
                 className={`w-full flex items-center gap-3 p-3 text-left hover:bg-primary-50 transition-colors ${selected ? 'bg-primary-50' : 'bg-white'}`}
               >
+                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${selected ? 'border-primary-600 bg-primary-600 text-white' : 'border-surface-300 bg-white text-transparent'}`}>
+                  <Check className="h-3.5 w-3.5" />
+                </span>
                 <div className="w-12 h-12 rounded-lg bg-surface-50 border border-surface-100 overflow-hidden shrink-0">
                   {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain p-1" />}
                 </div>
@@ -180,7 +216,7 @@ export default function Promotions() {
                   <p className="text-xs text-surface-400 line-through">EUR {product.price.toFixed(2)}</p>
                   <p className="text-lg font-black text-amber-600">EUR {promotion.promoPrice.toFixed(2)}</p>
                   <p className="text-[11px] text-surface-500 mt-1">
-                    Hasta {new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(promotion.endsAt))}
+                    Hasta {formatDateTime(promotion.endsAt)}
                   </p>
                 </div>
                 <button onClick={() => removePromotion(product.id)} className="btn-icon text-red-400 hover:text-red-600 hover:bg-red-50">

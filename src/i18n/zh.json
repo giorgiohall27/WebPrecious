@@ -124,7 +124,7 @@
     "expandOrder": "查看产品",
     "collapseOrder": "收起",
     "shopByCategory": "按分类购物",
-    "weeklyPromotions": "本周促销",
+    "weeklyPromotions": "促销",
     "weeklyPromotionsSubtitle": "精选特色产品"
   },
   "categoryNames": {
@@ -246,7 +246,7 @@
     "deleteConfirm": "删除此分类将把其产品移至'未分类'。继续吗？"
   },
   "promotions": {
-    "title": "本周促销",
+    "title": "促销",
     "subtitle": "选择产品并设置促销价格，在首页展示。",
     "searchProduct": "搜索要促销的产品...",
     "promoPrice": "促销价",
@@ -294,6 +294,7 @@
     "perBox": "€/箱",
     "unitsShort": "件",
     "unitPrice": "单价",
+    "boxPrice": "每箱价格",
     "subtotal": "小计",
     "remove": "移除",
     "categorySubtotal": "小计",
@@ -311,6 +312,7 @@
     "keepShopping": "继续购物",
     "reviewAndSend": "检查并发送订单",
     "unitsPerBoxLabel": "每箱件数",
+    "boxContents": "每箱内容",
     "promotionProduct": "促销产品",
     "companyData": "公司信息",
     "sendOrder": "提交订单",

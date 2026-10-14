@@ -76,6 +76,7 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
   if (items.length === 0) return '<p>No hay productos en este pedido.</p>';
 
   const rows = items.map(item => {
+    const pricePerUnit = (item.unitPrice ?? 0) / Math.max(1, item.unitsPerBox ?? 1);
     const availability = item.availabilityStatus === 'unavailable'
       ? '<span style="color:#b91c1c;font-weight:700">No llegará</span>'
       : '<span style="color:#047857;font-weight:700">Sí llegará</span>';
@@ -88,6 +89,7 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
         <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:center;color:#111827">${escapeHtml(item.unitsPerBox ?? 1)}</td>
         <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:center;color:#111827;font-weight:700">${escapeHtml(item.quantity)}</td>
         <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:right;color:#111827;white-space:nowrap">${formatMoney(item.unitPrice)}</td>
+        <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:right;color:#111827;white-space:nowrap">${formatMoney(pricePerUnit)}</td>
         <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:center;color:#111827">${escapeHtml(item.iva ?? 0)}%</td>
         <td style="padding:12px 10px;border-bottom:1px solid #dbeafe;text-align:right;color:#111827;font-weight:800;white-space:nowrap">${formatMoney(item.subtotal)}</td>
         ${includeAvailability ? `<td style="padding:10px;border-bottom:1px solid #e5e7eb">${availability}${item.adminNote ? `<br><small>${escapeHtml(item.adminNote)}</small>` : ''}</td>` : ''}
@@ -97,7 +99,7 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
 
   return `
     <div style="width:100%;overflow-x:auto;margin-top:20px;border:1px solid #dbeafe;border-radius:12px">
-    <table role="presentation" style="width:100%;min-width:680px;border-collapse:collapse;background:#ffffff">
+    <table role="presentation" style="width:100%;min-width:760px;border-collapse:collapse;background:#ffffff">
       <thead>
         <tr style="background:#eff6ff;color:#1d4ed8;font-size:11px;text-transform:uppercase;letter-spacing:.03em">
           <th style="padding:12px 10px;text-align:left">SKU</th>
@@ -106,6 +108,7 @@ const buildItemsHtml = (items: OrderEmailItem[] = [], includeAvailability = fals
           <th style="padding:10px;text-align:center">Uds./caja</th>
           <th style="padding:10px;text-align:center">Cajas</th>
           <th style="padding:10px;text-align:right">Precio/caja</th>
+          <th style="padding:10px;text-align:right">Precio/unidad</th>
           <th style="padding:10px;text-align:center">IVA</th>
           <th style="padding:10px;text-align:right">Total con IVA</th>
           ${includeAvailability ? '<th style="padding:10px;text-align:left">Disponibilidad</th>' : ''}

@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   Beer,
   Candy,
-  Check,
   Flame,
   GlassWater,
   Minus,
   Package,
   Plus,
-  ShoppingCart,
   Star,
   Tag,
   UtensilsCrossed,
@@ -59,21 +57,14 @@ export default function ClientDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { products, categories, adjustStock } = useProducts();
-  const { addItem, items: cartItems } = useCart();
+  const { addItem, updateQuantity, items: cartItems } = useCart();
   const { promotions } = usePromotions();
   const { isLoggedIn, isSuperAdmin } = useAuth();
   const canViewSensitive = isLoggedIn || isSuperAdmin;
-  const [promoQuantities, setPromoQuantities] = useState<Record<string, number>>({});
-  const [addedPromos, setAddedPromos] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    setPromoQuantities(current => Object.fromEntries(
-      Object.keys(current).map(productId => [
-        productId,
-        cartItems.filter(item => item.product.id === productId).reduce((total, item) => total + item.quantity, 0),
-      ]),
-    ));
-  }, [cartItems]);
+  const promoQuantities = useMemo(() => cartItems.reduce<Record<string, number>>((totals, item) => {
+    totals[item.product.id] = (totals[item.product.id] ?? 0) + item.quantity;
+    return totals;
+  }, {}), [cartItems]);
 
   const activeProducts = useMemo(() => products.filter(product => product.active), [products]);
   const marqueeImages = useMemo(() => {
@@ -126,17 +117,16 @@ export default function ClientDashboard() {
   );
 
   const getPromoQty = (productId: string) => promoQuantities[productId] || 0;
-  const setPromoQty = (productId: string, quantity: number) => {
-    setPromoQuantities(prev => ({ ...prev, [productId]: Math.max(0, quantity) }));
-  };
+  const setPromoQty = (product: typeof activeProducts[number], promoPrice: number, quantity: number) => {
+    const previousBoxes = getPromoQty(product.id);
+    const unitsPerBox = product.unitsPerBox || 1;
+    const availableAdditionalBoxes = Math.max(0, Math.floor(product.stock / unitsPerBox));
+    const boxes = Math.min(Math.max(0, quantity), previousBoxes + availableAdditionalBoxes);
+    if (boxes === previousBoxes) return;
 
-  const handleAddPromo = (product: typeof activeProducts[number], promoPrice: number) => {
-    const boxes = getPromoQty(product.id);
-    if (boxes <= 0) return;
-    addItem(product, boxes, promoPrice);
-    adjustStock(product.id, -(boxes * (product.unitsPerBox || 1)));
-    setAddedPromos(prev => ({ ...prev, [product.id]: true }));
-    setTimeout(() => setAddedPromos(prev => ({ ...prev, [product.id]: false })), 1500);
+    if (previousBoxes === 0 && boxes > 0) addItem(product, boxes, promoPrice);
+    else updateQuantity(product.id, boxes);
+    adjustStock(product.id, -(boxes - previousBoxes) * unitsPerBox);
   };
 
   return (
@@ -233,24 +223,39 @@ export default function ClientDashboard() {
                   ) : t('catalog.priceHidden')}
                 </p>
                 {canViewSensitive && (
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="flex items-center border border-surface-200 rounded-lg overflow-hidden">
-                      <button onClick={() => setPromoQty(product.id, getPromoQty(product.id) - 1)} className="px-2 py-1.5 hover:bg-surface-50">
-                        <Minus className="w-3.5 h-3.5" />
+                  <div className="mt-3 flex items-center">
+                    {getPromoQty(product.id) === 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setPromoQty(product, promotion.promoPrice, 1)}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white shadow-md transition-all hover:bg-primary-700 active:scale-95"
+                        aria-label={`Añadir una caja de ${product.name}`}
+                      >
+                        <Plus className="h-4 w-4" />
                       </button>
-                      <span className="w-8 text-center text-xs font-bold">{getPromoQty(product.id)}</span>
-                      <button onClick={() => setPromoQty(product.id, getPromoQty(product.id) + 1)} className="px-2 py-1.5 hover:bg-surface-50">
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => handleAddPromo(product, promotion.promoPrice)}
-                      disabled={getPromoQty(product.id) <= 0}
-                      className={`p-2 rounded-lg text-white transition-colors ${addedPromos[product.id] ? 'bg-emerald-500' : getPromoQty(product.id) <= 0 ? 'bg-surface-300 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
-                      title={t('catalog.addToOrder')}
-                    >
-                      {addedPromos[product.id] ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
-                    </button>
+                    ) : (
+                      <div className="flex items-center overflow-hidden rounded-lg border border-primary-200 bg-white shadow-sm">
+                        <button
+                          type="button"
+                          onClick={() => setPromoQty(product, promotion.promoPrice, getPromoQty(product.id) - 1)}
+                          className="px-2 py-2 text-surface-600 transition-colors hover:bg-surface-100"
+                          aria-label={`Restar una caja de ${product.name}`}
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="min-w-9 border-x border-primary-100 px-1 py-2 text-center text-xs font-black text-primary-700" aria-label={`${getPromoQty(product.id)} cajas en el carrito`}>
+                          {getPromoQty(product.id)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPromoQty(product, promotion.promoPrice, getPromoQty(product.id) + 1)}
+                          className="px-2 py-2 text-primary-700 transition-colors hover:bg-primary-50"
+                          aria-label={`Añadir otra caja de ${product.name}`}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

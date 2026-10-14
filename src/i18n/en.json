@@ -124,7 +124,7 @@
     "expandOrder": "View products",
     "collapseOrder": "Hide products",
     "shopByCategory": "Shop by Category",
-    "weeklyPromotions": "Promotions of the Week",
+    "weeklyPromotions": "Promotions",
     "weeklyPromotionsSubtitle": "A special selection of featured products"
   },
   "categoryNames": {
@@ -246,7 +246,7 @@
     "deleteConfirm": "Deleting this category will move its products to 'Uncategorized'. Continue?"
   },
   "promotions": {
-    "title": "Promotions of the Week",
+    "title": "Promotions",
     "subtitle": "Choose products and set their promotional price for the homepage.",
     "searchProduct": "Search product to promote...",
     "promoPrice": "Promo price",
@@ -294,6 +294,7 @@
     "perBox": "€/box",
     "unitsShort": "units",
     "unitPrice": "Unit Price",
+    "boxPrice": "Box price",
     "subtotal": "Subtotal",
     "remove": "Remove",
     "categorySubtotal": "Subtotal",
@@ -311,6 +312,7 @@
     "keepShopping": "Continue shopping",
     "reviewAndSend": "Review and send order",
     "unitsPerBoxLabel": "units per box",
+    "boxContents": "Box contents",
     "promotionProduct": "Promotional product",
     "companyData": "Company Details",
     "sendOrder": "Send Order",

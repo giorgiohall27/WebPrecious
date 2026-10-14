@@ -8,6 +8,7 @@ import { useAuth } from '../../store/authStore';
 import { useState } from 'react';
 import { notifyAdminNewOrder } from '../../lib/orderEmails';
 import { Order } from '../../types';
+import { formatProductPackaging } from '../../utils/productPackaging';
 
 export default function Cart() {
   const { t } = useTranslation();
@@ -157,6 +158,7 @@ export default function Cart() {
               {/* Items */}
               {catItems.map(item => {
                 const unitsPerBox = item.product.unitsPerBox || 1;
+                const packaging = formatProductPackaging(item.product);
                 const unitPrice = item.unitPriceOverride ?? item.product.price;
                 const boxPrice = unitPrice * unitsPerBox;
                 const lineSubtotal = boxPrice * item.quantity;
@@ -188,13 +190,24 @@ export default function Cart() {
                         {item.product.brand || 'Sin marca'}
                       </p>
                       <p className="font-medium text-surface-900 text-sm break-words [overflow-wrap:anywhere] mt-0.5">{item.product.name}</p>
-                      <p className="text-xs text-surface-500 mt-1">{unitsPerBox} {t('cart.unitsPerBoxLabel')}</p>
+                      <div className="mt-2 inline-flex flex-wrap items-center gap-1.5 rounded-lg border border-primary-100 bg-primary-50 px-2.5 py-1.5 text-xs text-primary-800">
+                        <span className="font-medium text-primary-600">{t('cart.boxContents')}:</span>
+                        <span className="font-bold">{packaging}</span>
+                      </div>
                       {item.unitPriceOverride !== undefined && (
                         <span className="inline-flex my-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase">{t('cart.promotionProduct')}</span>
                       )}
-                      <p className="text-xs text-surface-400">
-                        {item.product.sku} · {boxPrice.toFixed(2)} {t('cart.perBox')}{unitsPerBox > 1 ? ` (${unitsPerBox} ${t('cart.unitsShort')} x €${unitPrice.toFixed(2)})` : ''} · IVA {item.product.iva ?? 0}%
-                      </p>
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                        <span className="text-surface-500">
+                          {t('cart.unitPrice')}: <strong className="text-surface-800">{unitPrice.toFixed(2)} €</strong>
+                        </span>
+                        <span className="text-surface-500">
+                          {t('cart.boxPrice')}: <strong className="text-surface-800">{boxPrice.toFixed(2)} €</strong>
+                        </span>
+                        {item.product.iva === 21 && (
+                          <span className="rounded-full bg-sky-100 px-2 py-0.5 font-bold text-sky-700">IVA 21%</span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Quantity (in boxes) */}

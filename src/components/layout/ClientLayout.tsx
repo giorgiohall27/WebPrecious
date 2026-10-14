@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Bell,
   Home,
   LogIn,
   LogOut,
@@ -18,23 +17,59 @@ import LanguageSwitcher from '../LanguageSwitcher';
 import CartDrawer from '../cart/CartDrawer';
 import { useCart } from '../../store/cartStore';
 import { useAuth } from '../../store/authStore';
+import { useProducts } from '../../store/productsStore';
 
 export default function ClientLayout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getItemCount } = useCart();
+  const { products } = useProducts();
   const { isLoggedIn, isSuperAdmin, isSupplier, userEmail, logout, logoutSuperAdmin, logoutSupplier, userProfile, supplierProfile } = useAuth();
   const itemCount = getItemCount();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const searchSuggestions = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase();
+    if (!query) return [];
+
+    return products
+      .filter(product => product.active && [product.name, product.brand, product.sku].some(value =>
+        value?.toLocaleLowerCase().includes(query)
+      ))
+      .sort((a, b) => {
+        const aStartsWith = a.name.toLocaleLowerCase().startsWith(query);
+        const bStartsWith = b.name.toLocaleLowerCase().startsWith(query);
+        return Number(bStartsWith) - Number(aStartsWith) || a.name.localeCompare(b.name);
+      })
+      .slice(0, 6);
+  }, [products, searchQuery]);
+
+  useEffect(() => {
+    const closeSearchSuggestions = (event: MouseEvent) => {
+      if (!searchContainerRef.current?.contains(event.target as Node)) setSearchFocused(false);
+    };
+
+    document.addEventListener('mousedown', closeSearchSuggestions);
+    return () => document.removeEventListener('mousedown', closeSearchSuggestions);
+  }, []);
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     const query = searchQuery.trim();
+    setSearchFocused(false);
     navigate(query ? `/catalog?search=${encodeURIComponent(query)}` : '/catalog');
+    setSearchQuery('');
+  };
+
+  const openProduct = (productId: string) => {
+    setSearchFocused(false);
+    navigate(`/catalog?product=${encodeURIComponent(productId)}`);
+    setSearchQuery('');
   };
 
   const handleLogout = () => {
@@ -68,16 +103,66 @@ export default function ClientLayout() {
               <Home className="w-5 h-5" />
             </Link>
 
-            <form onSubmit={handleSearch} className="flex-1 max-w-xl">
-              <div className="relative">
+            <form onSubmit={handleSearch} className="flex-1 max-w-xl" role="search">
+              <div className="relative" ref={searchContainerRef}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={event => setSearchQuery(event.target.value)}
+                  onChange={event => {
+                    setSearchQuery(event.target.value);
+                    setSearchFocused(true);
+                  }}
+                  onFocus={() => setSearchFocused(true)}
+                  onKeyDown={event => {
+                    if (event.key === 'Escape') setSearchFocused(false);
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      event.currentTarget.form?.requestSubmit();
+                    }
+                  }}
                   placeholder={t('common.search')}
+                  autoComplete="off"
+                  aria-label={t('common.search')}
+                  aria-autocomplete="list"
+                  aria-expanded={searchFocused && searchSuggestions.length > 0}
+                  aria-controls="product-search-suggestions"
                   className="w-full pl-9 pr-4 py-2 bg-white border border-white/20 rounded-lg text-sm text-surface-900 placeholder-surface-400 focus:outline-none focus:border-primary-400 transition-colors"
                 />
+                {searchFocused && searchSuggestions.length > 0 && (
+                  <div
+                    id="product-search-suggestions"
+                    role="listbox"
+                    className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-xl border border-surface-200 bg-white shadow-dropdown z-50"
+                  >
+                    {searchSuggestions.map(product => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        role="option"
+                        aria-selected="false"
+                        onClick={() => openProduct(product.id)}
+                        className="flex w-full items-center gap-3 border-b border-surface-100 px-3 py-2.5 text-left last:border-b-0 hover:bg-primary-50 focus:bg-primary-50 focus:outline-none"
+                      >
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-surface-100 bg-surface-50">
+                          {product.imageUrl ? (
+                            <img src={product.imageUrl} alt="" className="h-full w-full object-contain p-1" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-sm font-black text-primary-600">
+                              {(product.brand || product.name)[0]}
+                            </div>
+                          )}
+                        </div>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-bold text-surface-900">{product.name}</span>
+                          <span className="block truncate text-xs text-surface-500">
+                            {[product.brand, product.sku].filter(Boolean).join(' · ')}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </form>
 
@@ -88,7 +173,6 @@ export default function ClientLayout() {
                   onClick={() => {
                     setCartOpen(true);
                     setUserMenuOpen(false);
-                    setNotifOpen(false);
                   }}
                   className="relative flex items-center gap-1.5 px-3 py-2 text-white/70 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
                   aria-label="Abrir carrito"
@@ -107,40 +191,10 @@ export default function ClientLayout() {
 
               {(isLoggedIn || isSuperAdmin || isSupplier) ? (
                 <>
-                  {isLoggedIn && !isSupplier && (
-                    <div className="relative">
-                      <button
-                        onClick={() => {
-                          setNotifOpen(!notifOpen);
-                          setUserMenuOpen(false);
-                        }}
-                        className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
-                        aria-label="Notificaciones"
-                      >
-                        <Bell className="w-4.5 h-4.5" style={{ width: '18px', height: '18px' }} />
-                      </button>
-                      {notifOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-surface-200 rounded-lg shadow-dropdown overflow-hidden z-50 animate-fade-in">
-                          <div className="px-4 py-3 border-b border-surface-100 flex items-center justify-between">
-                            <p className="text-sm font-semibold text-surface-900">{t('clientDashboard.notifications')}</p>
-                            <button onClick={() => setNotifOpen(false)} className="text-surface-400 hover:text-surface-600 p-0.5">
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                          <div className="px-4 py-8 text-center">
-                            <Bell className="w-7 h-7 text-surface-200 mx-auto mb-2" />
-                            <p className="text-sm text-surface-400">{t('clientDashboard.noNotifications')}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   <div className="relative">
                     <button
                       onClick={() => {
                         setUserMenuOpen(!userMenuOpen);
-                        setNotifOpen(false);
                       }}
                       className="flex items-center gap-2 pl-1.5 pr-2 py-1.5 text-white/70 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
                       aria-label="Empresa"

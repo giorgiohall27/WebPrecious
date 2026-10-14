@@ -1,28 +1,61 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   User, Building2, Mail, Phone, MapPin, LogIn, UserPlus,
-  ChevronDown, ChevronUp, Truck, Clock, Package,
+  ChevronDown, ChevronUp, Truck, Clock, Package, Pencil, Save, X,
 } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
 import { useOrders } from '../../store/ordersStore';
 import { useProducts } from '../../store/productsStore';
+import { formatDate } from '../../utils/dateFormat';
+
+const companyDraftFrom = (company: NonNullable<ReturnType<typeof useAuth>['userProfile']>) => ({
+  legalName: company.legalName ?? '',
+  name: company.name,
+  cif: company.cif,
+  email: company.email,
+  phone: company.phone,
+  contactPerson: company.contactPerson,
+  deliveryAddress: company.deliveryAddress,
+});
 
 export default function Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userEmail, isGuest, userProfile } = useAuth();
+  const { userEmail, isGuest, userProfile, updateOwnCompany } = useAuth();
   const { orders } = useOrders();
   const { products } = useProducts();
   const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
+  const [editingCompany, setEditingCompany] = useState(false);
+  const [companyDraft, setCompanyDraft] = useState(() => userProfile ? companyDraftFrom(userProfile) : null);
+  const [savingCompany, setSavingCompany] = useState(false);
+  const [companyMessage, setCompanyMessage] = useState('');
+  const [companyError, setCompanyError] = useState('');
   const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
+
+  useEffect(() => {
+    if (userProfile && !editingCompany) setCompanyDraft(companyDraftFrom(userProfile));
+  }, [editingCompany, userProfile]);
+
+  const saveCompany = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!companyDraft) return;
+    setSavingCompany(true);
+    setCompanyError('');
+    setCompanyMessage('');
+    const result = await updateOwnCompany(companyDraft);
+    setSavingCompany(false);
+    if (!result.success) {
+      setCompanyError(result.error || 'No se pudieron guardar los datos');
+      return;
+    }
+    setEditingCompany(false);
+    setCompanyMessage('Datos de empresa actualizados correctamente.');
+  };
 
   const toggleOrder = (id: string) =>
     setExpandedOrders(prev => ({ ...prev, [id]: !prev[id] }));
-
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
 
   /* ── Guest view ─────────────────────────────────── */
   if (isGuest) {
@@ -75,25 +108,68 @@ export default function Profile() {
 
         {userProfile && (
           <>
-            <p className="text-xs font-bold text-surface-400 uppercase tracking-widest mb-4">Datos de la empresa</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { Icon: Building2, label: 'Empresa',    value: userProfile.name },
-                { Icon: Building2, label: 'CIF',        value: userProfile.cif },
-                { Icon: Mail,      label: 'Email',       value: userProfile.email },
-                { Icon: Phone,     label: 'Teléfono',    value: userProfile.phone },
-                { Icon: User,      label: 'Contacto',    value: userProfile.contactPerson },
-                { Icon: MapPin,    label: 'Dirección',   value: userProfile.deliveryAddress },
-              ].map(({ Icon, label, value }) => (
-                <div key={label} className="flex items-start gap-3 p-3 rounded-xl bg-surface-50 border border-surface-100">
-                  <Icon className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[11px] text-surface-400 uppercase tracking-wide">{label}</p>
-                    <p className="text-sm font-medium text-surface-800 break-words">{value}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <p className="text-xs font-bold text-surface-400 uppercase tracking-widest">Datos de la empresa</p>
+              {!editingCompany && (
+                <button type="button" onClick={() => { setEditingCompany(true); setCompanyMessage(''); }} className="btn-secondary text-sm">
+                  <Pencil className="h-4 w-4" /> Editar datos
+                </button>
+              )}
             </div>
+
+            {companyMessage && <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{companyMessage}</div>}
+
+            {editingCompany && companyDraft ? (
+              <form onSubmit={saveCompany} className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {[
+                    { key: 'legalName', label: 'Nombre fiscal', Icon: Building2, required: true },
+                    { key: 'name', label: 'Nombre comercial', Icon: Building2, required: true },
+                    { key: 'cif', label: 'CIF', Icon: Building2 },
+                    { key: 'email', label: 'Email', Icon: Mail, type: 'email' },
+                    { key: 'phone', label: 'Teléfono', Icon: Phone, type: 'tel' },
+                    { key: 'contactPerson', label: 'Persona de contacto', Icon: User },
+                  ].map(({ key, label, Icon, required, type }) => (
+                    <label key={key} className="block">
+                      <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold text-surface-600"><Icon className="h-4 w-4 text-primary-500" />{label}</span>
+                      <input
+                        className="input-field"
+                        type={type || 'text'}
+                        required={required}
+                        value={companyDraft[key as keyof typeof companyDraft]}
+                        onChange={event => setCompanyDraft(current => current ? { ...current, [key]: event.target.value } : current)}
+                      />
+                    </label>
+                  ))}
+                  <label className="block sm:col-span-2">
+                    <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold text-surface-600"><MapPin className="h-4 w-4 text-primary-500" />Dirección de entrega</span>
+                    <input className="input-field" value={companyDraft.deliveryAddress} onChange={event => setCompanyDraft(current => current ? { ...current, deliveryAddress: event.target.value } : current)} />
+                  </label>
+                </div>
+                {companyError && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{companyError}</div>}
+                <div className="flex flex-wrap justify-end gap-3">
+                  <button type="button" className="btn-secondary" onClick={() => { setEditingCompany(false); setCompanyError(''); setCompanyDraft(companyDraftFrom(userProfile)); }}><X className="h-4 w-4" /> Cancelar</button>
+                  <button type="submit" className="btn-primary" disabled={savingCompany}><Save className="h-4 w-4" /> {savingCompany ? 'Guardando…' : 'Guardar cambios'}</button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { Icon: Building2, label: 'Nombre fiscal', value: userProfile.legalName },
+                  { Icon: Building2, label: 'Empresa', value: userProfile.name },
+                  { Icon: Building2, label: 'CIF', value: userProfile.cif },
+                  { Icon: Mail, label: 'Email', value: userProfile.email },
+                  { Icon: Phone, label: 'Teléfono', value: userProfile.phone },
+                  { Icon: User, label: 'Contacto', value: userProfile.contactPerson },
+                  { Icon: MapPin, label: 'Dirección', value: userProfile.deliveryAddress },
+                ].map(({ Icon, label, value }) => (
+                  <div key={label} className="flex items-start gap-3 p-3 rounded-xl bg-surface-50 border border-surface-100">
+                    <Icon className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0"><p className="text-[11px] text-surface-400 uppercase tracking-wide">{label}</p><p className="text-sm font-medium text-surface-800 break-words">{value || '—'}</p></div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

@@ -387,8 +387,7 @@ declare
   v_company public.companies%rowtype;
   v_token text;
 begin
-  if length(v_pin) <> 6 or public.pin_is_limited('company', v_pin) then
-    perform public.record_pin_attempt('company', v_pin, false);
+  if length(v_pin) <> 6 then
     return;
   end if;
 
@@ -398,28 +397,35 @@ begin
     and c.pin = v_pin
   limit 1;
 
-  if not found then
-    perform public.record_pin_attempt('company', v_pin, false);
+  if found then
+    delete from public.pin_attempts
+    where scope = 'company'
+      and pin_fingerprint = encode(extensions.digest(v_pin, 'sha256'), 'hex');
+
+    v_token := public.create_app_session('company', v_company.id, null);
+
+    return query select
+      v_token,
+      v_company.id,
+      v_company.name,
+      v_company.cif,
+      v_company.email,
+      v_company.phone,
+      v_company.contact_person,
+      v_company.delivery_address,
+      v_company.pin,
+      right(v_company.pin, 2),
+      v_company.active,
+      v_company.created_at,
+      v_company.notes;
     return;
   end if;
 
-  perform public.record_pin_attempt('company', v_pin, true);
-  v_token := public.create_app_session('company', v_company.id, null);
-
-  return query select
-    v_token,
-    v_company.id,
-    v_company.name,
-    v_company.cif,
-    v_company.email,
-    v_company.phone,
-    v_company.contact_person,
-    v_company.delivery_address,
-    v_company.pin,
-    right(v_company.pin, 2),
-    v_company.active,
-    v_company.created_at,
-    v_company.notes;
+  if public.pin_is_limited('company', v_pin) then
+    return;
+  else
+    perform public.record_pin_attempt('company', v_pin, false);
+  end if;
 end;
 $$;
 
@@ -439,8 +445,7 @@ declare
   v_admin public.super_admins%rowtype;
   v_token text;
 begin
-  if length(v_pin) <> 6 or public.pin_is_limited('super_admin', v_pin) then
-    perform public.record_pin_attempt('super_admin', v_pin, false);
+  if length(v_pin) <> 6 then
     return;
   end if;
 
@@ -450,15 +455,21 @@ begin
     and a.pin = v_pin
   limit 1;
 
-  if not found then
-    perform public.record_pin_attempt('super_admin', v_pin, false);
+  if found then
+    delete from public.pin_attempts
+    where scope = 'super_admin'
+      and pin_fingerprint = encode(extensions.digest(v_pin, 'sha256'), 'hex');
+
+    v_token := public.create_app_session('super_admin', null, v_admin.id);
+    return query select v_token, v_admin.id, v_admin.name, v_admin.email;
     return;
   end if;
 
-  perform public.record_pin_attempt('super_admin', v_pin, true);
-  v_token := public.create_app_session('super_admin', null, v_admin.id);
-
-  return query select v_token, v_admin.id, v_admin.name, v_admin.email;
+  if public.pin_is_limited('super_admin', v_pin) then
+    return;
+  else
+    perform public.record_pin_attempt('super_admin', v_pin, false);
+  end if;
 end;
 $$;
 
@@ -514,6 +525,76 @@ begin
   from public.super_admins a
   where a.id = v_admin_id;
 end;
+$$;
+
+create or replace function public.update_company_profile(p_company_token text, p_updates jsonb)
+returns table (
+  id text,
+  legal_name text,
+  name text,
+  cif text,
+  email text,
+  phone text,
+  contact_person text,
+  delivery_address text,
+  pin text,
+  pin_hint text,
+  active boolean,
+  created_at timestamptz,
+  notes text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_company_id text;
+begin
+  v_company_id := public.require_company_session(p_company_token);
+
+  update public.companies c
+  set
+    legal_name = coalesce(nullif(trim(p_updates->>'legal_name'), ''), c.legal_name),
+    name = coalesce(nullif(trim(p_updates->>'name'), ''), c.name),
+    cif = coalesce(p_updates->>'cif', c.cif),
+    email = coalesce(p_updates->>'email', c.email),
+    phone = coalesce(p_updates->>'phone', c.phone),
+    contact_person = coalesce(p_updates->>'contact_person', c.contact_person),
+    delivery_address = coalesce(p_updates->>'delivery_address', c.delivery_address)
+  where c.id = v_company_id;
+
+  return query
+  select c.id, c.legal_name, c.name, c.cif, c.email, c.phone, c.contact_person,
+         c.delivery_address, ''::text, right(c.pin, 2), c.active, c.created_at, c.notes
+  from public.companies c
+  where c.id = v_company_id;
+end;
+$$;
+
+create or replace function public.get_company_profile(p_company_token text)
+returns table (
+  id text,
+  legal_name text,
+  name text,
+  cif text,
+  email text,
+  phone text,
+  contact_person text,
+  delivery_address text,
+  pin text,
+  pin_hint text,
+  active boolean,
+  created_at timestamptz,
+  notes text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select c.id, c.legal_name, c.name, c.cif, c.email, c.phone, c.contact_person,
+         c.delivery_address, ''::text, right(c.pin, 2), c.active, c.created_at, c.notes
+  from public.companies c
+  where c.id = public.require_company_session(p_company_token);
 $$;
 
 create or replace function public.list_admin_companies(p_admin_token text)
@@ -1099,6 +1180,8 @@ grant usage on schema public to anon, authenticated;
 grant execute on function public.verify_company_pin(text) to anon, authenticated;
 grant execute on function public.verify_super_admin_pin(text) to anon, authenticated;
 grant execute on function public.validate_company_session(text) to anon, authenticated;
+grant execute on function public.update_company_profile(text, jsonb) to anon, authenticated;
+grant execute on function public.get_company_profile(text) to anon, authenticated;
 grant execute on function public.validate_super_admin_session(text) to anon, authenticated;
 grant execute on function public.list_admin_companies(text) to anon, authenticated;
 grant execute on function public.admin_create_company(text, jsonb, text) to anon, authenticated;

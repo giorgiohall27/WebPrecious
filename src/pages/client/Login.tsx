@@ -117,17 +117,17 @@ export default function ClientLogin() {
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-5xl">
+        <div className="w-full max-w-4xl">
           <div className="text-center mb-8">
             <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">{t('auth.loginPortalLabel')}</p>
             <h1 className="text-4xl lg:text-5xl font-black text-surface-900 tracking-[0.16em] uppercase">Precious Spain</h1>
             <p className="text-sm text-surface-500 mt-3">{t('auth.chooseAccess')}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <form
               onSubmit={handleCompanySubmit}
-              className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${preferredAdmin ? 'border-surface-200' : 'border-primary-200 ring-4 ring-primary-50'}`}
+              className={`w-full max-w-xl justify-self-center bg-white rounded-2xl shadow-xl border overflow-hidden lg:col-span-2 ${preferredAdmin || preferredSupplier ? 'border-surface-200' : 'border-primary-200 ring-4 ring-primary-50'}`}
             >
               <div className="bg-[#0C1E35] px-7 py-7 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-25" style={{ background: 'radial-gradient(circle at 18% 22%, rgba(59,130,246,0.9), transparent 38%)' }} />
@@ -179,11 +179,17 @@ export default function ClientLogin() {
               </div>
             </form>
 
+            <div className="lg:col-span-2 mt-5 flex items-center gap-4" aria-hidden="true">
+              <div className="h-px flex-1 bg-surface-200" />
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-surface-400">Otros accesos</span>
+              <div className="h-px flex-1 bg-surface-200" />
+            </div>
+
             <form onSubmit={handleSupplierSubmit} className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${preferredSupplier ? 'border-primary-200 ring-4 ring-primary-50' : 'border-surface-200'}`}>
               <div className="bg-primary-700 px-7 py-7 text-white">
                 <div className="flex items-start gap-4">
                   <div className="w-13 h-13 rounded-2xl bg-white/12 border border-white/15 flex items-center justify-center shrink-0" style={{ width: 52, height: 52 }}><Truck className="w-7 h-7" /></div>
-                  <div><h2 className="text-2xl font-bold mb-1">Proveedor</h2><p className="text-sm text-white/70">Acceso para preparar preventas</p></div>
+                  <div><h2 className="text-2xl font-bold mb-1">Preventa / Proveedor</h2><p className="text-sm text-white/70">Acceso para preparar preventas</p></div>
                 </div>
               </div>
               <div className="p-7 space-y-5">

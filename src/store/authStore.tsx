@@ -211,6 +211,7 @@ interface AuthContextType {
   logoutSupplier: () => void;
   addCompany: (company: CompanyInput) => ActionResult<{ company?: ManagedCompany }>;
   updateCompany: (id: string, updates: Partial<CompanyInput>) => ActionResult<{ company?: ManagedCompany }>;
+  updateOwnCompany: (updates: Partial<CompanyInput>) => ActionResult<{ company?: ManagedCompany }>;
   removeCompany: (id: string) => Promise<void>;
   generatePin: () => string;
   refreshCompanies: () => Promise<void>;
@@ -240,6 +241,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isSupplier = Boolean(supplierSessionToken && supplierProfile);
 
   const userEmail = currentCompany?.email ?? null;
+
+  useEffect(() => {
+    // A browser can only hold one active role. This also cleans up sessions
+    // left behind by older versions of the application.
+    if (companySessionToken) {
+      if (superAdminSessionToken) {
+        setSuperAdminSessionToken(null);
+        setIsSuperAdmin(false);
+        removeStored(SUPER_ADMIN_SESSION_KEY);
+      }
+      if (supplierSessionToken) {
+        setSupplierSessionToken(null);
+        setSupplierProfile(null);
+        removeStored(SUPPLIER_SESSION_KEY);
+        removeStored(SUPPLIER_PROFILE_KEY);
+      }
+      return;
+    }
+
+    if (superAdminSessionToken && supplierSessionToken) {
+      setSupplierSessionToken(null);
+      setSupplierProfile(null);
+      removeStored(SUPPLIER_SESSION_KEY);
+      removeStored(SUPPLIER_PROFILE_KEY);
+    }
+  }, [companySessionToken, superAdminSessionToken, supplierSessionToken]);
 
   const refreshCompanies = async () => {
     if (!supabaseEnabled) return;
@@ -275,7 +302,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.rpc('validate_company_session', { p_session_token: companySessionToken }).then(({ data, error }) => {
+    supabase.rpc('get_company_profile', { p_company_token: companySessionToken }).then(({ data, error }) => {
       const company = data?.[0] ? toCompany(data[0]) : null;
       if (error || !company) {
         setCompanySessionToken(null);
@@ -350,6 +377,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return pin;
   };
 
+  const clearCompanySession = () => {
+    setCurrentCompany(null);
+    setCompanySessionToken(null);
+    removeStored(COMPANY_SESSION_KEY);
+    removeStored(COMPANY_PROFILE_KEY);
+  };
+
+  const clearSuperAdminSession = () => {
+    setIsSuperAdmin(false);
+    setSuperAdminSessionToken(null);
+    if (supabaseEnabled) setCompanies([]);
+    removeStored(SUPER_ADMIN_SESSION_KEY);
+  };
+
+  const clearSupplierSession = () => {
+    setSupplierSessionToken(null);
+    setSupplierProfile(null);
+    if (supabaseEnabled) setCompanies([]);
+    removeStored(SUPPLIER_SESSION_KEY);
+    removeStored(SUPPLIER_PROFILE_KEY);
+  };
+
   const loginWithPin = async (pin: string): ActionResult => {
     const cleanPin = normalizePin(pin);
     if (cleanPin.length !== 6) {
@@ -358,12 +407,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (supabaseEnabled) {
       const { data, error } = await supabase.rpc('verify_company_pin', { p_pin: cleanPin });
+      if (error) {
+        console.error('Error verifying company PIN:', error);
+        return { success: false, error: 'El servicio de acceso no esta disponible temporalmente. Intentalo de nuevo en unos minutos.' };
+      }
       const row = data?.[0];
-      if (error || !row?.session_token) {
+      if (!row?.session_token) {
         return { success: false, error: 'PIN no encontrado o bloqueado temporalmente' };
       }
 
-      const company = toCompany(row);
+      const { data: profileData } = await supabase.rpc('get_company_profile', { p_company_token: row.session_token });
+      const company = toCompany(profileData?.[0] ?? row);
+      clearSuperAdminSession();
+      clearSupplierSession();
       setCompanySessionToken(row.session_token);
       setCurrentCompany(company);
       writeText(COMPANY_SESSION_KEY, row.session_token);
@@ -375,6 +431,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!company) return { success: false, error: 'PIN no encontrado' };
     if (!company.active) return { success: false, error: 'Esta empresa esta desactivada' };
 
+    clearSuperAdminSession();
+    clearSupplierSession();
     setCurrentCompany(company);
     writeJson(COMPANY_PROFILE_KEY, company);
     return { success: true };
@@ -390,6 +448,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (password !== SUPER_ADMIN_PASSWORD) return { success: false, error: 'Clave de Super Admin incorrecta' };
     if (!admin.active) return { success: false, error: 'Este Super Admin esta desactivado' };
 
+    clearCompanySession();
+    clearSupplierSession();
     setIsSuperAdmin(true);
     writeText(SUPER_ADMIN_SESSION_KEY, 'local-super-admin');
     return { success: true };
@@ -403,11 +463,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (supabaseEnabled) {
       const { data, error } = await supabase.rpc('verify_super_admin_pin', { p_pin: cleanPin });
+      if (error) {
+        console.error('Error verifying Super Admin PIN:', error);
+        return { success: false, error: 'El servicio de acceso no esta disponible temporalmente. Intentalo de nuevo en unos minutos.' };
+      }
       const row = data?.[0];
-      if (error || !row?.session_token) {
+      if (!row?.session_token) {
         return { success: false, error: 'PIN de Super Admin incorrecto o bloqueado temporalmente' };
       }
 
+      clearCompanySession();
+      clearSupplierSession();
       setSuperAdminSessionToken(row.session_token);
       setIsSuperAdmin(true);
       writeText(SUPER_ADMIN_SESSION_KEY, row.session_token);
@@ -418,6 +484,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!admin) return { success: false, error: 'PIN de Super Admin incorrecto' };
     if (!admin.active) return { success: false, error: 'Este Super Admin esta desactivado' };
 
+    clearCompanySession();
+    clearSupplierSession();
     setIsSuperAdmin(true);
     writeText(SUPER_ADMIN_SESSION_KEY, 'local-super-admin');
     return { success: true };
@@ -428,9 +496,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (cleanPin.length !== 6) return { success: false, error: 'Introduce un PIN de 6 digitos' };
     if (!supabaseEnabled) return { success: false, error: 'El acceso de proveedor requiere conexión a la base de datos' };
     const { data, error } = await supabase.rpc('verify_supplier_pin', { p_pin: cleanPin });
+    if (error) {
+      console.error('Error verifying supplier PIN:', error);
+      return { success: false, error: 'El servicio de acceso no esta disponible temporalmente. Intentalo de nuevo en unos minutos.' };
+    }
     const row = data?.[0];
-    if (error || !row?.session_token) return { success: false, error: 'PIN de proveedor incorrecto o bloqueado temporalmente' };
+    if (!row?.session_token) return { success: false, error: 'PIN de proveedor incorrecto o bloqueado temporalmente' };
     const supplier = toSupplier(row);
+    clearCompanySession();
+    clearSuperAdminSession();
     setSupplierSessionToken(row.session_token);
     setSupplierProfile(supplier);
     writeText(SUPPLIER_SESSION_KEY, row.session_token);
@@ -439,33 +513,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginAsGuest = () => {
-    setCurrentCompany(null);
-    setCompanySessionToken(null);
-    removeStored(COMPANY_SESSION_KEY);
-    removeStored(COMPANY_PROFILE_KEY);
+    clearCompanySession();
+    clearSuperAdminSession();
+    clearSupplierSession();
   };
 
-  const logout = () => {
-    setCurrentCompany(null);
-    setCompanySessionToken(null);
-    removeStored(COMPANY_SESSION_KEY);
-    removeStored(COMPANY_PROFILE_KEY);
-  };
+  const logout = clearCompanySession;
 
-  const logoutSuperAdmin = () => {
-    setIsSuperAdmin(false);
-    setSuperAdminSessionToken(null);
-    setCompanies(supabaseEnabled ? [] : companies);
-    removeStored(SUPER_ADMIN_SESSION_KEY);
-  };
+  const logoutSuperAdmin = clearSuperAdminSession;
 
-  const logoutSupplier = () => {
-    setSupplierSessionToken(null);
-    setSupplierProfile(null);
-    setCompanies([]);
-    removeStored(SUPPLIER_SESSION_KEY);
-    removeStored(SUPPLIER_PROFILE_KEY);
-  };
+  const logoutSupplier = clearSupplierSession;
 
   const addSupplier = async (supplier: SupplierInput): ActionResult<{ supplier?: ManagedSupplier }> => {
     const cleanPin = normalizePin(supplier.pin);
@@ -606,6 +663,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true, company: updatedCompany };
   };
 
+  const updateOwnCompany = async (updates: Partial<CompanyInput>): ActionResult<{ company?: ManagedCompany }> => {
+    if (!currentCompany || !companySessionToken) return { success: false, error: 'Sesion de empresa caducada' };
+
+    const cleanUpdates: Partial<CompanyInput> = {
+      legalName: updates.legalName?.trim(),
+      name: updates.name?.trim(),
+      cif: updates.cif?.trim(),
+      email: updates.email?.trim(),
+      phone: updates.phone?.trim(),
+      contactPerson: updates.contactPerson?.trim(),
+      deliveryAddress: updates.deliveryAddress?.trim(),
+    };
+
+    if (!cleanUpdates.name) return { success: false, error: 'La empresa necesita un nombre' };
+    if (!cleanUpdates.legalName) return { success: false, error: 'El nombre fiscal es obligatorio' };
+
+    if (supabaseEnabled) {
+      const { data, error } = await supabase.rpc('update_company_profile', {
+        p_company_token: companySessionToken,
+        p_updates: companyToPayload(cleanUpdates),
+      });
+      const row = data?.[0];
+      if (error || !row) return { success: false, error: error?.message || 'No se pudieron guardar los datos' };
+
+      const updated = { ...toCompany(row), pin: currentCompany.pin, pinHint: currentCompany.pinHint };
+      setCurrentCompany(updated);
+      writeJson(COMPANY_PROFILE_KEY, updated);
+      return { success: true, company: updated };
+    }
+
+    const updated = { ...currentCompany, ...cleanUpdates };
+    setCurrentCompany(updated);
+    setCompanies(current => current.map(company => company.id === updated.id ? updated : company));
+    writeJson(COMPANY_PROFILE_KEY, updated);
+    return { success: true, company: updated };
+  };
+
   const removeCompany = async (id: string) => {
     setCompanies(prev => prev.filter(company => company.id !== id));
 
@@ -645,6 +739,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logoutSupplier,
     addCompany,
     updateCompany,
+    updateOwnCompany,
     removeCompany,
     generatePin,
     refreshCompanies,

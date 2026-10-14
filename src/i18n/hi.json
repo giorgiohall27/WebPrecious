@@ -124,7 +124,7 @@
     "expandOrder": "उत्पाद देखें",
     "collapseOrder": "छुपाएं",
     "shopByCategory": "श्रेणी के अनुसार खरीदें",
-    "weeklyPromotions": "सप्ताह के प्रमोशन",
+    "weeklyPromotions": "प्रमोशन",
     "weeklyPromotionsSubtitle": "विशेष उत्पादों का चयन"
   },
   "categoryNames": {
@@ -246,7 +246,7 @@
     "deleteConfirm": "इस श्रेणी को हटाने से इसके उत्पाद 'बिना श्रेणी' में चले जाएंगे। जारी रखें?"
   },
   "promotions": {
-    "title": "सप्ताह के प्रमोशन",
+    "title": "प्रमोशन",
     "subtitle": "होमपेज पर दिखाने के लिए उत्पाद चुनें और उनका प्रमोशनल मूल्य तय करें।",
     "searchProduct": "प्रमोशन के लिए उत्पाद खोजें...",
     "promoPrice": "प्रमो मूल्य",
@@ -294,6 +294,7 @@
     "perBox": "€/बॉक्स",
     "unitsShort": "इकाइयाँ",
     "unitPrice": "इकाई मूल्य",
+    "boxPrice": "बॉक्स मूल्य",
     "subtotal": "उपकुल",
     "remove": "हटाएं",
     "categorySubtotal": "उपकुल",
@@ -311,6 +312,7 @@
     "keepShopping": "खरीदारी जारी रखें",
     "reviewAndSend": "ऑर्डर की समीक्षा करें और भेजें",
     "unitsPerBoxLabel": "प्रति बॉक्स इकाइयाँ",
+    "boxContents": "प्रति बॉक्स सामग्री",
     "promotionProduct": "प्रमोशनल उत्पाद",
     "companyData": "कंपनी विवरण",
     "sendOrder": "ऑर्डर भेजें",

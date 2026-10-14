@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatDateTime } from '../../utils/dateFormat';
 import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Order } from '../../types';
@@ -65,7 +66,7 @@ export default function Orders() {
                       <span className="badge border bg-blue-50 text-blue-700 border-blue-200">Pedido recibido</span>
                     </div>
                     <p className="font-semibold text-surface-900">{order.companyName}</p>
-                    <p className="text-xs text-surface-400">{new Date(order.createdAt).toLocaleString()} · {order.totalItems} {t('orders.items').toLowerCase()}</p>
+                    <p className="text-xs text-surface-400">{formatDateTime(order.createdAt)} · {order.totalItems} {t('orders.items').toLowerCase()}</p>
                   </div>
                   <div className="text-left lg:text-right">
                     <p className="text-xl font-bold text-surface-900">{order.totalAmount.toFixed(2)} €</p>

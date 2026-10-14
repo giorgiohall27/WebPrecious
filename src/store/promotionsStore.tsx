@@ -11,6 +11,7 @@ export interface Promotion {
 interface PromotionsContextType {
   promotions: Promotion[];
   upsertPromotion: (promotion: Promotion) => void;
+  upsertPromotions: (promotions: Promotion[]) => void;
   removePromotion: (productId: string) => void;
   clearPromotions: () => void;
 }
@@ -47,6 +48,19 @@ export function PromotionsProvider({ children }: { children: ReactNode }) {
     );
   }, [promotions, writePromotions]);
 
+  const upsertPromotions = useCallback((incoming: Promotion[]) => {
+    if (incoming.length === 0) return;
+    setPromotions(current => {
+      const replacements = new Map(incoming.map(promotion => [promotion.productId, promotion]));
+      const next = [
+        ...current.map(promotion => replacements.get(promotion.productId) ?? promotion),
+        ...incoming.filter(promotion => !current.some(item => item.productId === promotion.productId)),
+      ];
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const removePromotion = useCallback((productId: string) => {
     writePromotions(promotions.filter(item => item.productId !== productId));
   }, [promotions, writePromotions]);
@@ -71,8 +85,8 @@ export function PromotionsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ promotions, upsertPromotion, removePromotion, clearPromotions }),
-    [clearPromotions, promotions, removePromotion, upsertPromotion],
+    () => ({ promotions, upsertPromotion, upsertPromotions, removePromotion, clearPromotions }),
+    [clearPromotions, promotions, removePromotion, upsertPromotion, upsertPromotions],
   );
 
   return React.createElement(PromotionsContext.Provider, { value, children });

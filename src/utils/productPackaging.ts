@@ -28,3 +28,24 @@ export function normalizeProductPackaging(product: Product): Product {
     unitsPerBox: inferred ?? product.unitsPerBox ?? 1,
   };
 }
+
+function formatMeasure(value: string) {
+  return value
+    .trim()
+    .replace(/\s*[xX×]\s*/g, ' × ')
+    .replace(/(\d+(?:[.,]\d+)?)\s*(kg|gr|g|ml|cl|lt|l|oz)\b/gi, (_, amount: string, unit: string) => {
+      const normalizedUnit = unit.toLowerCase() === 'gr' ? 'g' : unit.toLowerCase() === 'lt' ? 'l' : unit.toLowerCase();
+      return `${amount.replace(',', '.')} ${normalizedUnit}`;
+    })
+    .replace(/(\d+)\s*pk\b/gi, '$1 pack')
+    .replace(/\s+/g, ' ');
+}
+
+export function formatProductPackaging(product: Pick<Product, 'unitMeasure' | 'unitsPerBox'>) {
+  const measure = formatMeasure(product.unitMeasure ?? '');
+  const unitsPerBox = product.unitsPerBox || 1;
+
+  if (!measure) return `${unitsPerBox} ud.`;
+  if (/^\d+\s*(?:×|pack\b)/i.test(measure)) return measure;
+  return unitsPerBox > 1 ? `${unitsPerBox} × ${measure}` : measure;
+}

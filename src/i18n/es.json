@@ -124,7 +124,7 @@
     "expandOrder": "Ver productos",
     "collapseOrder": "Ocultar productos",
     "shopByCategory": "Comprar por Categoría",
-    "weeklyPromotions": "Promociones de la Semana",
+    "weeklyPromotions": "Promociones",
     "weeklyPromotionsSubtitle": "Selección especial de productos destacados"
   },
   "categoryNames": {
@@ -246,7 +246,7 @@
     "deleteConfirm": "Al eliminar esta categoría, sus productos pasarán a 'Sin Categoría'. ¿Continuar?"
   },
   "promotions": {
-    "title": "Promociones de la Semana",
+    "title": "Promociones",
     "subtitle": "Elige productos y define su precio promocional para mostrarlos en el inicio.",
     "searchProduct": "Buscar producto para promocionar...",
     "promoPrice": "Precio promo",
@@ -294,6 +294,7 @@
     "perBox": "€/caja",
     "unitsShort": "uds",
     "unitPrice": "Precio Ud.",
+    "boxPrice": "Precio caja",
     "subtotal": "Subtotal",
     "remove": "Eliminar",
     "categorySubtotal": "Subtotal",
@@ -311,6 +312,7 @@
     "keepShopping": "Seguir comprando",
     "reviewAndSend": "Revisar y enviar pedido",
     "unitsPerBoxLabel": "unidades por caja",
+    "boxContents": "Contenido por caja",
     "promotionProduct": "Producto en promoción",
     "companyData": "Datos de la Empresa",
     "sendOrder": "Enviar Pedido",

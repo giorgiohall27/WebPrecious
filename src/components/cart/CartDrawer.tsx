@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../../store/cartStore';
 import { useProducts } from '../../store/productsStore';
+import { formatProductPackaging } from '../../utils/productPackaging';
 
 interface CartDrawerProps {
   open: boolean;
@@ -85,7 +86,9 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             <div className="flex-1 overflow-y-auto divide-y divide-surface-100">
               {items.map(item => {
                 const unitsPerBox = item.product.unitsPerBox || 1;
+                const packaging = formatProductPackaging(item.product);
                 const unitPrice = item.unitPriceOverride ?? item.product.price;
+                const boxPrice = unitPrice * unitsPerBox;
                 const total = unitPrice * unitsPerBox * item.quantity * (1 + ((item.product.iva ?? 0) / 100));
                 return (
                   <div key={`${item.product.id}-${unitPrice}`} className="p-4 flex gap-3">
@@ -103,11 +106,24 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                             {item.product.brand || 'Sin marca'}
                           </p>
                           <p className="text-sm font-semibold text-surface-900 break-words mt-0.5">{item.product.name}</p>
-                          <p className="text-[11px] text-surface-500 mt-1">{unitsPerBox} {t('cart.unitsPerBoxLabel')}</p>
+                          <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-primary-50 px-2 py-1 text-[11px] text-primary-800">
+                            <span className="font-medium text-primary-600">{t('cart.boxContents')}:</span>
+                            <span className="font-bold">{packaging}</span>
+                          </div>
                           {item.unitPriceOverride !== undefined && (
                             <span className="inline-flex mt-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase">{t('cart.promotionProduct')}</span>
                           )}
-                          <p className="text-[11px] text-surface-400 mt-1">{item.product.sku}</p>
+                          {item.product.iva === 21 && (
+                            <span className="ml-1 inline-flex mt-1 rounded-full bg-sky-100 text-sky-700 px-2 py-0.5 text-[10px] font-bold uppercase">IVA 21%</span>
+                          )}
+                          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+                            <span className="text-surface-500">
+                              {t('cart.unitPrice')}: <strong className="text-surface-800">{unitPrice.toFixed(2)} €</strong>
+                            </span>
+                            <span className="text-surface-500">
+                              {t('cart.boxPrice')}: <strong className="text-surface-800">{boxPrice.toFixed(2)} €</strong>
+                            </span>
+                          </div>
                         </div>
                         <button
                           type="button"
