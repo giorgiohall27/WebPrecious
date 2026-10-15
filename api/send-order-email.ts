@@ -128,7 +128,7 @@ const layout = (title: string, content: string) => `
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:800px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,.08)">
         <tr><td style="height:7px;background:#2563eb"></td></tr>
         <tr><td style="padding:28px 28px 12px;font-family:Arial,sans-serif">
-          <div style="color:#2563eb;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Precious Spain · Portal B2B</div>
+          <div style="color:#2563eb;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Precious Spain</div>
           <h1 style="color:#111827;font-size:25px;line-height:1.25;margin:0">${escapeHtml(title)}</h1>
         </td></tr>
         <tr><td style="padding:8px 28px 30px;font-family:Arial,sans-serif;color:#111827;line-height:1.55;font-size:14px">${content}</td></tr>

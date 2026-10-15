@@ -59,8 +59,8 @@ export default function ClientDashboard() {
   const { products, categories, adjustStock } = useProducts();
   const { addItem, updateQuantity, items: cartItems } = useCart();
   const { promotions } = usePromotions();
-  const { isLoggedIn, isSuperAdmin } = useAuth();
-  const canViewSensitive = isLoggedIn || isSuperAdmin;
+  const { isLoggedIn, isSuperAdmin, isSupplier } = useAuth();
+  const canViewSensitive = isLoggedIn || isSuperAdmin || isSupplier;
   const promoQuantities = useMemo(() => cartItems.reduce<Record<string, number>>((totals, item) => {
     totals[item.product.id] = (totals[item.product.id] ?? 0) + item.quantity;
     return totals;

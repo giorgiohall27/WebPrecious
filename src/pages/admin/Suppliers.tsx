@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Copy, KeyRound, Plus, Power, Search, Trash2, Truck } from 'lucide-react';
+import { Copy, KeyRound, Pencil, Plus, Power, RefreshCw, Save, Search, Trash2, Truck, X } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
 import { ManagedSupplier } from '../../types';
 
@@ -12,6 +12,8 @@ export default function Suppliers() {
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<SupplierDraft | null>(null);
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return suppliers.filter(supplier => !query || [supplier.name, supplier.email, supplier.phone, supplier.contactPerson].some(value => value.toLowerCase().includes(query)));
@@ -36,6 +38,49 @@ export default function Suppliers() {
     }
     await navigator.clipboard.writeText(supplier.pin);
     setMessage(`PIN de ${supplier.name} copiado.`);
+  };
+
+  const startEditing = (supplier: ManagedSupplier) => {
+    setEditingId(supplier.id);
+    setEditDraft({
+      name: supplier.name,
+      email: supplier.email,
+      phone: supplier.phone,
+      contactPerson: supplier.contactPerson,
+      pin: '',
+      active: supplier.active,
+      notes: supplier.notes ?? '',
+    });
+    setError('');
+    setMessage('');
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditDraft(null);
+  };
+
+  const setEditField = (field: keyof SupplierDraft, value: string | boolean) => {
+    setEditDraft(current => current ? {
+      ...current,
+      [field]: field === 'pin' && typeof value === 'string' ? value.replace(/\D/g, '').slice(0, 6) : value,
+    } : current);
+  };
+
+  const saveSupplier = async (supplier: ManagedSupplier) => {
+    if (!editDraft) return;
+    if (editDraft.pin && editDraft.pin.length !== 6) {
+      setError('El PIN del proveedor debe tener 6 dígitos.');
+      return;
+    }
+    const result = await updateSupplier(supplier.id, editDraft);
+    if (!result.success) {
+      setError(result.error || 'No se pudo actualizar el proveedor');
+      return;
+    }
+    cancelEditing();
+    setError('');
+    setMessage(editDraft.pin ? `Proveedor actualizado y PIN de ${supplier.name} cambiado.` : 'Proveedor actualizado.');
   };
 
   const inputClass = 'input-field';
@@ -73,8 +118,38 @@ export default function Suppliers() {
       </form>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map(supplier => (
+        {filtered.map(supplier => {
+          const editing = editingId === supplier.id && editDraft;
+          return (
           <article key={supplier.id} className="card p-5 space-y-4">
+            {editing ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-surface-900">Editar proveedor</h3>
+                  <button type="button" onClick={cancelEditing} className="btn-icon" title="Cancelar"><X className="h-4 w-4" /></button>
+                </div>
+                <input required className={inputClass} placeholder="Nombre del proveedor" value={editDraft.name} onChange={event => setEditField('name', event.target.value)} />
+                <input className={inputClass} type="email" placeholder="Email" value={editDraft.email} onChange={event => setEditField('email', event.target.value)} />
+                <input className={inputClass} placeholder="Teléfono" value={editDraft.phone} onChange={event => setEditField('phone', event.target.value)} />
+                <input className={inputClass} placeholder="Persona de contacto" value={editDraft.contactPerson} onChange={event => setEditField('contactPerson', event.target.value)} />
+                <div>
+                  <label className="input-label">Cambiar PIN (opcional)</label>
+                  <div className="flex gap-2">
+                    <input inputMode="numeric" maxLength={6} className={`${inputClass} font-mono tracking-widest`} placeholder="Nuevo PIN de 6 dígitos" value={editDraft.pin} onChange={event => setEditField('pin', event.target.value)} />
+                    <button type="button" className="btn-secondary px-3" onClick={() => setEditField('pin', generateSupplierPin())} title="Generar PIN"><RefreshCw className="w-4 h-4" /></button>
+                  </div>
+                  <p className="mt-1 text-[11px] text-surface-400">Déjalo vacío para conservar el PIN actual.</p>
+                </div>
+                <input className={inputClass} placeholder="Notas" value={editDraft.notes} onChange={event => setEditField('notes', event.target.value)} />
+                <label className="flex items-center gap-2 text-sm text-surface-700">
+                  <input type="checkbox" checked={editDraft.active} onChange={event => setEditField('active', event.target.checked)} /> Proveedor activo
+                </label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={cancelEditing} className="btn-secondary flex-1"><X className="w-4 h-4" />Cancelar</button>
+                  <button type="button" onClick={() => saveSupplier(supplier)} className="btn-primary flex-1"><Save className="w-4 h-4" />Guardar</button>
+                </div>
+              </div>
+            ) : (<>
             <div className="flex items-start justify-between gap-3">
               <div><h3 className="font-bold text-surface-900">{supplier.name}</h3><p className="text-xs text-surface-400">{supplier.contactPerson || 'Sin contacto'}</p></div>
               <span className={`badge border ${supplier.active ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-surface-100 text-surface-500 border-surface-200'}`}>{supplier.active ? 'Activo' : 'Desactivado'}</span>
@@ -86,10 +161,12 @@ export default function Suppliers() {
             </div>
             <div className="flex gap-2">
               <button type="button" className="btn-secondary flex-1 justify-center" onClick={() => updateSupplier(supplier.id, { active: !supplier.active })}><Power className="w-4 h-4" />{supplier.active ? 'Desactivar' : 'Activar'}</button>
+              <button type="button" className="btn-secondary px-3" onClick={() => startEditing(supplier)} title="Editar proveedor y PIN"><Pencil className="w-4 h-4" /></button>
               <button type="button" className="btn-icon text-red-500 hover:bg-red-50" onClick={() => removeSupplier(supplier.id)} title="Eliminar"><Trash2 className="w-4 h-4" /></button>
             </div>
+            </>)}
           </article>
-        ))}
+        );})}
       </div>
     </div>
   );

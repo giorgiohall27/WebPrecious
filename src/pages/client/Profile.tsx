@@ -23,7 +23,7 @@ const companyDraftFrom = (company: NonNullable<ReturnType<typeof useAuth>['userP
 export default function Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userEmail, isGuest, userProfile, updateOwnCompany } = useAuth();
+  const { userEmail, isGuest, isSupplier, supplierProfile, userProfile, updateOwnCompany } = useAuth();
   const { orders } = useOrders();
   const { products } = useProducts();
   const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
@@ -33,6 +33,11 @@ export default function Profile() {
   const [companyMessage, setCompanyMessage] = useState('');
   const [companyError, setCompanyError] = useState('');
   const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
+  const recentOrders = useMemo(() => {
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    return orders.filter(order => new Date(order.createdAt) >= twoMonthsAgo);
+  }, [orders]);
 
   useEffect(() => {
     if (userProfile && !editingCompany) setCompanyDraft(companyDraftFrom(userProfile));
@@ -58,7 +63,7 @@ export default function Profile() {
     setExpandedOrders(prev => ({ ...prev, [id]: !prev[id] }));
 
   /* ── Guest view ─────────────────────────────────── */
-  if (isGuest) {
+  if (isGuest && !isSupplier) {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 animate-fade-in text-center">
         <div className="w-16 h-16 rounded-full bg-surface-100 flex items-center justify-center mx-auto mb-5">
@@ -100,9 +105,9 @@ export default function Profile() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-surface-900">
-              {userProfile?.name ?? userEmail?.split('@')[0]}
+              {supplierProfile?.name ?? userProfile?.name ?? userEmail?.split('@')[0]}
             </h1>
-            <p className="text-sm text-surface-400">{userEmail}</p>
+            <p className="text-sm text-surface-400">{supplierProfile?.email || userEmail}</p>
           </div>
         </div>
 
@@ -172,25 +177,40 @@ export default function Profile() {
             )}
           </>
         )}
+        {isSupplier && supplierProfile && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { Icon: Building2, label: 'Proveedor', value: supplierProfile.name },
+              { Icon: User, label: 'Contacto', value: supplierProfile.contactPerson },
+              { Icon: Mail, label: 'Email', value: supplierProfile.email },
+              { Icon: Phone, label: 'Teléfono', value: supplierProfile.phone },
+            ].map(({ Icon, label, value }) => (
+              <div key={label} className="flex items-start gap-3 p-3 rounded-xl bg-surface-50 border border-surface-100">
+                <Icon className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
+                <div className="min-w-0"><p className="text-[11px] text-surface-400 uppercase tracking-wide">{label}</p><p className="text-sm font-medium text-surface-800 break-words">{value || '—'}</p></div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Orders */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-surface-900">{t('orders.title')}</h2>
-            <p className="text-xs text-surface-400 mt-0.5">{orders.length} pedidos</p>
+            <h2 className="text-lg font-semibold text-surface-900">{isSupplier ? 'Mis últimos pedidos' : t('orders.title')}</h2>
+            <p className="text-xs text-surface-400 mt-0.5">{recentOrders.length} {isSupplier ? 'preventas' : 'pedidos'} · últimos 2 meses</p>
           </div>
         </div>
 
-        {orders.length === 0 ? (
+        {recentOrders.length === 0 ? (
           <div className="card p-10 text-center">
             <Package className="w-10 h-10 text-surface-200 mx-auto mb-3" />
             <p className="text-surface-400 text-sm">{t('clientDashboard.noRecentOrders')}</p>
           </div>
         ) : (
           <div className="card overflow-hidden divide-y divide-surface-100">
-            {orders.map(order => {
+            {recentOrders.map(order => {
               const isExpanded = expandedOrders[order.id];
               return (
                 <div key={order.id}>

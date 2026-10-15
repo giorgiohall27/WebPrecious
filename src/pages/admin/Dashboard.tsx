@@ -28,7 +28,7 @@ export default function Dashboard() {
     <div className="space-y-8 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-surface-900">{t('dashboard.title')}</h1>
-        <p className="text-surface-500 mt-1">WebPedidos B2B Portal</p>
+        <p className="text-surface-500 mt-1">Portal Mayorista Precious Spain</p>
       </div>
 
       {/* KPI Cards */}

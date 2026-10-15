@@ -19,6 +19,7 @@ import Papa from 'papaparse';
 import { Product } from '../../types';
 import { useProducts } from '../../store/productsStore';
 import { inferUnitsPerBox, normalizeProductPackaging } from '../../utils/productPackaging';
+import { findCanonicalBrand, normalizeBrandKey } from '../../utils/brands';
 
 type ProductDraft = {
   sku: string;
@@ -102,6 +103,14 @@ export default function Products() {
       return matchesSearch && matchesCategory;
     });
   }, [products, search, categoryFilter]);
+
+  const existingBrands = useMemo(() => {
+    const brands = new Map<string, string>();
+    products.forEach(product => {
+      if (product.brand) brands.set(normalizeBrandKey(product.brand), product.brand.trim());
+    });
+    return Array.from(brands.values()).sort((a, b) => a.localeCompare(b));
+  }, [products]);
 
   const getCategoryLabel = (category?: { key?: string; name?: string }) =>
     category?.key ? t(`categoryNames.${category.key}`, { defaultValue: category.name ?? '' }) : category?.name ?? '';
@@ -207,7 +216,7 @@ export default function Products() {
       price: Number.parseFloat(productDraft.price) || 0,
       stock: productBeingEdited?.stock ?? 9999,
       description: productDraft.description.trim() || productDraft.name.trim(),
-      brand: productDraft.brand.trim(),
+      brand: findCanonicalBrand(products, productDraft.brand),
       unitMeasure: productDraft.unitMeasure.trim(),
       unitsPerBox: Math.max(1, Number.parseInt(productDraft.unitsPerBox, 10) || inferUnitsPerBox(productDraft.description, productDraft.unitMeasure, productDraft.name) || 1),
       imageUrl: productDraft.imageUrl.trim() || null,
@@ -444,7 +453,13 @@ export default function Products() {
               <select className={inputClass} value={productDraft.categoryId} onChange={event => setDraftField('categoryId', event.target.value)}>
                 {categories.map(category => <option key={category.id} value={category.id}>{getCategoryLabel(category)}</option>)}
               </select>
-              <input className={inputClass} placeholder={t('products.brand')} value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
+              <div>
+                <input className={inputClass} list="existing-product-brands" placeholder={t('products.brand')} value={productDraft.brand} onChange={event => setDraftField('brand', event.target.value)} />
+                <datalist id="existing-product-brands">
+                  {existingBrands.map(brand => <option key={brand} value={brand} />)}
+                </datalist>
+                <p className="mt-1 text-[11px] text-surface-400">Si la marca ya existe, el producto se añadirá automáticamente a su grupo.</p>
+              </div>
               <input className={inputClass} type="number" step="0.01" placeholder={t('products.price')} value={productDraft.price} onChange={event => setDraftField('price', event.target.value)} required />
               <input className={inputClass} placeholder={t('products.unitsPerBox')} value={productDraft.unitMeasure} onChange={event => setDraftField('unitMeasure', event.target.value)} />
               <input

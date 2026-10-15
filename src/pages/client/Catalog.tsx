@@ -10,6 +10,7 @@ import { useCart } from '../../store/cartStore';
 import { useProducts } from '../../store/productsStore';
 import { useAuth } from '../../store/authStore';
 import { usePromotions } from '../../store/promotionsStore';
+import { normalizeBrandKey } from '../../utils/brands';
 
 const iconMap: Record<string, any> = {
   wine: Wine,
@@ -25,6 +26,62 @@ const brandPriority = (brand: string, selectedCategoryName?: string) => {
   if (normalized === 'walkers') return -2;
   if (normalized === "mccoy's" || normalized === 'mccoys') return -1;
   return 0;
+};
+
+const enlargedProductImages = new Set([
+  'cadbury|white chocolate buttons',
+  'mr.beast|milk chocolate crunch bar',
+  'mr.beast|milk chocolate bar',
+  'mr.beast|milk chocolate / almond',
+  "reese's|overload",
+  "reese's|nutrageous bars",
+  'hill|chocolate creams',
+  'strongbow|original',
+]);
+
+const shouldEnlargeProductImage = (product: Product) =>
+  enlargedProductImages.has(`${product.brand?.toLowerCase()}|${product.name.toLowerCase().replace(/\s+/g, ' ').trim()}`);
+
+const sortBrandProducts = (brand: string, products: Product[]) => {
+  const normalizedBrand = brand.toLowerCase();
+  const gravyOrder = ['beef gravy', 'chicken gravy', 'vegetable gravy granules'];
+
+  return [...products].sort((a, b) => {
+    if (normalizedBrand === 'cadbury') {
+      const multipackOrder = Number(isCadburyMultipack(b)) - Number(isCadburyMultipack(a));
+      if (multipackOrder) return multipackOrder;
+    }
+
+    if (normalizedBrand === 'morrison') {
+      const aGravy = gravyOrder.indexOf(a.name.toLowerCase());
+      const bGravy = gravyOrder.indexOf(b.name.toLowerCase());
+      if (aGravy !== -1 || bGravy !== -1) {
+        if (aGravy === -1) return 1;
+        if (bGravy === -1) return -1;
+        return aGravy - bGravy;
+      }
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+};
+
+const sortBrands = (entries: [string, Product[]][], selectedCategoryName?: string) => {
+  const sorted = [...entries].sort(([a], [b]) =>
+    brandPriority(a, selectedCategoryName) - brandPriority(b, selectedCategoryName) || a.localeCompare(b)
+  );
+
+  if (selectedCategoryName?.toLocaleLowerCase() === 'alimentación') {
+    const pgIndex = sorted.findIndex(([brand]) => brand.toLowerCase() === 'pg');
+    const yorkshireIndex = sorted.findIndex(([brand]) => brand.toLowerCase() === 'yorkshire tea');
+    if (pgIndex !== -1 && yorkshireIndex !== -1) {
+      const [pg] = sorted.splice(pgIndex, 1);
+      const updatedYorkshireIndex = sorted.findIndex(([brand]) => brand.toLowerCase() === 'yorkshire tea');
+      sorted.splice(updatedYorkshireIndex + 1, 0, pg);
+    }
+  }
+
+  return sorted;
 };
 
 const isCadburyMultipack = (product: Product) =>
@@ -51,8 +108,8 @@ export default function Catalog() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(subFromUrl);
   const [quantities, setQuantities]   = useState<Record<string, number>>(() => quantitiesFromCart(cartItems));
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { isLoggedIn, isSuperAdmin } = useAuth();
-  const canViewSensitive = isLoggedIn || isSuperAdmin;
+  const { isLoggedIn, isSuperAdmin, isSupplier } = useAuth();
+  const canViewSensitive = isLoggedIn || isSuperAdmin || isSupplier;
 
   const promotionByProductId = useMemo(() => {
     const now = Date.now();
@@ -104,7 +161,7 @@ export default function Catalog() {
     }
     if (selectedCategory)    result = result.filter(p => p.categoryId === selectedCategory);
     if (selectedSubcategory) result = result.filter(p => p.subcategoryId === selectedSubcategory);
-    if (selectedBrand)       result = result.filter(p => (p.brand || 'Sin marca') === selectedBrand);
+    if (selectedBrand)       result = result.filter(p => normalizeBrandKey(p.brand || 'Sin marca') === normalizeBrandKey(selectedBrand));
     result.sort((a, b) => (a.brand || '').localeCompare(b.brand || '') || a.name.localeCompare(b.name));
     return result;
   }, [searchQuery, selectedCategory, selectedSubcategory, selectedBrand, products]);
@@ -113,27 +170,30 @@ export default function Catalog() {
     let scope = products.filter(p => p.active);
     if (selectedCategory) scope = scope.filter(p => p.categoryId === selectedCategory);
     if (selectedSubcategory) scope = scope.filter(p => p.subcategoryId === selectedSubcategory);
-    return Array.from(new Set(scope.map(p => p.brand || 'Sin marca'))).sort((a, b) => a.localeCompare(b));
+    const brands = new Map<string, string>();
+    scope.forEach(product => {
+      const brand = product.brand?.trim() || 'Sin marca';
+      if (!brands.has(normalizeBrandKey(brand))) brands.set(normalizeBrandKey(brand), brand);
+    });
+    return Array.from(brands.values()).sort((a, b) => a.localeCompare(b));
   }, [products, selectedCategory, selectedSubcategory]);
 
   const brandGroups = useMemo(() => {
-    const groups = new Map<string, Product[]>();
+    const groups = new Map<string, { brand: string; products: Product[] }>();
     filtered.forEach(product => {
-      const brand = product.brand || 'Sin marca';
-      groups.set(brand, [...(groups.get(brand) ?? []), product]);
+      const brand = product.brand?.trim() || 'Sin marca';
+      const key = normalizeBrandKey(brand);
+      const group = groups.get(key);
+      if (group) group.products.push(product);
+      else groups.set(key, { brand, products: [product] });
     });
     const categoryName = categories.find(category => category.id === selectedCategory)?.name;
-    return Array.from(groups.entries())
-      .map(([brand, brandProducts]) => [
+    const entries = Array.from(groups.values())
+      .map(({ brand, products: brandProducts }) => [
         brand,
-        [...brandProducts].sort((a, b) => {
-          if (a.brand?.toLowerCase() === 'cadbury' && b.brand?.toLowerCase() === 'cadbury') {
-            return Number(isCadburyMultipack(b)) - Number(isCadburyMultipack(a)) || a.name.localeCompare(b.name);
-          }
-          return a.name.localeCompare(b.name);
-        }),
-      ] as [string, Product[]])
-      .sort(([a], [b]) => brandPriority(a, categoryName) - brandPriority(b, categoryName) || a.localeCompare(b));
+        sortBrandProducts(brand, brandProducts),
+      ] as [string, Product[]]);
+    return sortBrands(entries, categoryName);
   }, [filtered, categories, selectedCategory]);
 
   useEffect(() => {
@@ -361,7 +421,11 @@ export default function Catalog() {
                         <img
                           src={product.imageUrl}
                           alt={product.name}
-                          className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-300 ease-out"
+                          className={`w-full h-full object-contain p-3 sm:p-4 transition-transform duration-300 ease-out ${
+                            shouldEnlargeProductImage(product)
+                              ? 'scale-[1.12] group-hover:scale-[1.17]'
+                              : 'group-hover:scale-105'
+                          }`}
                           onError={(e) => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';

@@ -317,18 +317,22 @@ export default function Companies() {
                       <input className={inputClass} placeholder="Telefono" value={currentDraft.phone} onChange={event => setEditField('phone', event.target.value)} />
                       <input className={inputClass} placeholder="Persona de contacto" value={currentDraft.contactPerson} onChange={event => setEditField('contactPerson', event.target.value)} />
                       <div className="flex gap-2">
-                        <input
-                          className={`${inputClass} font-bold tracking-[0.25em]`}
-                          placeholder="PIN"
-                          value={currentDraft.pin}
-                          onChange={event => setEditField('pin', event.target.value)}
-                          inputMode="numeric"
-                          maxLength={6}
-                        />
+                        <div className="flex-1">
+                          <label className="input-label">Cambiar PIN (opcional)</label>
+                          <input
+                            className={`${inputClass} font-bold tracking-[0.25em]`}
+                            placeholder="Nuevo PIN de 6 dígitos"
+                            value={currentDraft.pin}
+                            onChange={event => setEditField('pin', event.target.value)}
+                            inputMode="numeric"
+                            maxLength={6}
+                          />
+                          <p className="mt-1 text-[11px] text-surface-400">Déjalo vacío para conservar el PIN actual.</p>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setEditField('pin', generatePin())}
-                          className="btn-secondary px-3"
+                          className="btn-secondary self-end px-3 mb-5"
                           aria-label="Generar PIN"
                         >
                           <RefreshCw className="w-4 h-4" />

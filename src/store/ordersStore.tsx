@@ -58,21 +58,23 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
 
   const refreshOrders = useCallback(async () => {
     if (!supabaseEnabled) return;
-    if (!superAdminSessionToken && !companySessionToken) {
+    if (!superAdminSessionToken && !companySessionToken && !supplierSessionToken) {
       setOrders([]);
       return;
     }
 
     const { data, error } = superAdminSessionToken
       ? await supabase.rpc('list_admin_orders', { p_admin_token: superAdminSessionToken })
-      : await supabase.rpc('list_company_orders', { p_company_token: companySessionToken });
+      : supplierSessionToken
+        ? await supabase.rpc('list_supplier_orders', { p_supplier_token: supplierSessionToken })
+        : await supabase.rpc('list_company_orders', { p_company_token: companySessionToken });
     if (error) {
       console.error('Error loading orders:', error);
       return;
     }
 
     setOrders((data ?? []).map(toOrder));
-  }, [companySessionToken, superAdminSessionToken]);
+  }, [companySessionToken, superAdminSessionToken, supplierSessionToken]);
 
   useEffect(() => {
     refreshOrders();

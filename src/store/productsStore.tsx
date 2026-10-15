@@ -4,6 +4,7 @@ import { mockCategories, mockProducts, mockSubcategories } from '../data/mockDat
 import { supabase, supabaseEnabled } from '../lib/supabase';
 import { useAuth } from './authStore';
 import { normalizeProductPackaging } from '../utils/productPackaging';
+import { findCanonicalBrand } from '../utils/brands';
 
 interface ProductsContextType {
   products: Product[];
@@ -165,7 +166,10 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const upsertProduct = useCallback(async (product: Product) => {
-    const normalizedProduct = normalizeProductPackaging(product);
+    const normalizedProduct = normalizeProductPackaging({
+      ...product,
+      brand: findCanonicalBrand(products, product.brand),
+    });
     setProducts(prev => {
       const exists = prev.some(item => item.id === normalizedProduct.id);
       return exists ? prev.map(item => item.id === normalizedProduct.id ? normalizedProduct : item) : [normalizedProduct, ...prev];
@@ -185,7 +189,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
         setProducts(prev => prev.map(item => item.id === saved.id ? saved : item));
       }
     }
-  }, [superAdminSessionToken]);
+  }, [products, superAdminSessionToken]);
 
   const removeProduct = useCallback(async (productId: string) => {
     setProducts(prev => prev.filter(product => product.id !== productId));

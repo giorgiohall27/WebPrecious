@@ -7,9 +7,11 @@ import {
   LogIn,
   LogOut,
   LayoutDashboard,
+  MapPin,
   Search,
   ShoppingBag,
   ShoppingCart,
+  KeyRound,
   User,
   X,
 } from 'lucide-react';
@@ -84,7 +86,7 @@ export default function ClientLayout() {
     <div className="min-h-screen bg-[#f4f6fa] flex flex-col">
       <header className="sticky top-0 z-30 bg-[#0C1E35]" style={{ boxShadow: '0 1px 0 rgba(255,255,255,0.06)' }}>
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 px-4 lg:px-8 h-14">
+          <div className="flex flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap sm:gap-3 sm:py-0 sm:h-14 lg:px-8">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -96,14 +98,14 @@ export default function ClientLayout() {
             </button>
 
             <Link
-              to={isSupplier ? '/supplier/preorders' : '/'}
+              to="/"
               className="p-2 text-white/70 hover:text-white hover:bg-white/8 rounded-lg transition-colors shrink-0"
               aria-label="Home"
             >
               <Home className="w-5 h-5" />
             </Link>
 
-            <form onSubmit={handleSearch} className="flex-1 max-w-xl" role="search">
+            <form onSubmit={handleSearch} className="order-2 w-full sm:order-none sm:flex-1 sm:max-w-xl" role="search">
               <div className="relative" ref={searchContainerRef}>
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                 <input
@@ -154,8 +156,8 @@ export default function ClientLayout() {
                           )}
                         </div>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-bold text-surface-900">{product.name}</span>
-                          <span className="block truncate text-xs text-surface-500">
+                          <span className="block whitespace-normal break-words text-sm font-bold leading-snug text-surface-900">{product.name}</span>
+                          <span className="block whitespace-normal break-words text-xs leading-snug text-surface-500">
                             {[product.brand, product.sku].filter(Boolean).join(' · ')}
                           </span>
                         </span>
@@ -167,7 +169,7 @@ export default function ClientLayout() {
             </form>
 
             <div className="flex items-center gap-0.5 shrink-0 ml-auto">
-              {isLoggedIn && !isSupplier && (
+              {(isLoggedIn || isSupplier) && (
                 <button
                   type="button"
                   onClick={() => {
@@ -235,13 +237,22 @@ export default function ClientLayout() {
                             </button>
                           )}
                           {isSupplier && (
-                            <button
-                              onClick={() => { setUserMenuOpen(false); navigate('/supplier/preorders'); }}
-                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 hover:bg-surface-50 rounded-lg transition-colors font-medium"
-                            >
-                              <ShoppingBag className="w-4 h-4 text-primary-600" />
-                              Crear preventa
-                            </button>
+                            <>
+                              <button
+                                onClick={() => { setUserMenuOpen(false); navigate('/catalog'); }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 hover:bg-surface-50 rounded-lg transition-colors font-medium"
+                              >
+                                <ShoppingBag className="w-4 h-4 text-primary-600" />
+                                Crear pedido
+                              </button>
+                              <button
+                                onClick={() => { setUserMenuOpen(false); navigate('/profile'); }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 hover:bg-surface-50 rounded-lg transition-colors font-medium"
+                              >
+                                <LayoutDashboard className="w-4 h-4 text-primary-600" />
+                                Mis pedidos
+                              </button>
+                            </>
                           )}
                           <button
                             onClick={handleLogout}
@@ -274,7 +285,7 @@ export default function ClientLayout() {
       </main>
 
       <footer className="bg-[#0C1E35] border-t border-white/5 py-6 px-4 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left relative">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-primary-500/30 flex items-center justify-center">
               <ShoppingBag className="w-3 h-3 text-primary-300" />
@@ -284,11 +295,32 @@ export default function ClientLayout() {
               <p className="text-xs text-white/45 mt-0.5">CIF B93450534</p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5 text-xs text-white/65">
+          <div className="flex flex-col items-center gap-2 text-xs text-white/65 lg:items-start">
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Calle%20Jacaranda%2013%2C%20Local%201%2C%2029651%20Las%20Lagunas%20de%20Mijas%2C%20M%C3%A1laga"
+              target="_blank"
+              rel="noreferrer"
+              className="flex max-w-sm items-start justify-center gap-1.5 text-center hover:text-white transition-colors lg:text-left"
+            >
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>Calle Jacaranda 13, Local 1 · Las Lagunas, Mijas Costa 29651</span>
+            </a>
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-5 lg:items-start">
             <a href="tel:+34648227263" className="hover:text-white transition-colors">+34 648 227 263</a>
             <a href="mailto:giorgiohall27@gmail.com" className="hover:text-white transition-colors">giorgiohall27@gmail.com</a>
+            </div>
           </div>
-          <p className="text-xs text-white/30">© 2026 Precious Spain · Portal B2B Mayorista</p>
+          <p className="text-xs text-white/30">© 2026 Precious Spain · Portal Mayorista</p>
+          {!isLoggedIn && !isSuperAdmin && !isSupplier && (
+            <Link
+              to="/login?mode=staff"
+              className="absolute -right-1 -bottom-2 flex h-7 w-7 items-center justify-center rounded-full text-white/25 transition-colors hover:bg-white/10 hover:text-white/70 focus:outline-none focus:ring-2 focus:ring-white/30"
+              aria-label="Acceso interno"
+              title="Acceso interno"
+            >
+              <KeyRound className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
       </footer>
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />

@@ -18,7 +18,6 @@ import Categories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
 import Companies from './pages/admin/Companies';
 import Promotions from './pages/admin/Promotions';
-import Preorders from './pages/admin/Preorders';
 import Suppliers from './pages/admin/Suppliers';
 
 // Client Pages
@@ -31,8 +30,8 @@ import OrderConfirmation from './pages/client/OrderConfirmation';
 import Profile from './pages/client/Profile';
 
 function RequireCompany({ children }: { children: JSX.Element }) {
-  const { isLoggedIn } = useAuth();
-  return isLoggedIn ? children : <Navigate to="/login" replace />;
+  const { isLoggedIn, isSupplier } = useAuth();
+  return isLoggedIn || isSupplier ? children : <Navigate to="/login" replace />;
 }
 
 function RequireSuperAdmin({ children }: { children: JSX.Element }) {
@@ -73,7 +72,7 @@ export default function App() {
             </Route>
 
             <Route element={<RequireSupplier><ClientLayout /></RequireSupplier>}>
-              <Route path="/supplier/preorders" element={<Preorders />} />
+              <Route path="/supplier/preorders" element={<Navigate to="/" replace />} />
             </Route>
 
             {/* Admin Auth */}

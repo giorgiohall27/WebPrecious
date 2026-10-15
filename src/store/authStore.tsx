@@ -543,6 +543,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateSupplier = async (id: string, updates: Partial<SupplierInput>): ActionResult<{ supplier?: ManagedSupplier }> => {
     if (!superAdminSessionToken) return { success: false, error: 'Sesion de Super Admin caducada' };
     const cleanPin = updates.pin ? normalizePin(updates.pin) : '';
+    if (updates.pin !== undefined && cleanPin.length > 0 && cleanPin.length !== 6) {
+      return { success: false, error: 'El PIN debe tener 6 digitos' };
+    }
     const { data, error } = await supabase.rpc('admin_update_supplier', {
       p_admin_token: superAdminSessionToken,
       p_supplier_id: id,

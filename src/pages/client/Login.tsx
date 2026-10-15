@@ -21,6 +21,7 @@ export default function ClientLogin() {
 
   const preferredAdmin = searchParams.get('mode') === 'admin';
   const preferredSupplier = searchParams.get('mode') === 'supplier';
+  const staffAccess = preferredAdmin || preferredSupplier || searchParams.get('mode') === 'staff';
   const [pin, setPin] = useState('');
   const [adminPin, setAdminPin] = useState('');
   const [supplierPin, setSupplierPin] = useState('');
@@ -37,7 +38,7 @@ export default function ClientLogin() {
       return;
     }
     if (preferredSupplier && isSupplier) {
-      navigate('/supplier/preorders', { replace: true });
+      navigate('/', { replace: true });
       return;
     }
     if (!preferredAdmin && isLoggedIn) {
@@ -89,7 +90,7 @@ export default function ClientLogin() {
     setSupplierLoading(true);
     const result = await loginSupplierWithPin(supplierPin);
     setSupplierLoading(false);
-    if (result.success) navigate('/supplier/preorders');
+    if (result.success) navigate('/');
     else setSupplierError(result.error || 'Acceso denegado');
   };
 
@@ -121,13 +122,13 @@ export default function ClientLogin() {
           <div className="text-center mb-8">
             <p className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">{t('auth.loginPortalLabel')}</p>
             <h1 className="text-4xl lg:text-5xl font-black text-surface-900 tracking-[0.16em] uppercase">Precious Spain</h1>
-            <p className="text-sm text-surface-500 mt-3">{t('auth.chooseAccess')}</p>
+            <p className="text-sm text-surface-500 mt-3">{staffAccess ? 'Acceso interno' : 'Acceso para empresas'}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {!staffAccess ? (
             <form
               onSubmit={handleCompanySubmit}
-              className={`w-full max-w-xl justify-self-center bg-white rounded-2xl shadow-xl border overflow-hidden lg:col-span-2 ${preferredAdmin || preferredSupplier ? 'border-surface-200' : 'border-primary-200 ring-4 ring-primary-50'}`}
+              className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-primary-200 ring-4 ring-primary-50 overflow-hidden"
             >
               <div className="bg-[#0C1E35] px-7 py-7 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-25" style={{ background: 'radial-gradient(circle at 18% 22%, rgba(59,130,246,0.9), transparent 38%)' }} />
@@ -160,6 +161,12 @@ export default function ClientLogin() {
                       required
                     />
                   </div>
+                  <p className="mt-2 text-center text-[11px] leading-relaxed text-surface-400">
+                    Si no tienes acceso a esta web, contáctanos al{' '}
+                    <a href="tel:+34648227263" className="font-semibold text-primary-600 hover:underline">+34 648 227 263</a>
+                    {' '}o a{' '}
+                    <a href="mailto:giorgiohall27@gmail.com" className="font-semibold text-primary-600 hover:underline">giorgiohall27@gmail.com</a>.
+                  </p>
                 </div>
 
                 {companyError && (
@@ -178,18 +185,13 @@ export default function ClientLogin() {
                 </button>
               </div>
             </form>
-
-            <div className="lg:col-span-2 mt-5 flex items-center gap-4" aria-hidden="true">
-              <div className="h-px flex-1 bg-surface-200" />
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-surface-400">Otros accesos</span>
-              <div className="h-px flex-1 bg-surface-200" />
-            </div>
-
-            <form onSubmit={handleSupplierSubmit} className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${preferredSupplier ? 'border-primary-200 ring-4 ring-primary-50' : 'border-surface-200'}`}>
+          ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <form onSubmit={handleSupplierSubmit} className={`bg-white rounded-2xl shadow-xl border overflow-hidden ${!preferredAdmin ? 'border-primary-200 ring-4 ring-primary-50' : 'border-surface-200'}`}>
               <div className="bg-primary-700 px-7 py-7 text-white">
                 <div className="flex items-start gap-4">
                   <div className="w-13 h-13 rounded-2xl bg-white/12 border border-white/15 flex items-center justify-center shrink-0" style={{ width: 52, height: 52 }}><Truck className="w-7 h-7" /></div>
-                  <div><h2 className="text-2xl font-bold mb-1">Preventa / Proveedor</h2><p className="text-sm text-white/70">Acceso para preparar preventas</p></div>
+                  <div><h2 className="text-2xl font-bold mb-1">Preventa</h2><p className="text-sm text-white/70">Acceso para preparar preventas</p></div>
                 </div>
               </div>
               <div className="p-7 space-y-5">
@@ -202,7 +204,7 @@ export default function ClientLogin() {
                 </div>
                 {supplierError && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-medium">{supplierError}</div>}
                 <button type="submit" disabled={supplierLoading || supplierPin.length !== 6} className="w-full flex items-center justify-center gap-2 bg-primary-700 hover:bg-primary-800 disabled:bg-surface-300 text-white font-bold py-3.5 rounded-xl transition-colors text-sm">
-                  {supplierLoading ? t('auth.verifying') : 'Entrar como proveedor'}
+                  {supplierLoading ? t('auth.verifying') : 'Entrar en Preventa'}
                   {!supplierLoading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>
@@ -219,7 +221,7 @@ export default function ClientLogin() {
                     <ShieldCheck className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold mb-1">Super Admin</h2>
+                    <h2 className="text-2xl font-bold mb-1">Superadmin</h2>
                     <p className="text-sm text-white/65">{t('auth.adminPanelInternal')}</p>
                   </div>
                 </div>
@@ -256,12 +258,13 @@ export default function ClientLogin() {
                   disabled={adminLoading || adminPin.length !== 6}
                   className="w-full flex items-center justify-center gap-2 bg-surface-900 hover:bg-[#162d4d] disabled:bg-surface-300 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-colors text-sm shadow-lg shadow-surface-900/20"
                 >
-                  {adminLoading ? t('auth.verifying') : t('auth.enterAdminPanel')}
+                  {adminLoading ? t('auth.verifying') : 'Entrar en Superadmin'}
                   {!adminLoading && <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>
             </form>
           </div>
+          )}
         </div>
       </div>
     </div>

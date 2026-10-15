@@ -15,19 +15,22 @@ export default function Cart() {
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, getGroupedByCategory, getCategoryTotal, getSubtotal, getTaxTotal, getTotal, clearCart } = useCart();
   const { adjustStock } = useProducts();
-  const { addOrder } = useOrders();
-  const { userProfile } = useAuth();
+  const { addOrder, addAdminPreorder } = useOrders();
+  const { userProfile, isSupplier, supplierProfile, companies } = useAuth();
+  const [selectedCompanyId, setSelectedCompanyId] = useState('');
   const [notes, setNotes] = useState('');
   const [sending, setSending] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [pendingSavedOrder, setPendingSavedOrder] = useState<Order | null>(null);
 
-  const companyName   = userProfile?.name          ?? '';
-  const companyCif    = userProfile?.cif            ?? '';
-  const companyEmail  = userProfile?.email          ?? '';
-  const companyPhone  = userProfile?.phone          ?? '';
-  const contactPerson = userProfile?.contactPerson  ?? '';
-  const deliveryAddr  = userProfile?.deliveryAddress ?? '';
+  const selectedCompany = isSupplier ? companies.find(company => company.id === selectedCompanyId) : userProfile;
+  const companyName   = selectedCompany?.name          ?? '';
+  const companyCif    = selectedCompany?.cif            ?? '';
+  const companyEmail  = selectedCompany?.email          ?? '';
+  const companyPhone  = selectedCompany?.phone          ?? '';
+  const contactPerson = selectedCompany?.contactPerson  ?? '';
+  const deliveryAddr  = selectedCompany?.deliveryAddress ?? '';
+  const supplierName = supplierProfile?.contactPerson || supplierProfile?.name || '';
 
   const grouped = getGroupedByCategory();
   const subtotal = getSubtotal();
@@ -48,19 +51,23 @@ export default function Cart() {
   };
 
   const handleSendOrder = async () => {
+    if (isSupplier && !selectedCompany) {
+      setEmailError('Selecciona el cliente para el que estás preparando el pedido.');
+      return;
+    }
     setSending(true);
     setEmailError('');
     const itemsSnapshot = [...items];
     const totalSnapshot = getTotal();
 
-    const orderId = `PED-2026-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
+    const orderId = `${isSupplier ? 'PRE' : 'PED'}-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
     const now = new Date();
     const delivery = new Date(now);
     delivery.setDate(delivery.getDate() + 3);
     const order = {
       id: `ord-${Date.now()}`,
       orderId,
-      companyId: userProfile?.id ?? 'comp-pin',
+      companyId: selectedCompany?.id ?? 'comp-pin',
       companyName,
       companyCif,
       companyEmail,
@@ -81,12 +88,14 @@ export default function Cart() {
       })),
       totalItems: itemsSnapshot.length,
       totalAmount: totalSnapshot,
-      notes: notes || undefined,
-      status: 'authorization_pending' as const,
+      notes: isSupplier
+        ? (notes ? `[PREVENTA CREADA POR: ${supplierName}] ${notes}` : `[PREVENTA CREADA POR: ${supplierName}]`)
+        : notes || undefined,
+      status: isSupplier ? 'pending' as const : 'authorization_pending' as const,
       createdAt: now.toISOString(),
       estimatedDelivery: delivery.toISOString().split('T')[0],
     };
-    const savedOrder = pendingSavedOrder ?? await addOrder(order);
+    const savedOrder = pendingSavedOrder ?? await (isSupplier ? addAdminPreorder(order) : addOrder(order));
 
     if (savedOrder) {
       const orderToEmail: Order = pendingSavedOrder ?? {
@@ -290,11 +299,28 @@ export default function Cart() {
             <div className="border-t border-surface-200 pt-4">
               <h4 className="font-medium text-surface-700 mb-3">{t('cart.companyData')}</h4>
               <div className="space-y-2 text-sm">
-                <input className="input-field text-sm" placeholder={t('auth.companyName')} value={companyName} onChange={() => {}} readOnly={!!userProfile} />
-                <input className="input-field text-sm" placeholder={t('auth.cif')} value={companyCif} onChange={() => {}} readOnly={!!userProfile} />
-                <input className="input-field text-sm" placeholder={t('auth.email')} value={companyEmail} onChange={() => {}} readOnly={!!userProfile} />
-                <input className="input-field text-sm" placeholder={t('auth.phone')} value={companyPhone} onChange={() => {}} readOnly={!!userProfile} />
-                <input className="input-field text-sm" placeholder={t('auth.deliveryAddress')} value={deliveryAddr} onChange={() => {}} readOnly={!!userProfile} />
+                {isSupplier && (
+                  <div>
+                    <label className="input-label">Cliente del pedido *</label>
+                    <select
+                      className="input-field text-sm"
+                      value={selectedCompanyId}
+                      onChange={event => { setSelectedCompanyId(event.target.value); setEmailError(''); }}
+                      required
+                    >
+                      <option value="">Selecciona un cliente</option>
+                      {companies.filter(company => company.active).map(company => (
+                        <option key={company.id} value={company.id}>{company.name}{company.cif ? ` · ${company.cif}` : ''}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-[11px] text-surface-400">Pedido preparado por {supplierName || supplierProfile?.name}.</p>
+                  </div>
+                )}
+                <input className="input-field text-sm" placeholder={t('auth.companyName')} value={companyName} readOnly />
+                <input className="input-field text-sm" placeholder={t('auth.cif')} value={companyCif} readOnly />
+                <input className="input-field text-sm" placeholder={t('auth.email')} value={companyEmail} readOnly />
+                <input className="input-field text-sm" placeholder={t('auth.phone')} value={companyPhone} readOnly />
+                <input className="input-field text-sm" placeholder={t('auth.deliveryAddress')} value={deliveryAddr} readOnly />
               </div>
             </div>
 
@@ -318,7 +344,7 @@ export default function Cart() {
             )}
             <button
               onClick={handleSendOrder}
-              disabled={sending}
+              disabled={sending || (isSupplier && !selectedCompany)}
               className="btn-primary w-full py-3 text-base"
               id="send-order-btn"
             >
@@ -340,7 +366,7 @@ export default function Cart() {
         </div>
         <button
           onClick={handleSendOrder}
-          disabled={sending}
+          disabled={sending || (isSupplier && !selectedCompany)}
           className="btn-primary py-3 px-6 text-sm"
         >
           {sending ? t('cart.sending') : <><Send className="w-4 h-4" /> {pendingSavedOrder ? 'Reintentar correo' : t('cart.sendOrder')}</>}
