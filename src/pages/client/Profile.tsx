@@ -33,11 +33,6 @@ export default function Profile() {
   const [companyMessage, setCompanyMessage] = useState('');
   const [companyError, setCompanyError] = useState('');
   const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
-  const recentOrders = useMemo(() => {
-    const twoMonthsAgo = new Date();
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-    return orders.filter(order => new Date(order.createdAt) >= twoMonthsAgo);
-  }, [orders]);
 
   useEffect(() => {
     if (userProfile && !editingCompany) setCompanyDraft(companyDraftFrom(userProfile));
@@ -199,18 +194,18 @@ export default function Profile() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold text-surface-900">{isSupplier ? 'Mis últimos pedidos' : t('orders.title')}</h2>
-            <p className="text-xs text-surface-400 mt-0.5">{recentOrders.length} {isSupplier ? 'preventas' : 'pedidos'} · últimos 2 meses</p>
+            <p className="text-xs text-surface-400 mt-0.5">{orders.length} {isSupplier ? 'preventas' : 'pedidos'}</p>
           </div>
         </div>
 
-        {recentOrders.length === 0 ? (
+        {orders.length === 0 ? (
           <div className="card p-10 text-center">
             <Package className="w-10 h-10 text-surface-200 mx-auto mb-3" />
             <p className="text-surface-400 text-sm">{t('clientDashboard.noRecentOrders')}</p>
           </div>
         ) : (
           <div className="card overflow-hidden divide-y divide-surface-100">
-            {recentOrders.map(order => {
+            {orders.map(order => {
               const isExpanded = expandedOrders[order.id];
               return (
                 <div key={order.id}>
