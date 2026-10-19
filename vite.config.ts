@@ -61,7 +61,9 @@ function resendDevApi(): Plugin {
 export default defineConfig({
   plugins: [react(), resendDevApi()],
   server: {
+    host: '127.0.0.1',
     port: 5173,
+    strictPort: true,
     open: true
   },
   build: {

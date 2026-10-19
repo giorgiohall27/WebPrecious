@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2, Monitor, Tag, Truck } from 'lucide-react';
+import { Home, LayoutDashboard, Package, FolderTree, ClipboardList, LogOut, Menu, X, ShoppingBag, Building2, Monitor, Tag, Truck } from 'lucide-react';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { useState } from 'react';
 import { useAuth } from '../../store/authStore';
@@ -93,12 +93,12 @@ export default function AdminLayout() {
             </button>
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className="btn-icon"
-              aria-label="Volver atras"
-              title="Volver atras"
+              aria-label="Volver a la página principal"
+              title="Volver a la página principal"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <Home className="w-5 h-5" />
             </button>
           </div>
           <div className="flex-1" />

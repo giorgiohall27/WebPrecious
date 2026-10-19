@@ -283,7 +283,10 @@ begin
     p_role,
     p_company_id,
     p_super_admin_id,
-    now() + interval '12 hours'
+    now() + case
+      when p_role = 'company' then interval '7 days'
+      else interval '12 hours'
+    end
   );
 
   return v_token;

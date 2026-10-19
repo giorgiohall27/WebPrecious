@@ -161,12 +161,14 @@ export default function ClientLogin() {
                       required
                     />
                   </div>
-                  <p className="mt-2 text-center text-[11px] leading-relaxed text-surface-400">
-                    Si no tienes acceso a esta web, contáctanos al{' '}
-                    <a href="tel:+34648227263" className="font-semibold text-primary-600 hover:underline">+34 648 227 263</a>
-                    {' '}o a{' '}
-                    <a href="mailto:giorgiohall27@gmail.com" className="font-semibold text-primary-600 hover:underline">giorgiohall27@gmail.com</a>.
-                  </p>
+                  <div className="mt-4 rounded-xl border border-primary-100 bg-primary-50/70 px-4 py-3 text-center text-sm leading-6 text-surface-600">
+                    <p>Si no tiene acceso a esta web, contacte con el número y el email:</p>
+                    <div className="mt-1 flex flex-col items-center justify-center gap-x-2 sm:flex-row sm:flex-wrap">
+                      <a href="tel:+34648227263" className="whitespace-nowrap font-bold text-primary-700 hover:underline">+34 648 227 263</a>
+                      <span className="hidden text-surface-300 sm:inline" aria-hidden="true">·</span>
+                      <a href="mailto:giorgiohall27@gmail.com" className="max-w-full break-all font-bold text-primary-700 hover:underline">giorgiohall27@gmail.com</a>
+                    </div>
+                  </div>
                 </div>
 
                 {companyError && (

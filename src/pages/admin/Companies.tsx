@@ -132,13 +132,14 @@ export default function Companies() {
 
   const saveEditing = async (id: string) => {
     if (!editDraft) return;
+    const requestedPin = normalizePin(editDraft.pin);
     const result = await updateCompany(id, editDraft);
     if (!result.success) {
       showError(result.error || 'No se pudo guardar la empresa');
       return;
     }
     cancelEditing();
-    showMessage('Empresa actualizada');
+    showMessage(requestedPin ? `PIN actualizado y guardado: ${requestedPin}` : 'Empresa actualizada');
   };
 
   const toggleCompany = async (company: ManagedCompany) => {
@@ -327,7 +328,7 @@ export default function Companies() {
                             inputMode="numeric"
                             maxLength={6}
                           />
-                          <p className="mt-1 text-[11px] text-surface-400">Déjalo vacío para conservar el PIN actual.</p>
+                          <p className="mt-1 text-xs leading-5 text-surface-500">Escribe los 6 números que quiera el cliente. Quedarán guardados al pulsar Guardar.</p>
                         </div>
                         <button
                           type="button"

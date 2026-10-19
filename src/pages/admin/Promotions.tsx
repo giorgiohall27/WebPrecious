@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarClock, Check, Plus, Search, Tag, Trash2 } from 'lucide-react';
+import { CalendarClock, Check, CheckCircle2, Plus, Search, Tag, Trash2 } from 'lucide-react';
 import { useProducts } from '../../store/productsStore';
 import { usePromotions } from '../../store/promotionsStore';
 import { formatDate, formatDateTime, parseDayMonthYear } from '../../utils/dateFormat';
@@ -10,10 +10,13 @@ const isValid24HourTime = (value: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(va
 export default function Promotions() {
   const { t } = useTranslation();
   const { products } = useProducts();
-  const { promotions, upsertPromotions, removePromotion, clearPromotions } = usePromotions();
+  const { promotions, loading, upsertPromotions, removePromotion, clearPromotions } = usePromotions();
   const [search, setSearch] = useState('');
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [promoPrice, setPromoPrice] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
   const [endDate, setEndDate] = useState(() => formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)));
   const [endTime, setEndTime] = useState('23:59');
   const parsedEndDate = parseDayMonthYear(endDate);
@@ -44,23 +47,32 @@ export default function Promotions() {
     );
   }, [activeProducts, search]);
 
-  const handleAddPromotion = () => {
+  const handleAddPromotion = async () => {
     if (selectedProductIds.length === 0) return;
     const price = Number.parseFloat(promoPrice);
     if (!Number.isFinite(price) || price < 0) return;
     if (!promotionEnd || !validPromotionEnd) return;
     const startsAt = new Date().toISOString();
     const endsAt = promotionEnd.toISOString();
-    upsertPromotions(selectedProductIds.map(productId => ({
+    const promotionCount = selectedProductIds.length;
+    setSaving(true);
+    setSaveError('');
+    const result = await upsertPromotions(selectedProductIds.map(productId => ({
       productId,
       promoPrice: price,
       active: true,
       startsAt,
       endsAt,
     })));
+    setSaving(false);
+    if (!result.success) {
+      setSaveError(result.error || 'No se pudo guardar la oferta.');
+      return;
+    }
     setSelectedProductIds([]);
     setPromoPrice('');
     setSearch('');
+    setSaveMessage(promotionCount === 1 ? 'Oferta creada y guardada correctamente.' : `${promotionCount} ofertas creadas y guardadas correctamente.`);
   };
 
   const toggleProduct = (productId: string) => {
@@ -96,13 +108,24 @@ export default function Promotions() {
       </div>
 
       <div className="card p-5 space-y-4">
+        {saveMessage && !saveError && (
+          <div role="status" className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{saveMessage}</span>
+          </div>
+        )}
+        {saveError && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            {saveError}
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_150px_160px_110px_auto] gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
               className="input-field pl-10"
               value={search}
-              onChange={event => setSearch(event.target.value)}
+              onChange={event => { setSearch(event.target.value); setSaveMessage(''); }}
               placeholder={t('promotions.searchProduct')}
             />
           </div>
@@ -143,10 +166,10 @@ export default function Promotions() {
           </label>
           <button
             onClick={handleAddPromotion}
-            disabled={selectedProductIds.length === 0 || !promoPrice || !validPromotionEnd}
+            disabled={saving || selectedProductIds.length === 0 || !promoPrice || !validPromotionEnd}
             className="btn-primary disabled:bg-surface-300 disabled:cursor-not-allowed"
           >
-            <Plus className="w-4 h-4" /> Crear {selectedProductIds.length || ''} {selectedProductIds.length === 1 ? 'promoción' : 'promociones'}
+            <Plus className="w-4 h-4" /> {saving ? 'Guardando…' : `Crear ${selectedProductIds.length || ''} ${selectedProductIds.length === 1 ? 'promoción' : 'promociones'}`}
           </button>
         </div>
 
@@ -199,7 +222,9 @@ export default function Promotions() {
           <Tag className="w-4 h-4 text-amber-600" />
           <h2 className="font-bold text-surface-900">{t('promotions.activePromotions')}</h2>
         </div>
-        {promotionRows.length === 0 ? (
+        {loading ? (
+          <div className="p-10 text-center text-surface-400">Cargando ofertas guardadas…</div>
+        ) : promotionRows.length === 0 ? (
           <div className="p-10 text-center text-surface-400">{t('promotions.empty')}</div>
         ) : (
           <div className="divide-y divide-surface-100">
