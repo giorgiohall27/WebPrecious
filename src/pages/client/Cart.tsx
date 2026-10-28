@@ -10,15 +10,21 @@ import { notifyAdminNewOrder } from '../../lib/orderEmails';
 import { Order } from '../../types';
 import { formatProductPackaging } from '../../utils/productPackaging';
 
+const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase().trim();
+
 export default function Cart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, getGroupedByCategory, getCategoryTotal, getSubtotal, getTaxTotal, getTotal, clearCart } = useCart();
-  const { adjustStock } = useProducts();
+  const { adjustStock, products } = useProducts();
   const { addOrder, addAdminPreorder } = useOrders();
   const { userProfile, isSupplier, supplierProfile, companies } = useAuth();
   const [selectedCompanyId, setSelectedCompanyId] = useState('');
   const [notes, setNotes] = useState('');
+  const [credits, setCredits] = useState<{ id: string; productId: string; search: string; units: string; reason: string; detail: string }[]>([]);
+  const updateCredit = (id: string, patch: Partial<(typeof credits)[number]>) => {
+    setCredits(current => current.map(credit => credit.id === id ? { ...credit, ...patch } : credit));
+  };
   const [sending, setSending] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [pendingSavedOrder, setPendingSavedOrder] = useState<Order | null>(null);
@@ -55,6 +61,22 @@ export default function Cart() {
       setEmailError('Selecciona el cliente para el que estás preparando el pedido.');
       return;
     }
+    if (isSupplier && !pendingSavedOrder && credits.some(credit =>
+      !products.some(product => product.id === credit.productId) ||
+      !Number.isSafeInteger(Number(credit.units)) || Number(credit.units) <= 0 ||
+      (credit.reason === 'Otro' && !credit.detail.trim())
+    )) {
+      setEmailError('Completa cada abono con un producto, unidades enteras mayores que cero y el motivo. Si eliges «Otro», explica el motivo.');
+      return;
+    }
+    const creditNotes = isSupplier && !pendingSavedOrder && credits.length ? [
+      'ABONO / PRODUCTOS A RETIRAR (unidades):',
+      ...credits.map(credit => {
+        const product = products.find(candidate => candidate.id === credit.productId)!;
+        return `• ${product.brand ? `${product.brand} · ` : ''}${product.name}: ${Number(credit.units)} unidades — ${credit.reason}${credit.detail.trim() ? `: ${credit.detail.trim()}` : ''}`;
+      }),
+    ].join('\n') : '';
+    const combinedNotes = [notes.trim(), creditNotes].filter(Boolean).join('\n\n');
     setSending(true);
     setEmailError('');
     const itemsSnapshot = [...items];
@@ -89,7 +111,7 @@ export default function Cart() {
       totalItems: itemsSnapshot.length,
       totalAmount: totalSnapshot,
       notes: isSupplier
-        ? (notes ? `[PREVENTA CREADA POR: ${supplierName}] ${notes}` : `[PREVENTA CREADA POR: ${supplierName}]`)
+        ? (`[PREVENTA CREADA POR: ${supplierName}] ${combinedNotes}`.trim())
         : notes || undefined,
       status: isSupplier ? 'pending' as const : 'authorization_pending' as const,
       createdAt: now.toISOString(),
@@ -335,6 +357,78 @@ export default function Cart() {
               />
               <p className="text-[11px] text-surface-400 mt-1">{t('cart.notesUnlimited')}</p>
             </div>
+
+            {isSupplier && (
+              <fieldset disabled={sending || Boolean(pendingSavedOrder)} className="space-y-3 border-t border-surface-200 pt-4">
+                <legend className="font-semibold text-surface-800">Abono</legend>
+                <p className="text-xs text-surface-500">Indica los productos que hay que retirar al cliente. Cantidades en unidades, no en cajas. Se enviarán con el pedido sin cambiar su importe.</p>
+                {credits.map((credit, index) => {
+                  const searchWords = normalizeSearch(credit.search).split(/\s+/).filter(Boolean);
+                  const matches = searchWords.length ? products.filter(product => {
+                    const name = normalizeSearch(`${product.brand || ''} ${product.name}`);
+                    return searchWords.every(word => name.includes(word));
+                  }) : [];
+                  const selectedProduct = products.find(product => product.id === credit.productId);
+                  return (
+                  <div key={credit.id} className="rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold">Producto a retirar {index + 1}</span>
+                      <button type="button" onClick={() => setCredits(current => current.filter(row => row.id !== credit.id))} className="btn-icon text-red-600" aria-label={`Eliminar abono ${index + 1}`}><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-medium">Buscar producto
+                        <input
+                          type="search"
+                          value={credit.search}
+                          onChange={event => updateCredit(credit.id, { search: event.target.value, productId: '' })}
+                          placeholder="Escribe el nombre del producto"
+                          autoComplete="off"
+                          className="input-field mt-1 text-sm"
+                          aria-describedby={`credit-results-${credit.id}`}
+                        />
+                      </label>
+                      {selectedProduct ? (
+                        <p id={`credit-results-${credit.id}`} className="text-sm font-medium text-primary-700" role="status">Seleccionado: {selectedProduct.brand ? `${selectedProduct.brand} · ` : ''}{selectedProduct.name}</p>
+                      ) : (
+                        <div id={`credit-results-${credit.id}`}>
+                          {searchWords.length > 0 ? (
+                            matches.length ? (
+                              <ul aria-label="Productos encontrados" className="max-h-60 overflow-y-auto rounded-lg border border-surface-200 bg-white divide-y divide-surface-100">
+                                {matches.map(product => (
+                                  <li key={product.id}>
+                                    <button type="button" className="w-full px-3 py-3 text-left text-sm hover:bg-primary-50 focus-visible:bg-primary-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600" onClick={() => {
+                                      updateCredit(credit.id, { productId: product.id, search: product.name });
+                                      document.getElementById(`credit-units-${credit.id}`)?.focus();
+                                    }}>
+                                      {product.brand && <span className="block text-xs text-surface-500">{product.brand}</span>}
+                                      <span className="font-medium">{product.name}</span>
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : <p role="status" className="text-xs text-surface-500">No se han encontrado productos con ese nombre.</p>
+                          ) : <p className="text-xs text-surface-500">Escribe para buscar y pulsa un resultado para seleccionarlo.</p>}
+                        </div>
+                      )}
+                    </div>
+                    <label className="block text-xs font-medium">Unidades a retirar
+                      <input id={`credit-units-${credit.id}`} type="number" min="1" step="1" value={credit.units} onChange={event => updateCredit(credit.id, { units: event.target.value })} className="input-field mt-1 text-sm" />
+                    </label>
+                    <label className="block text-xs font-medium">Motivo
+                      <select value={credit.reason} onChange={event => updateCredit(credit.id, { reason: event.target.value })} className="input-field mt-1 text-sm">
+                        <option>Caducado</option><option>Roto</option><option>Otro</option>
+                      </select>
+                    </label>
+                    <label className="block text-xs font-medium">{credit.reason === 'Otro' ? 'Explica el motivo *' : 'Detalle (opcional)'}
+                      <textarea value={credit.detail} onChange={event => updateCredit(credit.id, { detail: event.target.value })} className="input-field mt-1 text-sm resize-none" placeholder="Lote, fecha de caducidad u otros detalles" />
+                    </label>
+                  </div>
+                  );
+                })}
+                <button type="button" className="btn-secondary w-full text-sm" onClick={() => setCredits(current => [...current, { id: crypto.randomUUID(), productId: '', search: '', units: '1', reason: 'Caducado', detail: '' }])}><Plus className="w-4 h-4" />Añadir producto al abono</button>
+                {pendingSavedOrder && <p className="text-xs text-surface-500">El abono ya está guardado con el pedido. Solo queda reenviar el correo.</p>}
+              </fieldset>
+            )}
 
             {/* Send Order */}
             {emailError && (

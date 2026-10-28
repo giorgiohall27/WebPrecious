@@ -122,7 +122,7 @@ export default function Orders() {
                     )}
 
                     {preorderDetails.notes && (
-                      <div className="px-6 py-3 bg-amber-50 text-sm text-amber-800 border-t border-amber-100">
+                      <div className="whitespace-pre-wrap px-6 py-3 bg-amber-50 text-sm text-amber-800 border-t border-amber-100">
                         <strong>Notas:</strong> {preorderDetails.notes}
                       </div>
                     )}

@@ -61,7 +61,7 @@ const normalizeEmailItem = (item: OrderEmailItem): OrderEmailItem => {
 const detailRow = (label: string, value?: string) => value ? `
   <tr>
     <td style="padding:7px 14px 7px 0;color:#2563eb;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;vertical-align:top">${escapeHtml(label)}</td>
-    <td style="padding:7px 0;color:#111827;font-size:14px;font-weight:600">${escapeHtml(value)}</td>
+    <td style="padding:7px 0;color:#111827;font-size:14px;font-weight:600">${escapeHtml(value).replace(/\n/g, '<br />')}</td>
   </tr>` : '';
 
 const getPreorderDetails = (notes?: string) => {
